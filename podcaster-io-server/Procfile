@@ -1,0 +1,1 @@
+web: java $JVM_OPTS -cp target/uberjar/podcaster-io-server.jar clojure.main -m podcaster-io-server.core

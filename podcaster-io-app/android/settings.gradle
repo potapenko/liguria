@@ -1,0 +1,3 @@
+rootProject.name = 'PodcasterIoApp'
+
+include ':app'
