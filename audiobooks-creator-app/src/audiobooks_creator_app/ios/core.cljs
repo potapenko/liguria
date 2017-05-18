@@ -3,12 +3,13 @@
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
             [audiobooks-creator-app.events]
             [audiobooks-creator-app.subs]
-            [audiobooks-creator-app.app :refer [app]]
+            [audiobooks-creator-app.app :refer [app-root-component]]
             [micro-rn.components :as c]))
 
 (defn app-root []
   (println "App Loaded")
-  [app-root-component])
+  (fn []
+    [app-root-component]))
 
 (defn init []
   (dispatch-sync [:initialize-db])

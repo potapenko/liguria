@@ -7,5 +7,9 @@
 
 (defn app-root-component []
   (fn []
-    [view {:style {:flex-direction "column" :margin 40 :align-items "center"}}
-     [text "hello!!!!!"]]))
+    [view {:style {:flex-direction "column"
+                   :flex 1
+                   :background-color "#ccc"
+                   :justify-content "center"
+                   :align-items "center"}}
+     [text "hello!!!"]]))
