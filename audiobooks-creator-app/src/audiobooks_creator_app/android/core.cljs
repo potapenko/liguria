@@ -1,10 +1,8 @@
-(ns podcaster-io-app.ios.core
+(ns audiobooks-creator-app.android.core
   (:require [reagent.core :as r :refer [atom]]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
-            [podcaster-io-app.events]
-            [podcaster-io-app.subs]
-            [micro-rn.components :as c :refer [AppRegistry view text]]
-            [podcaster-io-app.app :refer [app-root]]))
+            [audiobooks-creator-app.events]
+            [audiobooks-creator-app.subs]))
 
 (def ReactNative (js/require "react-native"))
 
@@ -32,4 +30,4 @@
 
 (defn init []
       (dispatch-sync [:initialize-db])
-      (.registerComponent app-registry "PodcasterIoApp" #(r/reactify-component app-root)))
+      (.registerComponent app-registry "AudiobooksCreatorApp" #(r/reactify-component app-root)))

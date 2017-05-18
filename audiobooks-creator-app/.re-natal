@@ -1,5 +1,5 @@
 {
-  "name": "PodcasterIoApp",
+  "name": "AudiobooksCreatorApp",
   "interface": "reagent6",
   "envRoots": {
     "dev": "env/dev",
