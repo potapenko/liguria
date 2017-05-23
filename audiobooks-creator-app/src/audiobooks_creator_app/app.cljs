@@ -3,7 +3,8 @@
    [reagent.core :as r :refer [atom]]
    [audiobooks-creator-app.events]
    [audiobooks-creator-app.subs]
-   [micro-rn.components :as c :refer [view text alert]]))
+   [micro-rn.components :as c :refer [view text alert]]
+   #_[micro-rn.react-navigation :as n]))
 
 (defn app-root-component []
   (fn []
@@ -12,4 +13,4 @@
                    :background-color "#ccc"
                    :justify-content  "center"
                    :align-items      "center"}}
-     [text "hello!!!"]]))
+     [text "hello!!"]]))

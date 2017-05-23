@@ -6,7 +6,8 @@
     "prod": "env/prod"
   },
   "modules": [
-    "./src/js/modules.js"
+    "./src/js/modules.js",
+    "react-navigation"
   ],
   "imageDirs": [
     "images"
