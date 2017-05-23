@@ -4,13 +4,31 @@
    [audiobooks-creator-app.events]
    [audiobooks-creator-app.subs]
    [micro-rn.components :as c :refer [view text alert]]
-   #_[micro-rn.react-navigation :as n]))
+   [micro-rn.react-navigation :as nav]))
+
+(defn main-screen-content []
+  (fn []
+    [view [text "hello"]]))
+
+(defn get-main-screen []
+  (nav/create-screen
+   {:title      "Main"}
+   (main-screen-content)))
+
+(def main-stack
+  (nav/create-stack-navigator
+   {:editor-main {:screen (get-main-screen)}}))
+
+(def main-tabs
+  (nav/create-tab-navigator
+   {:main-tab  {:screen main-stack}
+    :about-tab {:screen main-stack}}))
+
+(def main-wrapper
+  (r/adapt-react-class
+   (nav/create-tab-navigator
+    {:index {:screen main-tabs}}
+    {:lazy-load false})))
 
 (defn app-root-component []
-  (fn []
-    [view {:style {:flex-direction   "column"
-                   :flex             1
-                   :background-color "#ccc"
-                   :justify-content  "center"
-                   :align-items      "center"}}
-     [text "hello!!"]]))
+  [main-wrapper])
