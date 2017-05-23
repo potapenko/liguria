@@ -25,10 +25,7 @@
     :about-tab {:screen main-stack}}))
 
 (def main-wrapper
-  (r/adapt-react-class
-   (nav/create-tab-navigator
-    {:index {:screen main-tabs}}
-    {:lazy-load false})))
+  (r/adapt-react-class main-tabs))
 
 (defn app-root-component []
   [main-wrapper])
