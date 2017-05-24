@@ -23,8 +23,9 @@
 (def main-tabs
   (nav/create-tab-navigator
    {:projects-tab {:screen projects-stack}
+    :recording-tab {:screen recording/main}
     :friends-tab  {:screen friends/main}
-    :settings-tab {:screen settings/main}
+    ;; :settings-tab {:screen settings/main}
     :about-tab    {:screen about/main}}
    {:tab-bar-options {}}))
 

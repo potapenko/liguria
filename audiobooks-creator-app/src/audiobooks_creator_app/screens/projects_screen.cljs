@@ -18,6 +18,7 @@
 
 (def main
   (nav/create-screen
-   {:title "Projects"
-    :tab-bar-icon (nm/TabIcon "ios-book")}
+   {:title "Books"
+    :tab-bar-icon (nm/TabIcon "ios-book")
+    }
    (screen-content)))
