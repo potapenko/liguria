@@ -25,7 +25,7 @@
       {:component-did-mount
        (fn [this]
          (let [id (r/track! (fn []
-                              (let [nav (reaction (get @re-frame.db/app-db :nav))
+                              (let [nav (reaction (get @audiobooks-creator-app.db/app-db :nav))
                                     route (:route @nav)
                                     props (:props @nav)
                                     type (:type @nav)]

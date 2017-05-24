@@ -4,7 +4,9 @@
    [audiobooks-creator-app.events]
    [audiobooks-creator-app.subs]
    [micro-rn.components :as c :refer [view text alert]]
-   [micro-rn.react-navigation :as nav]))
+   [micro-rn.react-navigation :as nav]
+   [audiobooks-creator-app.installed-components :as ic]
+   [audiobooks-creator-app.native-modules :as nm]))
 
 (defn- screen-content []
   (fn []
@@ -15,7 +17,8 @@
 
 (def main
   (nav/create-screen
-   {:title "Friends"}
+   {:title        "Friends"
+    :tab-bar-icon (nm/TabIcon "ios-people")}
    (screen-content)))
 
 

@@ -12,18 +12,21 @@
    [audiobooks-creator-app.screens.recording-screen :as recording]
    [audiobooks-creator-app.screens.friends-screen :as friends]))
 
-(def main-stack
+(def projects-stack
   (nav/create-stack-navigator
    {:editor-main {:screen projects/main}}))
 
+(def friends-stack
+  (nav/create-stack-navigator
+   {:editor-main {:screen friends/main}}))
+
 (def main-tabs
   (nav/create-tab-navigator
-   {
-    :projects-tab {:screen main-stack}
+   {:projects-tab {:screen projects-stack}
     :friends-tab  {:screen friends/main}
     :settings-tab {:screen settings/main}
-    :about-tab    {:screen about/main}
-    }))
+    :about-tab    {:screen about/main}}
+   {:tab-bar-options {}}))
 
 (defn app-root-component []
   [(r/adapt-react-class main-tabs)])
