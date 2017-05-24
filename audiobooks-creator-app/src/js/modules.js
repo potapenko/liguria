@@ -5,7 +5,7 @@ import IconFA, {glyphMap as glyphMapFA} from 'react-native-vector-icons/FontAwes
 import IconMD, {glyphMap as glyphMapMD} from 'react-native-vector-icons/MaterialIcons';
 import IconIO, {glyphMap as glyphMapIO} from 'react-native-vector-icons/Ionicons';
 
-export const icons = {IconFA, IconMD, glyphMapFA, glyphMapMD};
+export const icons = {IconFA, IconMD, IconIO};
 
 export const TabIcon = (name) => (
     ({tintColor, focused}) => (<View style={{flex:1,
