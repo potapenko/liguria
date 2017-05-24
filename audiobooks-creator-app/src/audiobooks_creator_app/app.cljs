@@ -12,7 +12,7 @@
 
 (defn get-main-screen []
   (nav/create-screen
-   {:title      "Main"}
+   {:title "Main"}
    (main-screen-content)))
 
 (def main-stack
@@ -25,7 +25,7 @@
     :about-tab {:screen main-stack}}))
 
 (def main-wrapper
-  (r/adapt-react-class main-tabs))
+  (r/adapt-react-class main-stack))
 
 (defn app-root-component []
   [main-wrapper])
