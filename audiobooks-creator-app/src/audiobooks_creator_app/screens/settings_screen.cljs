@@ -18,6 +18,6 @@
 (def main
   (nav/create-screen
    {:title "Settings"
-    :tab-bar-icon #(r/as-element [sh/icon-settings (util/prepare-to-clj %)])}}
+    :tab-bar-icon #(r/as-element [sh/icon-settings (util/prepare-to-clj %)])}
    (screen-content)))
 
