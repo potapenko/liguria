@@ -1,10 +1,9 @@
 (ns audiobooks-creator-app.screens.export-screen
-  (:require
-   [reagent.core :as r :refer [atom]]
-   [audiobooks-creator-app.events]
-   [audiobooks-creator-app.subs]
-   [micro-rn.components :as c :refer [view text alert]]
-   [micro-rn.react-navigation :as nav]))
+  (:require audiobooks-creator-app.events
+            audiobooks-creator-app.subs
+            [micro-rn.react-native :as c :refer [alert text view]]
+            [micro-rn.react-navigation :as nav]
+            [reagent.core :as r :refer [atom]]))
 
 (defn- screen-content []
   (fn []

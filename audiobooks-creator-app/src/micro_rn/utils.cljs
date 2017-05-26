@@ -3,7 +3,8 @@
    [clojure.string :as string]
    [cljs.core.async :as async :refer [<! >! put! chan timeout]]
    [clojure.walk :as walk]
-   [goog.crypt.base64 :as base-64])
+   [goog.crypt.base64 :as base-64]
+   [camel-snake-kebab.core :as keb :refer [->camelCase ->kebab-case ->kebab-case-keyword]])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
@@ -16,29 +17,26 @@
     (reset! react-ref (js/require "react-native")))
   @react-ref)
 
-(defn dash-to-camel
-  [s]
-  (map string/capitalize (string/split #"\-" s)))
-
-(defn prepare-db-value
-  [v]
+(defn prepare-db-value [v]
   (str "\"" v "\""))
 
-(defn cemelify-keys
-  [ob]
-  (let [f (fn [[k v]] (if (keyword? k) [(dash-to-camel k) v] [k v]))]
-    (walk/postwalk (fn [x] (if (map? x) (into {} (map f x)) x)) ob)))
+(defn transform-keys [m f]
+  (let [f (fn [[k v]] [(f k) v])]
+    (walk/postwalk (fn [x] (if (map? x) (into {} (map f x)) x)) m)))
 
-(defn keywordize
-  [ob]
-  (if (nil? ob)
-    ob
-    (walk/keywordize-keys (js->clj ob))))
+(defn cemelify-keys [x]
+  (some-> x (transform-keys ->kebab-case)))
 
-(def prepare-to-clj keywordize)
+(defn keywordize [x]
+  (some-> x (transform-keys keyword)))
 
-(defn prepare-to-js
-  [m]
+(defn all-keys-camel-to-dash [x]
+  (some-> x (transform-keys ->kebab-case-keyword)))
+
+(defn prepare-to-clj [x]
+  (some-> x js->clj all-keys-camel-to-dash))
+
+(defn prepare-to-js [m]
   (clj->js (cemelify-keys m)))
 
 (defn catch-err [fn]
@@ -128,15 +126,6 @@
 (defn conv
   ([cb] (conv cb 0))
   ([cb t]))
-
-(defn camel-to-dash
-  [s]
-  (subs
-   (apply str
-          (map #(if (re-find #"A-Z" %)
-                  (str "-" (clojure.string/lower-case %))
-                  %)
-               s)) 1))
 
 (defn db-key [k]
   {:key (prepare-db-value k)})

@@ -1,9 +1,8 @@
 (ns audiobooks-creator-app.native-modules
-  (:require
-   [reagent.core :as r :refer [atom]]
-   [reagent.impl.component :as ru]
-   [clojure.string :as string]
-   [micro-rn.components :as c]))
+  (:require [clojure.string :as string]
+            [micro-rn.react-native :as c]
+            [reagent.core :as r :refer [atom]]
+            [reagent.impl.component :as ru]))
 
 (def modules (js/require "./src/js/modules.js"))
 (def TabIcon (.-TabIcon modules))

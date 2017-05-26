@@ -1,10 +1,10 @@
 (ns audiobooks-creator-app.android.core
-  (:require [reagent.core :as r :refer [atom]]
-            [re-frame.core :refer [subscribe dispatch dispatch-sync]]
-            [audiobooks-creator-app.events]
-            [audiobooks-creator-app.subs]
-            [audiobooks-creator-app.app :refer [app-root-component]]
-            [micro-rn.components :as c]))
+  (:require [audiobooks-creator-app.app :refer [app-root-component]]
+            audiobooks-creator-app.events
+            audiobooks-creator-app.subs
+            [micro-rn.react-native :as c]
+            [re-frame.core :refer [dispatch dispatch-sync subscribe]]
+            [reagent.core :as r :refer [atom]]))
 
 (defn app-root []
   (println "App Loaded")
