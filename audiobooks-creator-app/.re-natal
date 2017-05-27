@@ -10,7 +10,10 @@
     "react-navigation",
     "react-native-vector-icons",
     "react-native-zss-rich-text-editor",
-    "react-native-audio"
+    "react-native-audio",
+    "react-native-device-info",
+    "react-native-aws3",
+    "react-native-speech-to-text-ios"
   ],
   "imageDirs": [
     "images"

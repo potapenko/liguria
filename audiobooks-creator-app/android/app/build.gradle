@@ -126,6 +126,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-device-info')
     compile project(':react-native-audio')
     compile project(':react-native-webview-bridge-updated')
     compile project(':react-native-vector-icons')
