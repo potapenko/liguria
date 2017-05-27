@@ -9,7 +9,8 @@
     "./src/js/modules.js",
     "react-navigation",
     "react-native-vector-icons",
-    "react-native-zss-rich-text-editor"
+    "react-native-zss-rich-text-editor",
+    "react-native-audio"
   ],
   "imageDirs": [
     "images"
