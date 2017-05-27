@@ -38,6 +38,7 @@
 		31C309FAA6E945E7A5B59F2C /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D549806D31884C7095E5D464 /* Entypo.ttf */; };
 		4AC6279F63FD4875A2FA3D61 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9A11B0D2FA10420C8E4D4D9D /* EvilIcons.ttf */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
+		62E1BF3741094B5F8E844F4C /* CFNetwork.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 994ADBB4D0AC4F0485680C88 /* CFNetwork.framework */; };
 		654EDF1091CB4AAD8C2436A2 /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A6083F5FC084B37A7CDE0F6 /* libRNVectorIcons.a */; };
 		6D4A5140D9F24A31ABD9BF56 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DC4CF5F89C0B48E9AB6509A5 /* SimpleLineIcons.ttf */; };
 		709658DAE9424EB4AEA58A22 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 84A822BBBBD54C17BE2EE466 /* FontAwesome.ttf */; };
@@ -47,10 +48,18 @@
 		8755D442D32B45A88483F835 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 35C3B75400F941C885A231BC /* MaterialCommunityIcons.ttf */; };
 		90E1ED980C8A48B98294998E /* libRNSpeechToTextIos.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D426A338D815473994F500EF /* libRNSpeechToTextIos.a */; };
 		9188130294384D108208A062 /* libReact-Native-Webview-Bridge.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19575AA259034A17979E2550 /* libReact-Native-Webview-Bridge.a */; };
+		9D7FA22E1ED99CB4003E5B48 /* CouchbaseLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D7FA22C1ED99CB4003E5B48 /* CouchbaseLite.framework */; };
+		9D7FA22F1ED99CB4003E5B48 /* CouchbaseLiteListener.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D7FA22D1ED99CB4003E5B48 /* CouchbaseLiteListener.framework */; };
+		9D7FA2321ED99CFF003E5B48 /* libCBLJSViewCompiler.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9D7FA2311ED99CFF003E5B48 /* libCBLJSViewCompiler.a */; };
 		B1E375C07936442988FE32E6 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = CB6263B2251F43B9A6F4274C /* Octicons.ttf */; };
+		B94A7FFF83A34D758BA4D415 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 2240D52724384AACBAF86644 /* libz.tbd */; };
+		C24654BF69FD42D6AA12A522 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 239F10BFEC8C444BBE2B594C /* libsqlite3.tbd */; };
 		C2E511DEA4724273B2A72D7A /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E29A90DA881344799283E67C /* Foundation.ttf */; };
 		C7BC1AF415A94017BCE4B35E /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 97914BD8980E4B4996A261B4 /* Ionicons.ttf */; };
+		DE1ED1F080094E4E9CAFC37D /* libReactCBLite.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 93A270EBF85F4A28B860FEBD /* libReactCBLite.a */; };
 		DE5AC66857354EDC9BEBAA85 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = E2E600A397D744028C6CD243 /* Zocial.ttf */; };
+		E3FE0BD2BF8D4313A0020A20 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A804A259A7F74F00AA04472A /* Security.framework */; };
+		F111F935299B424ABB628F71 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 70C4469E42344291B4AE76A9 /* SystemConfiguration.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -278,6 +287,13 @@
 			remoteGlobalIDString = 134814201AA4EA6300B7C361;
 			remoteInfo = RNSpeechToTextIos;
 		};
+		9D7FA2261ED99BC3003E5B48 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 72D4E72CE4FC4625A0483FFC /* ReactCBLite.xcodeproj */;
+			proxyType = 2;
+			remoteGlobalIDString = BE8EFD251C0E6C6B00627BBA;
+			remoteInfo = ReactCBLite;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
@@ -301,6 +317,8 @@
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = AudiobooksCreatorApp/main.m; sourceTree = "<group>"; };
 		146833FF1AC3E56700842450 /* React.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = React.xcodeproj; path = "../node_modules/react-native/React/React.xcodeproj"; sourceTree = "<group>"; };
 		19575AA259034A17979E2550 /* libReact-Native-Webview-Bridge.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = "libReact-Native-Webview-Bridge.a"; sourceTree = "<group>"; };
+		2240D52724384AACBAF86644 /* libz.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		239F10BFEC8C444BBE2B594C /* libsqlite3.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		2D02E47B1E0B4A5D006451C7 /* AudiobooksCreatorApp-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "AudiobooksCreatorApp-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* AudiobooksCreatorApp-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "AudiobooksCreatorApp-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		35C3B75400F941C885A231BC /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
@@ -308,13 +326,22 @@
 		4A6083F5FC084B37A7CDE0F6 /* libRNVectorIcons.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNVectorIcons.a; sourceTree = "<group>"; };
 		4E4BACE8ECCD409CA505C1A7 /* React-Native-Webview-Bridge.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = "React-Native-Webview-Bridge.xcodeproj"; path = "../node_modules/react-native-webview-bridge-updated/ios/React-Native-Webview-Bridge.xcodeproj"; sourceTree = "<group>"; };
 		5E91572D1DD0AC6500FF2AA8 /* RCTAnimation.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTAnimation.xcodeproj; path = "../node_modules/react-native/Libraries/NativeAnimation/RCTAnimation.xcodeproj"; sourceTree = "<group>"; };
+		70C4469E42344291B4AE76A9 /* SystemConfiguration.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
+		72D4E72CE4FC4625A0483FFC /* ReactCBLite.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = ReactCBLite.xcodeproj; path = "../node_modules/react-native-couchbase-lite/ios/ReactCBLite.xcodeproj"; sourceTree = "<group>"; };
 		7612683672FC405683BE835D /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
 		78C398B01ACF4ADC00677621 /* RCTLinking.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTLinking.xcodeproj; path = "../node_modules/react-native/Libraries/LinkingIOS/RCTLinking.xcodeproj"; sourceTree = "<group>"; };
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		84A822BBBBD54C17BE2EE466 /* FontAwesome.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = FontAwesome.ttf; path = "../node_modules/react-native-vector-icons/Fonts/FontAwesome.ttf"; sourceTree = "<group>"; };
 		90307E79AA0946468C846B1D /* libRNDeviceInfo.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNDeviceInfo.a; sourceTree = "<group>"; };
+		93A270EBF85F4A28B860FEBD /* libReactCBLite.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libReactCBLite.a; sourceTree = "<group>"; };
 		97914BD8980E4B4996A261B4 /* Ionicons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
+		994ADBB4D0AC4F0485680C88 /* CFNetwork.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = CFNetwork.framework; path = System/Library/Frameworks/CFNetwork.framework; sourceTree = SDKROOT; };
 		9A11B0D2FA10420C8E4D4D9D /* EvilIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = EvilIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf"; sourceTree = "<group>"; };
+		9D7FA22C1ED99CB4003E5B48 /* CouchbaseLite.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CouchbaseLite.framework; sourceTree = "<group>"; };
+		9D7FA22D1ED99CB4003E5B48 /* CouchbaseLiteListener.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; path = CouchbaseLiteListener.framework; sourceTree = "<group>"; };
+		9D7FA2301ED99CFF003E5B48 /* CBLRegisterJSViewCompiler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CBLRegisterJSViewCompiler.h; sourceTree = "<group>"; };
+		9D7FA2311ED99CFF003E5B48 /* libCBLJSViewCompiler.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; path = libCBLJSViewCompiler.a; sourceTree = "<group>"; };
+		A804A259A7F74F00AA04472A /* Security.framework */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		ADBC98C5CB344B9A97B25619 /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNDeviceInfo.xcodeproj; path = "../node_modules/react-native-device-info/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; };
 		B54592C3755E435CB212DC8A /* RNAudio.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNAudio.xcodeproj; path = "../node_modules/react-native-audio/ios/RNAudio.xcodeproj"; sourceTree = "<group>"; };
 		C4160110A7B04E589405169D /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
@@ -349,13 +376,22 @@
 				00C302E91ABCBA2D00DB3ED1 /* libRCTNetwork.a in Frameworks */,
 				139105C61AF99C1200B5F7CC /* libRCTSettings.a in Frameworks */,
 				832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */,
+				9D7FA22E1ED99CB4003E5B48 /* CouchbaseLite.framework in Frameworks */,
+				9D7FA2321ED99CFF003E5B48 /* libCBLJSViewCompiler.a in Frameworks */,
 				00C302EA1ABCBA2D00DB3ED1 /* libRCTVibration.a in Frameworks */,
 				139FDEF61B0652A700C62182 /* libRCTWebSocket.a in Frameworks */,
+				9D7FA22F1ED99CB4003E5B48 /* CouchbaseLiteListener.framework in Frameworks */,
 				654EDF1091CB4AAD8C2436A2 /* libRNVectorIcons.a in Frameworks */,
 				9188130294384D108208A062 /* libReact-Native-Webview-Bridge.a in Frameworks */,
 				74C5D91E62C045388E33CA79 /* libRNAudio.a in Frameworks */,
 				0279F9070F4447F7A2EC0D4F /* libRNDeviceInfo.a in Frameworks */,
 				90E1ED980C8A48B98294998E /* libRNSpeechToTextIos.a in Frameworks */,
+				DE1ED1F080094E4E9CAFC37D /* libReactCBLite.a in Frameworks */,
+				B94A7FFF83A34D758BA4D415 /* libz.tbd in Frameworks */,
+				C24654BF69FD42D6AA12A522 /* libsqlite3.tbd in Frameworks */,
+				F111F935299B424ABB628F71 /* SystemConfiguration.framework in Frameworks */,
+				62E1BF3741094B5F8E844F4C /* CFNetwork.framework in Frameworks */,
+				E3FE0BD2BF8D4313A0020A20 /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -544,6 +580,7 @@
 				B54592C3755E435CB212DC8A /* RNAudio.xcodeproj */,
 				ADBC98C5CB344B9A97B25619 /* RNDeviceInfo.xcodeproj */,
 				FBC42E85B6DE4F73A753AAD8 /* RNSpeechToTextIos.xcodeproj */,
+				72D4E72CE4FC4625A0483FFC /* ReactCBLite.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -565,6 +602,7 @@
 				00E356EF1AD99517003FC87E /* AudiobooksCreatorAppTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				7F94A2B3455F4AE0A0357C88 /* Resources */,
+				BC80BEE33CF7488797B2A740 /* Frameworks */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -619,6 +657,30 @@
 				9D7FA1F71ED995E4003E5B48 /* libRNSpeechToTextIos.a */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9D7FA2091ED99BC2003E5B48 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9D7FA2271ED99BC3003E5B48 /* libReactCBLite.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BC80BEE33CF7488797B2A740 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				9D7FA2301ED99CFF003E5B48 /* CBLRegisterJSViewCompiler.h */,
+				9D7FA2311ED99CFF003E5B48 /* libCBLJSViewCompiler.a */,
+				9D7FA22C1ED99CB4003E5B48 /* CouchbaseLite.framework */,
+				9D7FA22D1ED99CB4003E5B48 /* CouchbaseLiteListener.framework */,
+				2240D52724384AACBAF86644 /* libz.tbd */,
+				239F10BFEC8C444BBE2B594C /* libsqlite3.tbd */,
+				70C4469E42344291B4AE76A9 /* SystemConfiguration.framework */,
+				994ADBB4D0AC4F0485680C88 /* CFNetwork.framework */,
+				A804A259A7F74F00AA04472A /* Security.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -779,6 +841,10 @@
 				{
 					ProductGroup = 146834001AC3E56700842450 /* Products */;
 					ProjectRef = 146833FF1AC3E56700842450 /* React.xcodeproj */;
+				},
+				{
+					ProductGroup = 9D7FA2091ED99BC2003E5B48 /* Products */;
+					ProjectRef = 72D4E72CE4FC4625A0483FFC /* ReactCBLite.xcodeproj */;
 				},
 				{
 					ProductGroup = 9D7FA1791ED992CB003E5B48 /* Products */;
@@ -1018,6 +1084,13 @@
 			remoteRef = 9D7FA1F61ED995E4003E5B48 /* PBXContainerItemProxy */;
 			sourceTree = BUILT_PRODUCTS_DIR;
 		};
+		9D7FA2271ED99BC3003E5B48 /* libReactCBLite.a */ = {
+			isa = PBXReferenceProxy;
+			fileType = archive.ar;
+			path = libReactCBLite.a;
+			remoteRef = 9D7FA2261ED99BC3003E5B48 /* PBXContainerItemProxy */;
+			sourceTree = BUILT_PRODUCTS_DIR;
+		};
 /* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
@@ -1173,12 +1246,14 @@
 					"$(SRCROOT)/../node_modules/react-native-audio/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-info/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-speech-to-text-ios/ios",
+					"$(SRCROOT)/../node_modules/react-native-couchbase-lite/ios",
 				);
 				INFOPLIST_FILE = AudiobooksCreatorAppTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1206,12 +1281,14 @@
 					"$(SRCROOT)/../node_modules/react-native-audio/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-info/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-speech-to-text-ios/ios",
+					"$(SRCROOT)/../node_modules/react-native-couchbase-lite/ios",
 				);
 				INFOPLIST_FILE = AudiobooksCreatorAppTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1233,6 +1310,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
@@ -1240,9 +1321,14 @@
 					"$(SRCROOT)/../node_modules/react-native-audio/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-info/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-speech-to-text-ios/ios",
+					"$(SRCROOT)/../node_modules/react-native-couchbase-lite/ios",
 				);
 				INFOPLIST_FILE = AudiobooksCreatorApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1258,6 +1344,10 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(SRCROOT)/../node_modules/react-native-vector-icons/RNVectorIconsManager",
@@ -1265,9 +1355,14 @@
 					"$(SRCROOT)/../node_modules/react-native-audio/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-info/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-speech-to-text-ios/ios",
+					"$(SRCROOT)/../node_modules/react-native-couchbase-lite/ios",
 				);
 				INFOPLIST_FILE = AudiobooksCreatorApp/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+				);
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1297,11 +1392,13 @@
 					"$(SRCROOT)/../node_modules/react-native-audio/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-info/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-speech-to-text-ios/ios",
+					"$(SRCROOT)/../node_modules/react-native-couchbase-lite/ios",
 				);
 				INFOPLIST_FILE = "AudiobooksCreatorApp-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1339,11 +1436,13 @@
 					"$(SRCROOT)/../node_modules/react-native-audio/ios",
 					"$(SRCROOT)/../node_modules/react-native-device-info/RNDeviceInfo",
 					"$(SRCROOT)/../node_modules/react-native-speech-to-text-ios/ios",
+					"$(SRCROOT)/../node_modules/react-native-couchbase-lite/ios",
 				);
 				INFOPLIST_FILE = "AudiobooksCreatorApp-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
@@ -1382,6 +1481,7 @@
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.AudiobooksCreatorApp-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1406,6 +1506,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",

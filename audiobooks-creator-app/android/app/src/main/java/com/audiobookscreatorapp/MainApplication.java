@@ -3,6 +3,7 @@ package com.audiobookscreatorapp;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import me.fraserxu.rncouchbaselite.ReactCBLiteManager;
 import com.learnium.RNDeviceInfo.RNDeviceInfo;
 import com.rnim.rn.audio.ReactNativeAudioPackage;
 import com.github.alinz.reactnativewebviewbridge.WebViewBridgePackage;
@@ -27,6 +28,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ReactCBLiteManager(),
             new RNDeviceInfo(),
             new ReactNativeAudioPackage(),
             new WebViewBridgePackage(),
