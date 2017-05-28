@@ -10,5 +10,5 @@
     [app-root-component]))
 
 (defn init []
-  ;; (dispatch-sync [:initialize-db])
+  (dispatch-sync [:initialize-db])
   (.registerComponent c/AppRegistry "AudiobooksCreatorApp" #(r/reactify-component app-root)))

@@ -19,11 +19,11 @@
 
 (def main-tabs
   (nav/create-tab-navigator
-   {:books-tab {:screen books-stack}
+   {:books-tab     {:screen books-stack}
     :recording-tab {:screen recording/main}
     :bookshelf-tab {:screen bookshelf/main}
-    :friends-tab  {:screen friends/main}
-    :more-tab    {:screen more/main}}
+    :friends-tab   {:screen friends/main}
+    :more-tab      {:screen more/main}}
    {:tab-bar-options {}}))
 
 (defn app-root-component []
