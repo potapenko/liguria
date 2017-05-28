@@ -1,8 +1,6 @@
-(ns audiobooks-creator-app.screens.recording-screen
-  (:require audiobooks-creator-app.events
-            [audiobooks-creator-app.installed-components :as ic]
+(ns audiobooks-creator-app.screens.books.views
+  (:require [audiobooks-creator-app.installed-components :as ic]
             [audiobooks-creator-app.native-modules :as nm]
-            [audiobooks-creator-app.subs]
             [micro-rn.react-native :as c :refer [alert text view]]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
@@ -18,6 +16,7 @@
 
 (def main
   (nav/create-screen
-   {:title "Recording"
-    :tab-bar-icon #(r/as-element [sh/icon-recording (util/prepare-to-clj %)])}
+   {:title "Books"
+    :tab-bar-icon #(r/as-element [sh/icon-books (util/prepare-to-clj %)])}
    (screen-content)))
+

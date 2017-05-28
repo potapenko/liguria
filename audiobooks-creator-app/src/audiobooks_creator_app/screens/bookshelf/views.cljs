@@ -1,7 +1,6 @@
-(ns audiobooks-creator-app.screens.settings-screen
-  (:require audiobooks-creator-app.events
+(ns audiobooks-creator-app.screens.bookshelf.views
+  (:require [audiobooks-creator-app.installed-components :as ic]
             [audiobooks-creator-app.native-modules :as nm]
-            audiobooks-creator-app.subs
             [micro-rn.react-native :as c :refer [alert text view]]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
@@ -17,7 +16,6 @@
 
 (def main
   (nav/create-screen
-   {:title "Settings"
-    :tab-bar-icon #(r/as-element [sh/icon-settings (util/prepare-to-clj %)])}
+   {:title "Bookshelf"
+    :tab-bar-icon #(r/as-element [sh/icon-bookshelf (util/prepare-to-clj %)])}
    (screen-content)))
-

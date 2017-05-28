@@ -1,9 +1,10 @@
-(ns audiobooks-creator-app.screens.export-screen
-  (:require audiobooks-creator-app.events
-            audiobooks-creator-app.subs
+(ns audiobooks-creator-app.screens.settings.views
+  (:require [audiobooks-creator-app.native-modules :as nm]
             [micro-rn.react-native :as c :refer [alert text view]]
             [micro-rn.react-navigation :as nav]
-            [reagent.core :as r :refer [atom]]))
+            [reagent.core :as r :refer [atom]]
+            [micro-rn.utils :as util]
+            [audiobooks-creator-app.screens-shared-ui :as sh]))
 
 (defn- screen-content []
   (fn []
@@ -14,7 +15,8 @@
 
 (def main
   (nav/create-screen
-   {:title "Export"}
+   {:title "Settings"
+    :tab-bar-icon #(r/as-element [sh/icon-settings (util/prepare-to-clj %)])}
    (screen-content)))
 
 

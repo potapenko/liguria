@@ -1,12 +1,10 @@
 (ns audiobooks-creator-app.app
-  (:require [audiobooks-creator-app.screens
-             [about-screen :as about]
-             [books-screen :as books]
-             [export-screen :as export]
-             [friends-screen :as friends]
-             [recording-screen :as recording]
-             [settings-screen :as settings]
-             [bookshelf-screen :as bookshelf]]
+  (:require [audiobooks-creator-app.screens.books.views :as books]
+            [audiobooks-creator-app.screens.recording.views :as recording]
+            [audiobooks-creator-app.screens.friends.views :as friends]
+            [audiobooks-creator-app.screens.bookshelf.views :as bookshelf]
+            [audiobooks-creator-app.screens.settings.views :as settings]
+            [audiobooks-creator-app.screens.more.views :as more]
             [micro-rn.react-native :as rn]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]))
@@ -25,8 +23,9 @@
     :recording-tab {:screen recording/main}
     :bookshelf-tab {:screen bookshelf/main}
     :friends-tab  {:screen friends/main}
-    :about-tab    {:screen about/main}}
+    :more-tab    {:screen more/main}}
    {:tab-bar-options {}}))
 
 (defn app-root-component []
   [(r/adapt-react-class main-tabs)])
+

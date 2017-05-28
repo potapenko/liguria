@@ -48,6 +48,7 @@ Couchbase.initRESTClient = function (cb) {
 };
 
 "
+)
 
 (defprotocol IResultBuilder
   (as-one-doc [this])

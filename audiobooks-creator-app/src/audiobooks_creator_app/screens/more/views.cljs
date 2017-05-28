@@ -1,8 +1,6 @@
-(ns audiobooks-creator-app.screens.about-screen
-  (:require audiobooks-creator-app.events
-            [audiobooks-creator-app.installed-components :as ic]
+(ns audiobooks-creator-app.screens.more.views
+  (:require [audiobooks-creator-app.installed-components :as ic]
             [audiobooks-creator-app.native-modules :as nm]
-            [audiobooks-creator-app.subs]
             [micro-rn.react-native :as c :refer [alert text view]]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
