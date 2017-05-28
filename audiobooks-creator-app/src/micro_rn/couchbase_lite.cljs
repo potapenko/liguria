@@ -6,7 +6,8 @@
    [clojure.walk :as walk]
    [goog.crypt.base64 :as base-64]
    [micro-rn.utils :as utils]
-   [cljs.core.async :as async :refer [<! >! put! chan timeout]])
+   [cljs.core.async :as async :refer [<! >! put! chan timeout]]
+   [micro-rn.react-native :as rn])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
@@ -19,10 +20,34 @@
     (cb)
     (catch js/Error e (js/console.error "error:" e))))
 
-(set! js/React (js/require "react-native"))
-
-(def cbl-light (.-ReactCBLite (js/require "react-native-couchbase-lite")))
+(def cbl-light (.-ReactCBLite rn/NativeModules))
 (def server-url (atom ""))
+
+(comment "
+
+Couchbase.init(url => {
+  spec.host = url.split('/')[2];
+
+  new Swagger({spec: spec, usePromise: true})
+    .then(client => {
+      var encodedCredentials = ') Basic ' + base64.encode(url.split('//')[1].split('@')[0]);
+      client.clientAuthorizations.add('auth', new Swagger.ApiKeyAuthorization('Authorization', encodedCredentials, 'header'));
+      manager = client;
+      if (typeof callback == 'function') {
+        callback(manager);
+      }
+    });
+});
+
+Couchbase.initRESTClient = function (cb) {
+  if (typeof manager !== 'undefined') {
+    cb(manager); // If manager is already defined, don't wait.
+  } else {
+    callback = cb;
+  }
+};
+
+"
 
 (defprotocol IResultBuilder
   (as-one-doc [this])
@@ -80,69 +105,69 @@
   ([method url] (make-request nil method url nil))
   ([db method url] (make-request db method url nil))
   ([db method url body]
-   (let [url (str @server-url url)
-         json-doc (atom nil)
-         result-atom (atom nil)
+   (let [url            (str @server-url url)
+         json-doc       (atom nil)
+         result-atom    (atom nil)
          aggregate-info (atom nil)
          data-converter (atom (reify IDataConverter (convert [this data] data)))
-         result-chan (chan)
-         data-filter (atom (fn [d] true))
-         success-state (atom nil)
-         send-data (fn []
-                     (put! @messages-queue
-                           (fn []
-                             (println ">>> make request:" method url body)
-                             (def t (js/Date.now))
+         result-chan    (chan)
+         data-filter    (atom (fn [d] true))
+         success-state  (atom nil)
+         send-data      (fn []
+                          (put! @messages-queue
+                                (fn []
+                                  (println ">! make request:" method url body)
+                                  (def t (js/Date.now))
 
-                             (go
-                               (let [[err res] (<! (utils/fetch method url body))]
-                                 (put! @waiting-queue "ping")
+                                  (go
+                                    (let [[err res] (<! (utils/fetch method url body))]
+                                      (put! @waiting-queue "ping")
 
-                                 (println "  [db delay]: " (- (js/Date.now) t) err res)
+                                      (println ">!  [db delay]: " (- (js/Date.now) t) err res)
 
-                                 (reset! json-doc res)
-                                 (reset! success-state (and
-                                                        (nil? err)
-                                                        (let [status (:status @json-doc)]
-                                                          (and
-                                                           (not= status 404)
-                                                           (not= status 403)
-                                                           (not= status 401)))))
+                                      (reset! json-doc res)
+                                      (reset! success-state (and
+                                                             (nil? err)
+                                                             (let [status (:status @json-doc)]
+                                                               (and
+                                                                (not= status 404)
+                                                                (not= status 403)
+                                                                (not= status 401)))))
 
-                                 (when (and @success-state @aggregate-info)
-                                   (doseq [[k v] @aggregate-info]
-                                     (assert (keyword? k))
-                                     (let [aggregate-doc
-                                           (fn [doc]
-                                             (let [port (chan)
-                                                   id (k doc)]
-                                               (assert (string? id)
-                                                       (str "Invalid aggreggation param - "
-                                                            "id is not string: " doc k v))
-                                               (go
-                                                 (>! port
-                                                     (assoc doc k
-                                                            (<! (-> db
-                                                                    (document id)
-                                                                    (get)
-                                                                    (aggregate v) <?)))))
-                                               port))]
-                                       (reset! json-doc
-                                               (if (:rows @json-doc)
-                                                 (assoc @json-doc :rows
-                                                        (loop [[d & t] (:rows @json-doc) result []]
-                                                          (if d
-                                                            (recur t (concat [{:doc (<! (aggregate-doc (:doc d)))}] result))
-                                                            result)))
-                                                 (<! (aggregate-doc @json-doc)))))))
+                                      (when (and @success-state @aggregate-info)
+                                        (doseq [[k v] @aggregate-info]
+                                          (assert (keyword? k))
+                                          (let [aggregate-doc
+                                                (fn [doc]
+                                                  (let [port (chan)
+                                                        id   (k doc)]
+                                                    (assert (string? id)
+                                                            (str "Invalid aggreggation param - "
+                                                                 "id is not string: " doc k v))
+                                                    (go
+                                                      (>! port
+                                                          (assoc doc k
+                                                                 (<! (-> db
+                                                                         (document id)
+                                                                         (get)
+                                                                         (aggregate v) <?)))))
+                                                    port))]
+                                            (reset! json-doc
+                                                    (if (:rows @json-doc)
+                                                      (assoc @json-doc :rows
+                                                             (loop [[d & t] (:rows @json-doc) result []]
+                                                               (if d
+                                                                 (recur t (concat [{:doc (<! (aggregate-doc (:doc d)))}] result))
+                                                                 result)))
+                                                      (<! (aggregate-doc @json-doc)))))))
 
-                                 (if @success-state
-                                   (do
-                                     (reset! result-atom (-> @data-converter (convert  @json-doc)))
-                                     (>! result-chan @result-atom))
-                                   (do
-                                     (js/console.warn "Error: " method url (clj->js err) (clj->js @json-doc))
-                                     (>! result-chan (-> @data-converter (convert  false))))))))))]
+                                      (if @success-state
+                                        (do
+                                          (reset! result-atom (-> @data-converter (convert  @json-doc)))
+                                          (>! result-chan @result-atom))
+                                        (do
+                                          (js/console.warn "Error: " method url (clj->js err) (clj->js @json-doc))
+                                          (>! result-chan (-> @data-converter (convert  false))))))))))]
 
      (send-data)
 

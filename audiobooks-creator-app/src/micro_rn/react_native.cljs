@@ -64,6 +64,7 @@
   ([title message buttons]
    (.alert (.-Alert ReactNative) title message (utils/prepare-to-js buttons))))
 
+(def NativeModules (.-NativeModules ReactNative))
 (def AppRegistry (.-AppRegistry ReactNative))
 (def DeviceEventEmitter (.-DeviceEventEmitter ReactNative))
 (def AppState (.-AppState ReactNative))

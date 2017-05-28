@@ -1,13 +1,12 @@
 (ns audiobooks-creator-app.app
-  (:require audiobooks-creator-app.events
-            [audiobooks-creator-app.screens.about-screen :as about]
-            [audiobooks-creator-app.screens.books-screen :as books]
-            [audiobooks-creator-app.screens.export-screen :as export]
-            [audiobooks-creator-app.screens.friends-screen :as friends]
-            [audiobooks-creator-app.screens.recording-screen :as recording]
-            [audiobooks-creator-app.screens.settings-screen :as settings]
-            [audiobooks-creator-app.screens.bookshelf-screen :as bookshelf]
-            [audiobooks-creator-app.subs]
+  (:require [audiobooks-creator-app.screens
+             [about-screen :as about]
+             [books-screen :as books]
+             [export-screen :as export]
+             [friends-screen :as friends]
+             [recording-screen :as recording]
+             [settings-screen :as settings]
+             [bookshelf-screen :as bookshelf]]
             [micro-rn.react-native :as rn]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]))

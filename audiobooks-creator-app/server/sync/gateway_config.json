@@ -1,0 +1,37 @@
+{
+  "interface":":4984",
+  "log": ["*"],
+  "facebook" : {
+    "register" : true
+  },
+  "databases": {
+    "betting-app": {
+
+      "server":"http://localhost:8091",
+
+      "bucket":"betting-app",
+
+      "users": {
+
+          "admin": {"password": "flvbygfc", "admin_channels": ["*"]},
+          "moderator": {"password": "pass", "admin_channels": ["*"]},
+          "GUEST": {"disabled": false, "admin_channels": ["*"]}
+      },
+
+      "sync":
+      `
+      function(doc, oldDoc){
+        var ch = doc.channel;
+        if(ch){
+          channel(ch);
+          access(ch, ch);
+        }else{
+          channel("!");
+        }
+
+      }
+
+      `
+    }
+  }
+}

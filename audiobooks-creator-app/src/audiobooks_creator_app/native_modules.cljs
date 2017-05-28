@@ -12,3 +12,5 @@
 (def icon-fa (r/adapt-react-class (.-IconFA icons)))
 (def icon-md (r/adapt-react-class (.-IconMD icons)))
 (def icon-io (r/adapt-react-class (.-IconIO icons)))
+
+(def couchbase (.-Couchbase modules))

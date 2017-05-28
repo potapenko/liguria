@@ -15,3 +15,4 @@ export const TabIcon = (name) => (
                                              justifyContent: 'center',
                                              flexDirection: 'row'}}>
                                <IconIO size={22} name={name} color={tintColor}/></View>));
+
