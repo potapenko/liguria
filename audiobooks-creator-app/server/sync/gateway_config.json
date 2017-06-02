@@ -9,7 +9,7 @@
 
       "server":"http://localhost:8091",
 
-      "bucket":"betting-app",
+      "bucket":"default",
 
       "users": {
 

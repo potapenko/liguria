@@ -24,7 +24,6 @@
 (def server-url (atom ""))
 
 (comment "
-
 Couchbase.init(url => {
   spec.host = url.split('/')[2];
 
@@ -33,22 +32,12 @@ Couchbase.init(url => {
       var encodedCredentials = ') Basic ' + base64.encode(url.split('//')[1].split('@')[0]);
       client.clientAuthorizations.add('auth', new Swagger.ApiKeyAuthorization('Authorization', encodedCredentials, 'header'));
       manager = client;
-      if (typeof callback == 'function') {
+      if (typeof callbsck == 'function') {
         callback(manager);
       }
     });
 });
-
-Couchbase.initRESTClient = function (cb) {
-  if (typeof manager !== 'undefined') {
-    cb(manager); // If manager is already defined, don't wait.
-  } else {
-    callback = cb;
-  }
-};
-
-"
-)
+")
 
 (defprotocol IResultBuilder
   (as-one-doc [this])
@@ -65,6 +54,14 @@ Couchbase.initRESTClient = function (cb) {
 
 (def messages-queue (atom (chan)))
 (def waiting-queue (atom (chan)))
+(def log-state (atom {}))
+
+(defn log [data & path]
+  (when-not (get-in @log-state path)
+    (swap! log-state assoc-in path []))
+  (when (-> @log-state (get-in path) count (> 10))
+    (swap! log-state update-in path #(-> % rest vec)))
+  (reset! log-state (update-in @log-state path conj data)))
 
 (go-loop []
   (let [cb (<! @messages-queue)]
@@ -117,14 +114,14 @@ Couchbase.initRESTClient = function (cb) {
          send-data      (fn []
                           (put! @messages-queue
                                 (fn []
-                                  (println ">! make request:" method url body)
+                                  (log "make request:" method url body :messages)
                                   (def t (js/Date.now))
 
                                   (go
                                     (let [[err res] (<! (utils/fetch method url body))]
                                       (put! @waiting-queue "ping")
 
-                                      (println ">!  [db delay]: " (- (js/Date.now) t) err res)
+                                      (log "[db delay]: " (- (js/Date.now) t) err res :messages)
 
                                       (reset! json-doc res)
                                       (reset! success-state (and
@@ -165,6 +162,8 @@ Couchbase.initRESTClient = function (cb) {
                                       (if @success-state
                                         (do
                                           (reset! result-atom (-> @data-converter (convert  @json-doc)))
+                                          (log {:request [method url body]
+                                                :result @result-atom} :data-log)
                                           (>! result-chan @result-atom))
                                         (do
                                           (js/console.warn "Error: " method url (clj->js err) (clj->js @json-doc))
@@ -294,7 +293,7 @@ Couchbase.initRESTClient = function (cb) {
   IServer
 
   (init [this]
-    (println "init coucbase server")
+    (log "init coucbase server" :messages)
     (let [port (chan)]
       (-> cbl-light (.init (fn [url] (go (>! port (reset! server-url url))))))
       port))
@@ -389,3 +388,7 @@ Couchbase.initRESTClient = function (cb) {
 
   (facebook-token [this options] (make-request nil "POST" (build-url server-url "_facebook_token") options))
   (persona_assertion [this options] (make-request nil "POST" (build-url server-url "_persona_assertion") options)))
+
+(comment
+  (:messages @log-state)
+  (:data-log @log-state))
