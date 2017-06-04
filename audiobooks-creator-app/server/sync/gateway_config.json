@@ -5,7 +5,7 @@
     "register" : true
   },
   "databases": {
-    "betting-app": {
+    "audiobooks-app": {
 
       "server":"http://localhost:8091",
 

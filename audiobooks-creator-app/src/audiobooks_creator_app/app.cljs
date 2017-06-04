@@ -8,8 +8,7 @@
             [micro-rn.react-native :as rn]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
-            [micro-rn.couchbase-lite :as couchbase]
-            [audiobooks-creator-app.couch]))
+            [micro-rn.couchbase-lite :as couchbase]))
 
 (def books-stack
   (nav/create-stack-navigator
