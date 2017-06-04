@@ -7,12 +7,14 @@
    [clojure.string :as string]
    [micro-rn.utils :as utils]
    [cljs.core.async :as async :refer [<! >! put! chan timeout]]
-   [audiobooks-creator-app.server.main :as server]
+   [audiobooks-creator-app.server.main :as server :refer [db]]
    [audiobooks-creator-app.server.utils :as u :refer [add-view]])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
-(def users (-> views/users-design-document (view :users)))
+(def users-design-document (-> db (design-document :users)))
+
+(def users (-> users-design-document (view :users)))
 
 (defn init-views []
   (let [port (chan)]
@@ -44,7 +46,6 @@
 
   (def sport-events-design-document (-> db (design-document :sport-events)))
   (def bets-design-document (-> db (design-document :bets)))
-  (def users-design-document (-> db (design-document :users)))
   (def messages-design-document (-> db (design-document :messages)))
 
   (def current-events (-> sport-events-design-document (view :current-sport-events)))
