@@ -12,18 +12,10 @@
 (defn- screen-content []
   (fn []
     [view {:style {:flex 1}}
-
-     [view {:style {:flex-direction   "row"
-                    :background-color "#ccc"
-                    :height           60}}
-      [recorder/monitor]]
-
-     [view {:style {:flex 1}}
-      [text "Recording"]]
-
-     [view {:style {:flex-direction   "row"
-                    :background-color "#ccc"
-                    :height           60}}]]))
+     [recorder/monitor]
+     [recorder/recording-controls]
+     [view {:style {:flex 1 :padding 8}}
+      [text "Recording:"]]]))
 
 (def main
   (nav/create-screen
