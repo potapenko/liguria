@@ -1,7 +1,7 @@
 (ns audiobooks-creator-app.server.main
   (:require
    [reagent.core :as r :refer [atom]]
-   [micro-rn.couchbase-lite :as cbl :refer [Server init database]]
+   [micro-rn.couchbase-lite :as cbl :refer [Server init database <? put get delete]]
    [clojure.string :as string]
    [micro-rn.utils :as utils]
    [cljs.core.async :as async :refer [<! >! put! chan timeout]])
@@ -31,7 +31,8 @@
       (let [all-dbs (<! (-> server (cbl/all-dbs) <?))]
         (when-not (contains? (set all-dbs) db-name)
           (println "[create-new-db] " (<! (-> db (put) <?)))
-          (println (<! (init-views)))))
+          ;; TODO переделать на mount
+          #_(println (<! (init-views)))))
       (>! port "(init-server) complete"))
     port))
 
@@ -66,7 +67,8 @@
                                               :source     db-name
                                               :continuous true}) <?)))
 
-      (when-not (<! (load-user email))
+      ;; TODO переделать на mount
+      #_(when-not (<! (load-user email))
         (<! (timeout 2000)))
 
       (>! port "(start-sync) complete"))

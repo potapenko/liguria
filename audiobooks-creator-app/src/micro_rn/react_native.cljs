@@ -64,15 +64,16 @@
   ([title message buttons]
    (.alert (.-Alert ReactNative) title message (utils/prepare-to-js buttons))))
 
-(def NativeModules (.-NativeModules ReactNative))
 (def AppRegistry (.-AppRegistry ReactNative))
-(def DeviceEventEmitter (.-DeviceEventEmitter ReactNative))
 (def AppState (.-AppState ReactNative))
 (def AsyncStorage (.-AsyncStorage ReactNative))
 (def CameraRoll (.-CameraRoll ReactNative))
 (def dimensions (.-Dimensions ReactNative))
 (def InteractionManager (.-InteractionManager ReactNative))
 (def Platform (.-Platform ReactNative))
+(def NativeModules (.-NativeModules ReactNative))
+(def NativeAppEventEmitter (.-NativeAppEventEmitter ReactNative))
+(def DeviceEventEmitter (.-DeviceEventEmitter ReactNative))
 (def android? (= "android" (.-OS Platform)))
 (def ios? (= "ios" (.-OS Platform)))
 
