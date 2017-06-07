@@ -18,17 +18,17 @@
 
 (defn init-views []
   (let [port (chan)]
-      (go
-        (<! (add-view users-design-document
-                      {:users
-                       {:map "
+    (go
+      (<! (add-view users-design-document
+                    {:users
+                     {:map "
                            function(doc){
                            if(doc.type == 'user'){emit(doc['email'], doc.name)}
                            }
                            "}
 
-                       :user-balance
-                       {:map "
+                     :user-balance
+                     {:map "
                             function(doc){
                               if(doc.type == 'user.bet' &&  doc.archived == null){
                                 emit(doc.user, (doc.profit || 0) - (doc.amount || 0));
@@ -36,13 +36,13 @@
                                 emit(doc.user, doc['balance-change']*1);
                               }
                            }"
-                        :reduce "_sum"}}))
-        (>! port "[init view complete]"))
-      port))
+                      :reduce "_sum"}}))
+      (>! port "[init view complete]"))
+    port))
 
 (comment
 
- ;; ----- views
+  ;; ----- views
 
   (def sport-events-design-document (-> db (design-document :sport-events)))
   (def bets-design-document (-> db (design-document :bets)))
@@ -56,7 +56,7 @@
   (def users-messages (-> messages-design-document (view :user-messages)))
   (def not-read-messages-count-view (-> messages-design-document (view :not-read-messages-count)))
 
- ;; ----- init
+  ;; ----- init
 
   (defn create-user-id [email]
     (str "user::" email))
@@ -130,8 +130,6 @@
         :message-type "friends"
         :message-body {:type "gift" :amount 20 :message-text "Ваш друг подарил вам 20 монет."}})))
 
- ;; todo - move to server
-
   (defn new-user-transaction [type info value]
     (add-doc {:type             "user.transaction"
               :transaction-type "gift"
@@ -153,7 +151,7 @@
           (>! port user)))
       port))
 
- ;; ----- init
+  ;; ----- init
 
   (defn init-user [first-name last-name email fb-data]
     (add-doc {:_id           (create-user-id email)

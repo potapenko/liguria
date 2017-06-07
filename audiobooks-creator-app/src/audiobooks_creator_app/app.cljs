@@ -14,14 +14,19 @@
   (nav/create-stack-navigator
    {:books {:screen books/main}}))
 
+(def recording-stack
+  (nav/create-stack-navigator
+   {:books {:screen recording/main}}))
+
 (def friends-stack
   (nav/create-stack-navigator
    {:friends {:screen friends/main}}))
 
 (def main-tabs
   (nav/create-tab-navigator
-   {:books-tab     {:screen books-stack}
-    :recording-tab {:screen recording/main}
+   {
+    :recording-tab {:screen recording-stack}
+    :books-tab     {:screen books-stack}
     :bookshelf-tab {:screen bookshelf/main}
     :friends-tab   {:screen friends/main}
     :more-tab      {:screen more/main}}

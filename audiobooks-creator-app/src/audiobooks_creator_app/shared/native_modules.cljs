@@ -1,4 +1,4 @@
-(ns audiobooks-creator-app.native-modules
+(ns audiobooks-creator-app.shared.native-modules
   (:require [clojure.string :as string]
             [micro-rn.react-native :as c]
             [reagent.core :as r :refer [atom]]

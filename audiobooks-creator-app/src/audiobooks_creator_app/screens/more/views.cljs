@@ -1,11 +1,11 @@
 (ns audiobooks-creator-app.screens.more.views
-  (:require [audiobooks-creator-app.installed-components :as ic]
-            [audiobooks-creator-app.native-modules :as nm]
+  (:require [audiobooks-creator-app.shared.installed-components :as ic]
+            [audiobooks-creator-app.shared.native-modules :as nm]
             [micro-rn.react-native :as c :refer [alert text view]]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
             [micro-rn.utils :as util]
-            [audiobooks-creator-app.screens-shared-ui :as sh]))
+            [audiobooks-creator-app.shared.screens-shared-ui :as sh]))
 
 (defn- screen-content []
   (fn []

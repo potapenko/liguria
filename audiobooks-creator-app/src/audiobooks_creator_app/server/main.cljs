@@ -39,8 +39,7 @@
   (let [port (chan)]
     (go
       (<! (-> db (delete) <?))
-                                        ;(<! (-> db (put) <?))
-
+      #_(<! (-> db (put) <?))
       (>! port "(init-new-db) complete"))
     port))
 
