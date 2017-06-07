@@ -69,7 +69,7 @@
 
       ;; TODO переделать на mount
       #_(when-not (<! (load-user email))
-        (<! (timeout 2000)))
+          (<! (timeout 2000)))
 
       (>! port "(start-sync) complete"))
 

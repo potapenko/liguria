@@ -9,7 +9,7 @@
                            [re-frame "0.9.2"]
                            [com.cognitect/transit-cljs "0.8.239"]
                            [camel-snake-kebab "0.4.0"]
-
+                           [mount "0.1.11"]
                            ]
             :plugins [[lein-cljsbuild "1.1.4"]
                       [lein-figwheel "0.5.10"]]
