@@ -21,29 +21,31 @@
 
 (defn monitor-line []
   (let [monitor-value (subscribe [::model/monitoring])
-        in-progress?    (subscribe [::model/recording])
-        bg (fn [o]
-             [view {:style [st/box st/row (st/opacity o)]}
-              [view {:style [(st/width "85%") (st/background "green")]}]
-              [view {:style [(st/width "10%") (st/background "yellow")]}]
-              [view {:style [(st/width "5%") (st/background "red")]}]])]
+        in-progress?  (subscribe [::model/recording])
+        top-w (atom 0)
+        bg            (fn [o]
+                        [view {:style [st/box st/row (st/opacity o) (st/width @top-w)]}
+                         [view {:style [(st/width "85%") (st/background "green")]}]
+                         [view {:style [(st/width "10%") (st/background "yellow")]}]
+                         [view {:style [(st/width "5%") (st/background "red")]}]])]
     (fn []
-      [view {:style [(st/gray 1)]}
-       [bg 0.4]
+      [view {:on-layout (fn [e] (let [w (-> e .-nativeEvent .-layout .-width)]
+                                  (println "on-layout:" e w) (reset! top-w w)))
+             :style [(st/gray 1)]}
+       [bg 0.1]
        (if @in-progress?
-           [view {:style [(st/height 6)
-                          (st/margin 4 0)
-                          (st/width #_"10%" (str @monitor-value "%"))
-                          (st/border)
-                          (st/opacity 0.3)
-                          (st/background "black")]}]
-           [view {:style [(st/height 14)]}])])))
+         [view {:style [(st/height 6)
+                        (st/margin 4 0)
+                        (st/width (str @monitor-value "%"))
+                        (st/overflow "hidden")]}
+          [bg 1]]
+         [view {:style [(st/height 14)]}])])))
 
 (defn monitor []
   (let [monitor-value (subscribe [::model/monitoring])
         in-progress?    (subscribe [::model/recording])]
     (fn []
-      [view {:style {:padding 8 :background-color "#aaa"}}
+      [view {:style [(st/padding 0 0) (st/background "#aaa")]}
        [monitor-line]
        [spacer 4]
        [monitor-line]])))
