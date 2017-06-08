@@ -19,6 +19,7 @@
 (reg-event-db
  ::recording
  (fn [db [_ value]]
+   (assoc db ::monitoring 0)
    (assoc db ::recording value)))
 
 (comment

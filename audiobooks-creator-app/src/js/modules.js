@@ -16,3 +16,5 @@ export const TabIcon = (name) => (
                                              flexDirection: 'row'}}>
                                <IconIO size={22} name={name} color={tintColor}/></View>));
 
+import AudioRecorderLinks from './recording.js';
+export const { AudioRecorder, audioPath } = AudioRecorderLinks;

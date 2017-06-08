@@ -14,3 +14,6 @@
 (def icon-io (r/adapt-react-class (.-IconIO icons)))
 
 (def couchbase (.-Couchbase modules))
+
+(def audio-recorder (.-AudioRecorder modules))
+(def audio-path (.-audioPath modules))
