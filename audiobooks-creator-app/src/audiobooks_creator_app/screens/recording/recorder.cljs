@@ -13,7 +13,13 @@
 (defn start-recording []
   (dispatch [::model/recording true])
   (-> nm/audio-recorder .startRecording)
-  (-> nm/audio-recorder (aset "onProgress" #(dispatch [::model/monitoring (-> % .-currentMetering (+ 100))]))))
+  ;; -160dB 0dB
+  (-> nm/audio-recorder
+      (aset "onProgress"
+            #(let [from 33 to 0]
+               (dispatch [::model/monitoring
+                          (-> % .-currentMetering
+                              (+ from) (/ from) (* 100) (max 0))])))))
 
 (defn stop-recording []
   (dispatch [::model/recording false])
@@ -22,8 +28,8 @@
 (defn monitor-line []
   (let [monitor-value (subscribe [::model/monitoring])
         in-progress?  (subscribe [::model/recording])
-        top-w (atom 0)
-        bg            (fn [o]
+        top-w         (atom 0)
+        line-bg       (fn [o]
                         [view {:style [st/box st/row (st/opacity o) (st/width @top-w)]}
                          [view {:style [(st/width "85%") (st/background "green")]}]
                          [view {:style [(st/width "10%") (st/background "yellow")]}]
@@ -31,24 +37,25 @@
     (fn []
       [view {:on-layout (fn [e] (let [w (-> e .-nativeEvent .-layout .-width)]
                                   (println "on-layout:" e w) (reset! top-w w)))
-             :style [(st/gray 1)]}
-       [bg 0.1]
+             :style     [(st/gray 1)]}
+       [line-bg 0.1]
        (if @in-progress?
          [view {:style [(st/height 6)
                         (st/margin 4 0)
                         (st/width (str @monitor-value "%"))
                         (st/overflow "hidden")]}
-          [bg 1]]
+          [line-bg 1]]
          [view {:style [(st/height 14)]}])])))
 
 (defn monitor []
   (let [monitor-value (subscribe [::model/monitoring])
-        in-progress?    (subscribe [::model/recording])]
+        in-progress?  (subscribe [::model/recording])]
     (fn []
       [view {:style [(st/padding 0 0) (st/background "#aaa")]}
        [monitor-line]
        [spacer 4]
-       [monitor-line]])))
+       [monitor-line]
+       #_[view [text @monitor-value]]])))
 
 (defn recording-button [icon-name focused on-press]
   (let [d (- 60 (* 2 8))]
@@ -61,15 +68,15 @@
                                    (st/overflow "hidden")]
                            :on-press on-press}
      [view {:style {:justify-content "center" :align-items "center"}}
-      [nm/icon-md {:color "#ccc" :size 38 :name icon-name}]]]))
+      [nm/icon-md {:color (if-not focused "#ccc" #_"#E6532C" "#FB783A") :size 38 :name icon-name}]]]))
 
 (defn recording-controls []
-  (let [in-progress?    (subscribe [::model/recording])]
+  (let [in-progress? (subscribe [::model/recording])]
     (fn []
       [view {:style {:height 60 :flex-direction "row"}}
-       [recording-button
-        (if @in-progress? "stop" "fiber-manual-record") false
-        #(if @in-progress? (stop-recording) (start-recording))]
+       (if @in-progress?
+         [recording-button "stop" true #(stop-recording)]
+         [recording-button "fiber-manual-record" false #(start-recording)])
        [recording-button "play-arrow" false #()]
        [recording-button "edit" false #()]])))
 
