@@ -7,14 +7,16 @@
             [micro-rn.utils :as util]
             [audiobooks-creator-app.shared.screens-shared-ui :as sh]
             [audiobooks-creator-app.screens.recording.recorder :as recorder]
-            [audiobooks-creator-app.screens.recording.model :as model]))
+            [audiobooks-creator-app.screens.recording.model :as model]
+            [audiobooks-creator-app.screens.recording.recognizer :as rz]))
 
 (defn- screen-content []
   (fn []
     [view {:style {:flex 1}}
      [recorder/monitor]
      [recorder/recording-controls]
-     [view {:style {:flex 1 :padding 8}}
+     [rz/text-editor]
+     #_[view {:style {:flex 1 :padding 8}}
       [text "Recording:"]]]))
 
 (def main

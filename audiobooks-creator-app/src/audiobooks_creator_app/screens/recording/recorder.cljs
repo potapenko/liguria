@@ -8,26 +8,26 @@
             [micro-rn.utils :as util]
             [audiobooks-creator-app.shared.screens-shared-ui :as sh]
             [re-frame.core :refer [subscribe dispatch]]
-            [audiobooks-creator-app.screens.recording.model :as model]))
+            [audiobooks-creator-app.screens.recording.model :as m]))
 
 (defn start-recording []
-  (dispatch [::model/recording true])
+  (dispatch [::m/recording true])
   (-> nm/audio-recorder .startRecording)
   ;; -160dB 0dB
   (-> nm/audio-recorder
       (aset "onProgress"
-            #(let [from 33 to 0]
-               (dispatch [::model/monitoring
+            #(let [from 38 to 0]
+               (dispatch [::m/monitoring
                           (-> % .-currentMetering
                               (+ from) (/ from) (* 100) (max 0))])))))
 
 (defn stop-recording []
-  (dispatch [::model/recording false])
+  (dispatch [::m/recording false])
   (-> nm/audio-recorder .stopRecording))
 
 (defn monitor-line []
-  (let [monitor-value (subscribe [::model/monitoring])
-        in-progress?  (subscribe [::model/recording])
+  (let [monitor-value (subscribe [::m/monitoring])
+        in-progress?  (subscribe [::m/recording])
         top-w         (atom 0)
         line-bg       (fn [o]
                         [view {:style [st/box st/row (st/opacity o) (st/width @top-w)]}
@@ -48,8 +48,8 @@
          [view {:style [(st/height 14)]}])])))
 
 (defn monitor []
-  (let [monitor-value (subscribe [::model/monitoring])
-        in-progress?  (subscribe [::model/recording])]
+  (let [monitor-value (subscribe [::m/monitoring])
+        in-progress?  (subscribe [::m/recording])]
     (fn []
       [view {:style [(st/padding 0 0) (st/background "#aaa")]}
        [monitor-line]
@@ -59,19 +59,19 @@
 
 (defn recording-button [icon-name focused on-press]
   (let [d (- 60 (* 2 8))]
-    [rn/touchable-opacity {:style [(st/margin 8)
-                                   (st/flex)
-                                   (st/background "white")
-                                   (st/justify-content "center")
-                                   (st/align-items "center")
-                                   (st/rounded 4)
-                                   (st/overflow "hidden")]
+    [rn/touchable-opacity {:style    [(st/margin 8)
+                                      (st/flex)
+                                      (st/background "white")
+                                      (st/justify-content "center")
+                                      (st/align-items "center")
+                                      (st/rounded 4)
+                                      (st/overflow "hidden")]
                            :on-press on-press}
      [view {:style {:justify-content "center" :align-items "center"}}
       [nm/icon-md {:color (if-not focused "#ccc" #_"#E6532C" "#FB783A") :size 38 :name icon-name}]]]))
 
 (defn recording-controls []
-  (let [in-progress? (subscribe [::model/recording])]
+  (let [in-progress? (subscribe [::m/recording])]
     (fn []
       [view {:style {:height 60 :flex-direction "row"}}
        (if @in-progress?

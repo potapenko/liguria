@@ -10,3 +10,14 @@
             [audiobooks-creator-app.screens.recording.model :as model]))
 
 ;; react-native-speech-to-text-ios
+
+(defn text-editor []
+  (let [r (atom nil)]
+    (fn []
+      [view {:style [(st/flex) (st/background "red")]}
+       [nm/rte-editor {:ref #(reset! r %)
+                       :initialTitleHTML "My Title"
+                       :initialContentHTML "Hello <b>World</b>
+                                            <p>this is a new paragraph</p>
+                                            <p>this is another new paragraph</p>"}]
+       [nm/rte-toolbar {:get-editor #(do @r)}]])))

@@ -17,3 +17,13 @@
 
 (def audio-recorder (.-AudioRecorder modules))
 (def audio-path (.-audioPath modules))
+
+(def rte-modules (js/require "react-native-zss-rich-text-editor"))
+(def rte-editor (r/adapt-react-class (.-RichTextEditor rte-modules)))
+(def rte-toolbar (r/adapt-react-class (.-RichTextToolbar rte-modules)))
+(def rte-actions (.-actions rte-modules))
+
+(comment
+  (js/Object.keys modules)
+  )
+
