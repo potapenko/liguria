@@ -9,11 +9,13 @@
   "dependencies": {
     "babel-plugin-transform-es2015-block-scoping": "6.15.0",
     "react": "16.0.0-alpha.6",
+    "react-addons-shallow-compare": "^15.5.2",
     "react-native": "0.43.4",
     "react-native-audio": "^3.2.2",
     "react-native-aws3": "0.0.8",
     "react-native-couchbase-lite": "^0.6.0",
     "react-native-device-info": "^0.10.2",
+    "react-native-fence-html": "^1.0.6",
     "react-native-speech-to-text-ios": "^1.0.3",
     "react-native-vector-icons": "^4.1.1",
     "react-native-zss-rich-text-editor": "^1.0.2",

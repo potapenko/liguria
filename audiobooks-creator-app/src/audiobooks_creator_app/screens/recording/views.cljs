@@ -1,14 +1,17 @@
 (ns audiobooks-creator-app.screens.recording.views
   (:require [audiobooks-creator-app.shared.installed-components :as ic]
             [audiobooks-creator-app.shared.native-modules :as nm]
-            [micro-rn.react-native :as c :refer [alert text view]]
+            [micro-rn.react-native :as rn :refer [alert text view]]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
             [micro-rn.utils :as util]
             [audiobooks-creator-app.shared.screens-shared-ui :as sh]
             [audiobooks-creator-app.screens.recording.recorder :as recorder]
             [audiobooks-creator-app.screens.recording.model :as model]
-            [audiobooks-creator-app.screens.recording.recognizer :as rz]))
+            [audiobooks-creator-app.screens.recording.recognizer :as rz]
+            [cljs.core.async :as async :refer [<! >! put! chan timeout]])
+  (:require-macros
+   [cljs.core.async.macros :refer [go go-loop]]))
 
 (defn- screen-content []
   (fn []

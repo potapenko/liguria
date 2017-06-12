@@ -18,4 +18,3 @@ export const TabIcon = (name) => (
 
 import AudioRecorderLinks from './recording.js';
 export const { AudioRecorder, audioPath } = AudioRecorderLinks;
-

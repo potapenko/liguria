@@ -14,7 +14,9 @@
     "react-native-device-info",
     "react-native-aws3",
     "react-native-speech-to-text-ios",
-    "react-native-couchbase-lite"
+    "react-native-couchbase-lite",
+    "react-native-fence-html",
+    "react-addons-shallow-compare"
   ],
   "imageDirs": [
     "images"
