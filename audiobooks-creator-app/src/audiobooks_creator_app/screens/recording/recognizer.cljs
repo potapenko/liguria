@@ -1,7 +1,7 @@
 (ns audiobooks-creator-app.screens.recording.recognizer
   (:require [audiobooks-creator-app.shared.installed-components :as ic]
             [audiobooks-creator-app.shared.native-modules :as nm]
-            [micro-rn.react-native :as rn :refer [alert text view spacer flexer]]
+            [micro-rn.react-native :as rn :refer [alert text text-input view spacer flexer]]
             [micro-rn.styles :as st]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
@@ -18,7 +18,7 @@
 (def editor-ref (atom nil))
 
 (defn make-spaces [x]
-  (apply str (repeat x " &nbsp; ")))
+  (apply str (repeat x " ")))
 
 (def test-text (apply str (repeat 1 (str "
     <p><s>Четверг четвертого числа,</s></p>
@@ -28,23 +28,37 @@
     <p><u>Лигурийский регулировщик</u> регулировал в Лигурии</p>
 "))))
 
+(defn- stylize [st]
+  (let [this (r/current-component)]
+    (into [text {:style st}] (r/children this))))
+
+(defn word [s]
+  [text s])
+
+(defn u []
+  (stylize [st/underline (st/color "#9a9a9a")]))
+
+(defn s []
+  (stylize [st/line-through (st/color "#ccc")]))
+
+(defn space
+  ([] (space 1))
+  ([x] [word (make-spaces x)]))
+
+(defn p [s]
+  (let [this (r/current-component)]
+    (into [view [text s]] (r/children this))))
+
 (defn text-editor []
   [view {:style [(st/flex) (st/background "white") (st/padding 8 0 0 0)]}
-   [nm/rte-editor {:ref                #(reset! editor-ref %)
-                   :style              [(st/flex 1) (st/margin 0 0 0 8)]
-                   :customCSS          css
-                   :titlePlaceholder   "Record title"
-                   :contentPlaceholder "Paste subtitle text here"
-                   :initialTitleHTML   "My record #1"
-                   :initialContentHTML test-text}]
-   #_[nm/rte-toolbar {:actions    [
-                                 nm/rte-actions.setBold
-                                 nm/rte-actions.setItalic
-                                 ;; nm/rte-actions.setUnderline
-                                 ;; nm/rte-actions.setStrikethrough
-                                 ;; nm/rte-actions.setTextColor
-                                 ]
-                    :get-editor #(do @editor-ref)}]])
+   [view {:style [(st/padding 8)]}
+    [text
+     [u [word "Четверг"]]
+     [space]
+     [u
+      [s [word "четвертого"]]
+      [space 8]]
+     [word "числа,"]]]])
 
 (comment
   (-> @editor-ref (.showTitle false))

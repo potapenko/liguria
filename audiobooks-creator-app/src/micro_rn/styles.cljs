@@ -163,9 +163,12 @@
   (new-style (keyword (str "text-decoration-color" v)) {:text-decoration-color v}))
 
 (defn text-decoration-line
-  "'none', 'underline', 'line-through', 'underline line-through'"
+  "'none', 'underline', 'line-through'"
   [v]
   (new-style (keyword (str "text-decoration-line" v)) {:text-decoration-line v}))
+
+(def underline (text-decoration-line "underline"))
+(def line-through (text-decoration-line "line-through"))
 
 (defn text-decoration-style
   "'solid', 'double', 'dotted', 'dashed'"
