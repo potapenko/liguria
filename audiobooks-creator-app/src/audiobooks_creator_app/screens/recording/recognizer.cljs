@@ -30,16 +30,32 @@
 
 (defn- stylize [st]
   (let [this (r/current-component)]
-    (into [text {:style st}] (r/children this))))
+    (into [text (merge {:style st} (r/props this))] (r/children this))))
+
+(defn selected []
+  (stylize [st/line-through (st/gray 1) st/bold]))
 
 (defn word [s]
-  [text s])
+  (let [selected? (atom false)]
+    (fn []
+      [(if @selected? selected text)
+       {:on-long-press #(swap! selected? not)} s])))
+
+(defn b []
+  (stylize [st/bold]))
+
+(defn i []
+  (stylize [st/italic]))
 
 (defn u []
   (stylize [st/underline (st/color "#9a9a9a")]))
 
 (defn s []
   (stylize [st/line-through (st/color "#ccc")]))
+
+(defn cr [c]
+  (stylize [st/line-through (st/color c)]))
+
 
 (defn space
   ([] (space 1))
@@ -53,10 +69,9 @@
   [view {:style [(st/flex) (st/background "white") (st/padding 8 0 0 0)]}
    [view {:style [(st/padding 8)]}
     [text
-     [u [word "Четверг"]]
-     [space]
-     [u
-      [s [word "четвертого"]]
+     [u [word "В"] [space] [word "четверг"]
+      [space 4]
+      [selected [word "четвертого"]]
       [space 8]]
      [word "числа,"]]]])
 

@@ -24,8 +24,7 @@
 
 (def main-tabs
   (nav/create-tab-navigator
-   {
-    :recording-tab {:screen recording-stack}
+   {:recording-tab {:screen recording-stack}
     :books-tab     {:screen books-stack}
     :bookshelf-tab {:screen bookshelf/main}
     :friends-tab   {:screen friends/main}
