@@ -36,7 +36,7 @@
                          [view {:style [(st/width "5%") (st/background "red")]}]])]
     (fn []
       [view {:on-layout (fn [e] (let [w (-> e .-nativeEvent .-layout .-width)]
-                                  (println "on-layout:" e w) (reset! top-w w)))
+                                  (reset! top-w w)))
              :style     [(st/gray 1)]}
        [line-bg 0.1]
        (if @in-progress?

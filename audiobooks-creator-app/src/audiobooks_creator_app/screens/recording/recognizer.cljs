@@ -6,9 +6,11 @@
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
             [micro-rn.utils :as util :refer [await]]
+            [micro-rn.rn-utils :as rn-util]
             [re-frame.core :refer [subscribe dispatch]]
             [audiobooks-creator-app.screens.recording.model :as model]
             [audiobooks-creator-app.screens.recording.rte-css :refer [css]]
+            [micro-rn.text-decorator :refer [word space b p u s selected make-spaces]]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
@@ -16,9 +18,6 @@
 ;; react-native-speech-to-text-ios
 
 (def editor-ref (atom nil))
-
-(defn make-spaces [x]
-  (apply str (repeat x " ")))
 
 (def test-text (apply str (repeat 1 (str "
     <p><s>Четверг четвертого числа,</s></p>
@@ -28,47 +27,16 @@
     <p><u>Лигурийский регулировщик</u> регулировал в Лигурии</p>
 "))))
 
-(defn- stylize [st]
-  (let [this (r/current-component)]
-    (into [text (merge {:style st} (r/props this))] (r/children this))))
+(def layout (atom nil))
 
-(defn selected []
-  (stylize [st/line-through (st/gray 1) st/bold]))
-
-(defn word [s]
-  (let [selected? (atom false)]
-    (fn []
-      [(if @selected? selected text)
-       {:on-long-press #(swap! selected? not)} s])))
-
-(defn b []
-  (stylize [st/bold]))
-
-(defn i []
-  (stylize [st/italic]))
-
-(defn u []
-  (stylize [st/underline (st/color "#9a9a9a")]))
-
-(defn s []
-  (stylize [st/line-through (st/color "#ccc")]))
-
-(defn cr [c]
-  (stylize [st/line-through (st/color c)]))
-
-
-(defn space
-  ([] (space 1))
-  ([x] [word (make-spaces x)]))
-
-(defn p [s]
-  (let [this (r/current-component)]
-    (into [view [text s]] (r/children this))))
+(deref layout)
 
 (defn text-editor []
   [view {:style [(st/flex) (st/background "white") (st/padding 8 0 0 0)]}
    [view {:style [(st/padding 8)]}
+    [text {:on-layout #(reset! layout (rn-util/event->layout %))} "hello"]
     [text
+     [word "!!!"]
      [u [word "В"] [space] [word "четверг"]
       [space 4]
       [selected [word "четвертого"]]
