@@ -54,35 +54,63 @@
   (let [text-style (-> text-style (conj (when selected :invert)))
         text-style (-> text-style map-decorations)
         on-layout  (or on-layout identity)]
-    [touchable-opacity {:on-layout #(on-layout (rn-util/event->layout %))
-                        :style     [(st/padding 2)
-                                    (when selected (st/gray 9))
-                                    (when background-gray (st/gray 1))]
-                        :on-press  on-press}
+    [rn/touchable-highlight {:on-layout #(on-layout (rn-util/event->layout %))
+                             :style     [(st/padding 2)
+                                         (when selected (st/gray 9))
+                                         (when background-gray (st/gray 1))]
+                             :on-press  on-press}
      [rn/text {:style text-style} text]]))
 
+(defn icon-button [icon-name icon-text focused]
+  [touchable-opacity {:style [(st/justify-content "center")
+                              (st/align-items "center")]}
+   [nm/icon-fa {:color "#ccc" :size 22 :name icon-name}]
+   [text {:style [(st/color "#ccc") (st/font-size 8) (st/text-align "center")]} icon-text]])
+
+(defn editor-toolbar []
+  [view {:style [(st/flex)]}
+   [flexer]
+   [icon-button "search" "Find"]
+   [flexer]
+   [icon-button "eye-slash" "Hide deleted"]
+   [flexer]
+   [icon-button "strikethrough" "Mark as deleted"]
+   [flexer]
+   [icon-button "bold" "Volume +"]
+   [flexer]
+   [icon-button "italic" "Volume -"]
+   [flexer]
+   [icon-button "undo" "Undo"]
+   [flexer]
+   [icon-button "repeat" "Redo"]
+   [flexer]])
+
 (defn text-editor []
-  [view {:style [(st/flex) (st/background "white") (st/padding 8 0 0 0)]}
-   [p
-    [word {:text "В"}]
-    [word {:text "четверг" :text-style [:u :b]}]
-    [word {:text "четвертого" :text-style [:u]}]
-    [word {:text "числа"}]]
-   [p
-    [word {:text "Четыре" :background-gray true}]
-    [word {:text "c" :background-gray true}]
-    [word {:text "четвертью" :background-gray true}]
-    [word {:text "числа"}]]
-   [p
-    [word {:text "В" :text-style [:s]}]
-    [word {:text "четверг" :text-style [:s]}]
-    [word {:text "четвертого" :text-style [:s]}]
-    [word {:text "числа" :text-style [:s]}]]
-   [p
-    [word {:text "Четыре" :selected true}]
-    [word {:text "c" :selected true}]
-    [word {:text "четвертью"}]
-    [word {:text "числа"}]]])
+  [view {:style [(st/flex) st/row (st/background "white")]}
+   [view {:style [(st/width 48)]}
+    [editor-toolbar]]
+   [view {:style [(st/gray 1) (st/width 1)]}]
+   [view {:style [(st/padding 8 0 0 0)]}
+    [p
+     [word {:text "В"}]
+     [word {:text "четверг" :text-style [:u :b]}]
+     [word {:text "четвертого" :text-style [:u]}]
+     [word {:text "числа"}]]
+    [p
+     [word {:text "Четыре" :background-gray true}]
+     [word {:text "c" :background-gray true}]
+     [word {:text "четвертью" :background-gray true}]
+     [word {:text "числа"}]]
+    [p
+     [word {:text "В" :text-style [:s]}]
+     [word {:text "четверг" :text-style [:s]}]
+     [word {:text "четвертого" :text-style [:s]}]
+     [word {:text "числа" :text-style [:s]}]]
+    [p
+     [word {:text "Четыре" :selected true}]
+     [word {:text "c" :selected true}]
+     [word {:text "четвертью"}]
+     [word {:text "числа"}]]]])
 
 (comment
   (map-decorations [:u :b])

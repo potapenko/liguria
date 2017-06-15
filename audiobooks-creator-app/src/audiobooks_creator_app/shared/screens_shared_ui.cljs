@@ -1,6 +1,6 @@
 (ns audiobooks-creator-app.shared.screens-shared-ui
   (:require [audiobooks-creator-app.shared.native-modules :as nm]
-            [micro-rn.react-native :as c :refer [alert text view]]
+            [micro-rn.react-native :as rn :refer [alert text view]]
             [reagent.core :as r :refer [atom]]
             [micro-rn.utils :as util]))
 

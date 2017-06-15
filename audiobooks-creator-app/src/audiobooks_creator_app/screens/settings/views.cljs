@@ -1,7 +1,7 @@
 (ns audiobooks-creator-app.screens.settings.views
   (:require [audiobooks-creator-app.shared.installed-components :as ic]
             [audiobooks-creator-app.shared.native-modules :as nm]
-            [micro-rn.react-native :as c :refer [alert text view]]
+            [micro-rn.react-native :as rn :refer [alert text view]]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
             [micro-rn.utils :as util]
