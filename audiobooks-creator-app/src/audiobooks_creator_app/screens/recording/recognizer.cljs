@@ -42,16 +42,16 @@
 
 (defn- map-decorations [values]
   (->> (map #(case %
-               :selected (st/color "white")
-               :s        [st/line-through (st/color "#ccc")]
-               :u        st/underline
-               :b        st/bold
-               :i        st/italic nil) values)
+               :invert (st/color "white")
+               :s      [st/line-through (st/color "#ccc")]
+               :u      st/underline
+               :b      st/bold
+               :i      st/italic nil) values)
 
        (filter #(-> % nil? not)) flatten vec))
 
 (defn word [{:keys [text background-gray text-style selected editable on-press on-layout]}]
-  (let [text-style (-> text-style (conj (when selected :selected)))
+  (let [text-style (-> text-style (conj (when selected :invert)))
         text-style (-> text-style map-decorations)
         on-layout  (or on-layout identity)]
     [touchable-opacity {:on-layout #(on-layout (rn-util/event->layout %))
