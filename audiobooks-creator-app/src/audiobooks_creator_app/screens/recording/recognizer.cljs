@@ -38,35 +38,46 @@
     (into [view {:style [st/row st/wrap (st/padding 4 8)]}] (r/children this))))
 
 (defn map-decorations [values]
-  (mapv #(case %
-           :u st/underline    :b st/bold
-           :s st/line-through :i st/italic nil) values))
+  (vec
+   (filter #(-> % nil? not)
+           (map #(case %
+                   :selected (st/color "white")
+                   :u        st/underline
+                   :b        st/bold
+                   :s        st/line-through
+                   :i        st/italic nil) values))))
 
-(defn word [{:keys [text text-style selected on-press editable]}]
-  (let [text-style (map-decorations text-style)]
+(defn word [{:keys [text background-gray text-style selected on-press editable]}]
+  (let [text-style (-> text-style (conj (when selected :selected)))
+        text-style (-> text-style map-decorations)]
     [touchable-opacity {:style    [(st/padding 2)
-                                   (when selected (st/gray 1))]
+                                   (when selected (st/gray 9))
+                                   (when background-gray (st/gray 1))]
                         :on-press on-press }
-     (if-not editable
-       [rn/text {:style text-style} text]
-       [text-input {:style text-style :value text}])]))
+     [rn/text {:style text-style} text]]))
 
 (defn text-editor []
   [view {:style [(st/flex) (st/background "white") (st/padding 8 0 0 0)]}
    [p
     [word {:text "В"}]
-    [word {:text "четверг" :text-style [:u :b] :editable true :selected true}]
+    [word {:text "четверг" :text-style [:u :b]}]
     [word {:text "четвертого" :text-style [:u]}]
     [word {:text "числа"}]]
    [p
-    [word {:text "В" :selected true}]
-    [word {:text "четверг" :selected true}]
-    [word {:text "четвертого" :selected true}]
+    [word {:text "Четыре"  :background-gray true}]
+    [word {:text "c" :background-gray true}]
+    [word {:text "четвертью" :background-gray true}]
+    [word {:text "числа"}]]
+   [p
+    [word {:text "Четыре" :selected true}]
+    [word {:text "c" :selected true}]
+    [word {:text "четвертью" :selected true}]
     [word {:text "числа"}]]])
 
 (comment
   (map-decorations [:u :b])
-  (word {:text "четверг" :text-style [:u :b] :editable false :selected true})
+  (word {:text "четверг" :text-style [:u :b] :editable true :selected true})
+
   (-> @editor-ref (.showTitle false))
   (go
     (let [[err res] (<! (await (-> @editor-ref .getContentHtml)))]
