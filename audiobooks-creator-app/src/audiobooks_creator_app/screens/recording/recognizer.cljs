@@ -42,26 +42,31 @@
            :u st/underline    :b st/bold
            :s st/line-through :i st/italic nil) values))
 
-(defn word [s & decorations]
-  (let [decorations (set decorations)
-        selected    (decorations :selected)
-        editable    (decorations :editable)
-        text-style  (map-decorations decorations)]
-    [touchable-opacity {:style [(st/padding 2) (when selected (st/gray 1))]}
+(defn word [{:keys [text text-style selected on-press editable]}]
+  (let [text-style (map-decorations text-style)]
+    [touchable-opacity {:style    [(st/padding 2)
+                                   (when selected (st/gray 1))]
+                        :on-press on-press }
      (if-not editable
-       [text {:style text-style} s]
-       [text-input {:style text-style :value s}])]))
+       [rn/text {:style text-style} text]
+       [text-input {:style text-style :value text}])]))
 
 (defn text-editor []
   [view {:style [(st/flex) (st/background "white") (st/padding 8 0 0 0)]}
    [p
-    [word "В"] [word "четверг" :u :b :editable :selected] [word "четвертого" :u] [word "числа"]]
+    [word {:text "В"}]
+    [word {:text "четверг" :text-style [:u :b] :editable true :selected true}]
+    [word {:text "четвертого" :text-style [:u]}]
+    [word {:text "числа"}]]
    [p
-    [word "В" :selected] [word "четверг" :selected] [word "четвертого" :selected] [word "числа"]]])
+    [word {:text "В" :selected true}]
+    [word {:text "четверг" :selected true}]
+    [word {:text "четвертого" :selected true}]
+    [word {:text "числа"}]]])
 
 (comment
   (map-decorations [:u :b])
-  (word "четверг" :u)
+  (word {:text "четверг" :text-style [:u :b] :editable false :selected true})
   (-> @editor-ref (.showTitle false))
   (go
     (let [[err res] (<! (await (-> @editor-ref .getContentHtml)))]
