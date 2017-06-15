@@ -1,7 +1,7 @@
 (ns audiobooks-creator-app.screens.recording.recognizer
   (:require [audiobooks-creator-app.shared.installed-components :as ic]
             [audiobooks-creator-app.shared.native-modules :as nm]
-            [micro-rn.react-native :as rn :refer [alert text text-input view spacer flexer]]
+            [micro-rn.react-native :as rn :refer [alert text text-input view spacer flexer touchable-opacity]]
             [micro-rn.styles :as st]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
@@ -35,24 +35,29 @@
 
 (defn p []
   (let [this (r/current-component)]
-    (into [view {:style [st/row st/wrap (st/padding 4 8)]} ] (r/children this))))
+    (into [view {:style [st/row st/wrap (st/padding 4 8)]}] (r/children this))))
 
 (defn map-decorations [values]
   (mapv #(case %
-          :u st/underline    :b st/bold
-          :s st/line-through :i st/italic) values))
+           :u st/underline    :b st/bold
+           :s st/line-through :i st/italic nil) values))
 
 (defn word [s & decorations]
-  [view {:style [(st/padding 2)]}
-   [text {:style (map-decorations decorations)} s]])
+  (let [decorations (set decorations)
+        selected    (decorations :selected)
+        editable    (decorations :editable)
+        text-style  (map-decorations decorations)]
+    [touchable-opacity {:style [(st/padding 2) (when selected (st/gray 1))]}
+     (if-not editable
+       [text {:style text-style} s]
+       [text-input {:style text-style :value s}])]))
 
 (defn text-editor []
   [view {:style [(st/flex) (st/background "white") (st/padding 8 0 0 0)]}
    [p
-    [word "В"] [word "четверг" :u :b] [word "четвертого" :u][word "числа"]]
+    [word "В"] [word "четверг" :u :b :editable :selected] [word "четвертого" :u] [word "числа"]]
    [p
-    [word "В"][word "четверг"][word "четвертого"][word "числа"]]
-   ])
+    [word "В" :selected] [word "четверг" :selected] [word "четвертого" :selected] [word "числа"]]])
 
 (comment
   (map-decorations [:u :b])
