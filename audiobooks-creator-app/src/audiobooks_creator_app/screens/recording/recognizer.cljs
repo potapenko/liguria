@@ -34,26 +34,31 @@
 (deref layout)
 
 (defn p []
-  (let [this (r/current-component)]
-    (into [view {:style [st/row st/wrap (st/padding 4 8)]}] (r/children this))))
+  (let [this      (r/current-component)
+        props     (r/props this)
+        on-layout (or (:on-layout props) identity)]
+    (into [view {:on-layout #(on-layout (rn-util/event->layout %))
+                 :style     [st/row st/wrap (st/padding 4 8)]}] (r/children this))))
 
-(defn map-decorations [values]
+(defn- map-decorations [values]
   (->> (map #(case %
                :selected (st/color "white")
+               :s        [st/line-through (st/color "#ccc")]
                :u        st/underline
                :b        st/bold
-               :s        [st/line-through (st/color "#ccc")]
                :i        st/italic nil) values)
 
        (filter #(-> % nil? not)) flatten vec))
 
-(defn word [{:keys [text background-gray text-style selected on-press editable]}]
+(defn word [{:keys [text background-gray text-style selected editable on-press on-layout]}]
   (let [text-style (-> text-style (conj (when selected :selected)))
-        text-style (-> text-style map-decorations)]
-    [touchable-opacity {:style    [(st/padding 2)
-                                   (when selected (st/gray 9))
-                                   (when background-gray (st/gray 1))]
-                        :on-press on-press }
+        text-style (-> text-style map-decorations)
+        on-layout  (or on-layout identity)]
+    [touchable-opacity {:on-layout #(on-layout (rn-util/event->layout %))
+                        :style     [(st/padding 2)
+                                    (when selected (st/gray 9))
+                                    (when background-gray (st/gray 1))]
+                        :on-press  on-press}
      [rn/text {:style text-style} text]]))
 
 (defn text-editor []
