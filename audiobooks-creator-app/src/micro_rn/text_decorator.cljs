@@ -45,3 +45,12 @@
 (defn p [s]
   (let [this (r/current-component)]
     (into [view [text s]] (r/children this))))
+
+(comment
+  [text
+   [word "!!!"]
+   [u [word "В"] [space] [word "четверг"]
+    [space 4]
+    [selected [word "четвертого"]]
+    [space 8]]
+   [word "числа,"]])

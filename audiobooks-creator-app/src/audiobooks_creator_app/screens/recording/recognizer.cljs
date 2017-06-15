@@ -10,7 +10,6 @@
             [re-frame.core :refer [subscribe dispatch]]
             [audiobooks-creator-app.screens.recording.model :as model]
             [audiobooks-creator-app.screens.recording.rte-css :refer [css]]
-            [micro-rn.text-decorator :refer [word space b p u s selected make-spaces]]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
@@ -19,31 +18,45 @@
 
 (def editor-ref (atom nil))
 
+(defn make-spaces [x]
+  (apply str (repeat x " ")))
+
 (def test-text (apply str (repeat 1 (str "
-    <p><s>Четверг четвертого числа,</s></p>
-    <p><u>В четверг четвертого числа,</u></p>
-    <p><u>четыре с " (make-spaces 8) "четвертью числа" (make-spaces 18) "</u></p>
-    <p><s>Лигурийский регулировщик регулировал в Лигурии</s></p>
-    <p><u>Лигурийский регулировщик</u> регулировал в Лигурии</p>
+    Четверг четвертого числа,
+    В четверг четвертого числа,
+    четыре с " (make-spaces 8) "четвертью числа" (make-spaces 18) "
+    Лигурийский регулировщик регулировал в Лигурии
+    Лигурийский регулировщик регулировал в Лигурии
 "))))
 
 (def layout (atom nil))
 
 (deref layout)
 
+(defn p []
+  (let [this (r/current-component)]
+    (into [view {:style [st/row st/wrap (st/padding 4 8)]} ] (r/children this))))
+
+(defn map-decorations [values]
+  (mapv #(case %
+          :u st/underline    :b st/bold
+          :s st/line-through :i st/italic) values))
+
+(defn word [s & decorations]
+  [view {:style [(st/padding 2)]}
+   [text {:style (map-decorations decorations)} s]])
+
 (defn text-editor []
   [view {:style [(st/flex) (st/background "white") (st/padding 8 0 0 0)]}
-   [view {:style [(st/padding 8)]}
-    [text {:on-layout #(reset! layout (rn-util/event->layout %))} "hello"]
-    [text
-     [word "!!!"]
-     [u [word "В"] [space] [word "четверг"]
-      [space 4]
-      [selected [word "четвертого"]]
-      [space 8]]
-     [word "числа,"]]]])
+   [p
+    [word "В"] [word "четверг" :u :b] [word "четвертого" :u][word "числа"]]
+   [p
+    [word "В"][word "четверг"][word "четвертого"][word "числа"]]
+   ])
 
 (comment
+  (map-decorations [:u :b])
+  (word "четверг" :u)
   (-> @editor-ref (.showTitle false))
   (go
     (let [[err res] (<! (await (-> @editor-ref .getContentHtml)))]
