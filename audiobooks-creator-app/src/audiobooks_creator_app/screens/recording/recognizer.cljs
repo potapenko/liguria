@@ -38,14 +38,14 @@
     (into [view {:style [st/row st/wrap (st/padding 4 8)]}] (r/children this))))
 
 (defn map-decorations [values]
-  (vec
-   (filter #(-> % nil? not)
-           (map #(case %
-                   :selected (st/color "white")
-                   :u        st/underline
-                   :b        st/bold
-                   :s        st/line-through
-                   :i        st/italic nil) values))))
+  (->> (map #(case %
+               :selected (st/color "white")
+               :u        st/underline
+               :b        st/bold
+               :s        [st/line-through (st/color "#ccc")]
+               :i        st/italic nil) values)
+
+       (filter #(-> % nil? not)) flatten vec))
 
 (defn word [{:keys [text background-gray text-style selected on-press editable]}]
   (let [text-style (-> text-style (conj (when selected :selected)))
@@ -64,14 +64,19 @@
     [word {:text "четвертого" :text-style [:u]}]
     [word {:text "числа"}]]
    [p
-    [word {:text "Четыре"  :background-gray true}]
+    [word {:text "Четыре" :background-gray true}]
     [word {:text "c" :background-gray true}]
     [word {:text "четвертью" :background-gray true}]
     [word {:text "числа"}]]
    [p
+    [word {:text "В" :text-style [:s]}]
+    [word {:text "четверг" :text-style [:s]}]
+    [word {:text "четвертого" :text-style [:s]}]
+    [word {:text "числа" :text-style [:s]}]]
+   [p
     [word {:text "Четыре" :selected true}]
     [word {:text "c" :selected true}]
-    [word {:text "четвертью" :selected true}]
+    [word {:text "четвертью"}]
     [word {:text "числа"}]]])
 
 (comment
