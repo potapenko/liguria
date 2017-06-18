@@ -9,7 +9,8 @@
             [re-frame.core :refer [subscribe dispatch]]
             [audiobooks-creator-app.screens.recording.model :as model]
             [audiobooks-creator-app.screens.recording.rte-css :refer [css]]
-            [cljs.core.async :as async :refer [<! >! put! chan timeout]])
+            [cljs.core.async :as async :refer [<! >! put! chan timeout]]
+            [micro-rn.utils :as utils])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
@@ -50,14 +51,19 @@
        (filter #(-> % nil? not)) flatten vec))
 
 (defn word [word-data]
-  (let [selected  (atom false)
-        pos       (atom nil)
-        responder (rn/pan-responder-create {:on-start-should-set-pan-responder #(do (println "Set pan" text) true)
-                                            :on-pan-responder-grant            #(do (println "Grant" text)
-                                                                                    (reset! selected true))
-                                            :on-pan-responder-move             #(println "Move" text)
-                                            :on-pan-responder-release          #(do (println "Release" text)
-                                                                                    (reset! selected false))})]
+  (let [selected     (atom false)
+        pos          (atom nil)
+        gesture-data (atom nil)
+        responder    (rn/pan-responder-create {:on-start-should-set-pan-responder #(do (println "Set pan" text) true)
+                                               :on-pan-responder-grant            #(do (println "Grant" text)
+                                                                                       (println (rn-util/event->pan-data %))
+                                                                                       (reset! selected true))
+                                               :on-pan-responder-move             #(do
+                                                                                     (println "Move" text)
+                                                                                     (println (rn-util/getsture-state %2))
+                                                                                     #_(println (rn-util/event->pan-data %1)))
+                                               :on-pan-responder-release          #(do (println "Release" text)
+                                                                                       (reset! selected false))})]
     (fn [{:keys [text background-gray text-style] :as word-data}]
       (let [text-style (-> text-style (conj (when @selected :invert)))
             text-style (-> text-style map-decorations)]

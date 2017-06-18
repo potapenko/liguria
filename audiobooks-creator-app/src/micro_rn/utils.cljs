@@ -34,7 +34,7 @@
   (some-> x (transform-keys ->kebab-case-keyword)))
 
 (defn prepare-to-clj [x]
-  (some-> x js->clj all-keys-camel-to-dash))
+  (some-> x js->clj keywordize all-keys-camel-to-dash))
 
 (defn prepare-to-js [m]
   (clj->js (cemelify-keys m)))
