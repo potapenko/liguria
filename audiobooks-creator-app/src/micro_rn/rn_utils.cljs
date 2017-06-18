@@ -15,5 +15,5 @@
      :target     (-> e .-target)
      :timestamp  (-> e .-timestamp)}))
 
-(defn getsture-state [state]
+(defn ->getsture-state [state]
   (-> state utils/prepare-to-clj))

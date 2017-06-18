@@ -60,7 +60,7 @@
                                                                                        (reset! selected true))
                                                :on-pan-responder-move             #(do
                                                                                      (println "Move" text)
-                                                                                     (println (rn-util/getsture-state %2))
+                                                                                     (println (rn-util/->getsture-state %2))
                                                                                      #_(println (rn-util/event->pan-data %1)))
                                                :on-pan-responder-release          #(do (println "Release" text)
                                                                                        (reset! selected false))})]
