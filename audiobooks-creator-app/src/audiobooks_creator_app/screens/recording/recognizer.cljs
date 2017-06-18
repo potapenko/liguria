@@ -1,6 +1,5 @@
 (ns audiobooks-creator-app.screens.recording.recognizer
-  (:require [audiobooks-creator-app.shared.installed-components :as ic]
-            [audiobooks-creator-app.shared.native-modules :as nm]
+  (:require [audiobooks-creator-app.shared.native-modules :as nm]
             [micro-rn.react-native :as rn :refer [alert text text-input view spacer flexer touchable-opacity]]
             [micro-rn.styles :as st]
             [micro-rn.react-navigation :as nav]
@@ -50,16 +49,37 @@
 
        (filter #(-> % nil? not)) flatten vec))
 
-(defn word [{:keys [text background-gray text-style selected editable on-press on-layout]}]
-  (let [text-style (-> text-style (conj (when selected :invert)))
-        text-style (-> text-style map-decorations)
-        on-layout  (or on-layout identity)]
-    [rn/touchable-highlight {:on-layout #(on-layout (rn-util/event->layout %))
-                             :style     [(st/padding 2)
-                                         (when selected (st/gray 9))
-                                         (when background-gray (st/gray 1))]
-                             :on-press  on-press}
-     [rn/text {:style text-style} text]]))
+(defn create-pan-responder []
+  (rn/pan-responder-create {
+                               :on-start-should-set-pan-responder         #()
+                               :on-move-should-set-pan-responder          #()
+                               :on-pan-responder-grant                    #()
+                               :on-pan-responder-move                     #()
+                               :on-pan-responder-release                  #()
+                               :on-pan-responder-terminate                #()
+                               }))
+
+
+(defn word []
+  (let [selected  (atom false)
+        pos       (atom nil)
+        responder (rn/pan-responder-create {:on-start-should-set-pan-responder #(do (println "Set pan" text) true)
+                                            :on-pan-responder-grant            #(do (println "Grant" text)
+                                                                                    (reset! selected true))
+                                            :on-pan-responder-move             #(println "Move" text)
+                                            :on-pan-responder-release          #(do (println "Release" text)
+                                                                                    (reset! selected false))})]
+    (fn [{:keys [text background-gray text-style] :as word-data}]
+      (let [text-style (-> text-style (conj (when @selected :invert)))
+            text-style (-> text-style map-decorations)]
+        [view (merge
+               {:on-layout #(reset! pos (rn-util/event->layout %))
+                :style     [(st/padding 2)
+                            (when @selected (st/gray 9))
+                            (when background-gray (st/gray 1))]}
+               (some-> responder .-panHandlers js->clj))
+         [rn/text {:style text-style} text]]))
+    ))
 
 (defn icon-button [icon-name icon-text focused]
   [touchable-opacity {:style [(st/justify-content "center")

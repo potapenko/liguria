@@ -1,6 +1,5 @@
 (ns audiobooks-creator-app.screens.recording.recorder
-  (:require [audiobooks-creator-app.shared.installed-components :as ic]
-            [audiobooks-creator-app.shared.native-modules :as nm]
+  (:require [audiobooks-creator-app.shared.native-modules :as nm]
             [micro-rn.react-native :as rn :refer [alert text view spacer flexer]]
             [micro-rn.styles :as st]
             [micro-rn.react-navigation :as nav]
