@@ -49,18 +49,7 @@
 
        (filter #(-> % nil? not)) flatten vec))
 
-(defn create-pan-responder []
-  (rn/pan-responder-create {
-                               :on-start-should-set-pan-responder         #()
-                               :on-move-should-set-pan-responder          #()
-                               :on-pan-responder-grant                    #()
-                               :on-pan-responder-move                     #()
-                               :on-pan-responder-release                  #()
-                               :on-pan-responder-terminate                #()
-                               }))
-
-
-(defn word []
+(defn word [word-data]
   (let [selected  (atom false)
         pos       (atom nil)
         responder (rn/pan-responder-create {:on-start-should-set-pan-responder #(do (println "Set pan" text) true)
