@@ -50,8 +50,9 @@
 
        (filter #(-> % nil? not)) flatten vec))
 
-(defn word [word-data]
-  (let [selected     (atom false)
+(defn word [id]
+  (let [word (subscribe [::model/word id])
+        selected     (atom false)
         pos          (atom nil)
         gesture-data (atom nil)
         responder    (rn/pan-responder-create {:on-start-should-set-pan-responder #(do (println "Set pan" text) true)
@@ -64,8 +65,9 @@
                                                                                      #_(println (rn-util/event->pan-data %1)))
                                                :on-pan-responder-release          #(do (println "Release" text)
                                                                                        (reset! selected false))})]
-    (fn [{:keys [text background-gray text-style] :as word-data}]
-      (let [text-style (-> text-style (conj (when @selected :invert)))
+    (fn []
+      (let [{:keys [text background-gray text-style]} @word
+            text-style (-> text-style (conj (when @selected :invert)))
             text-style (-> text-style map-decorations)]
         [view (merge
                {:on-layout #(reset! pos (rn-util/event->layout %))
@@ -73,8 +75,7 @@
                             (when @selected (st/gray 9))
                             (when background-gray (st/gray 1))]}
                (some-> responder .-panHandlers js->clj))
-         [rn/text {:style text-style} text]]))
-    ))
+         [rn/text {:style text-style} text]]))))
 
 (defn icon-button [icon-name icon-text focused]
   [touchable-opacity {:style [(st/justify-content "center")
@@ -101,33 +102,45 @@
    [flexer]])
 
 (defn text-editor []
-  [view {:style [(st/flex) st/row (st/background "white")]}
-   [view {:style [(st/width 48)]}
-    [editor-toolbar]]
-   [view {:style [(st/gray 1) (st/width 1)]}]
-   [view {:style [(st/padding 8 0 0 0)]}
-    [p
-     [word {:text "В"}]
-     [word {:text "четверг" :text-style [:u :b]}]
-     [word {:text "четвертого" :text-style [:u]}]
-     [word {:text "числа"}]]
-    [p
-     [word {:text "Четыре" :background-gray true}]
-     [word {:text "c" :background-gray true}]
-     [word {:text "четвертью" :background-gray true}]
-     [word {:text "числа"}]]
-    [p
-     [word {:text "В" :text-style [:s]}]
-     [word {:text "четверг" :text-style [:s]}]
-     [word {:text "четвертого" :text-style [:s]}]
-     [word {:text "числа" :text-style [:s]}]]
-    [p
-     [word {:text "Четыре" :selected true}]
-     [word {:text "c" :selected true}]
-     [word {:text "четвертью"}]
-     [word {:text "числа"}]]]])
+  (let [transcript (subscribe [::model/transcript])]
+    (dispatch [::model/transcript
+               [
+                [{:text "В"}
+                 {:text "четверг" :text-style [:u :b]}
+                 {:text "четвертого" :text-style [:u]}
+                 {:text "числа"}]
+                [{:text "Четыре" :background-gray true}
+                 {:text "c" :background-gray true}
+                 {:text "четвертью" :background-gray true}
+                 {:text "числа"}]
+                [{:text "В" :text-style [:s]}
+                 {:text "четверг" :text-style [:s]}
+                 {:text "четвертого" :text-style [:s]}
+                 {:text "числа" :text-style [:s]}]
+                [{:text "Четыре" :selected true}
+                 {:text "c" :selected true}
+                 {:text "четвертью"}
+                 {:text "числа"}]
+                ]])
+
+    (fn []
+      [view {:style [(st/flex) st/row (st/background "white")]}
+       [view {:style [(st/width 48)]}
+        [editor-toolbar]]
+       [view {:style [(st/gray 1) (st/width 1)]}]
+       [view {:style [(st/padding 8 0 0 0)]}
+        (let [c (atom 0)]
+          (doall
+           (for [x @transcript]
+             ^{:key {:id (str "paragraph-" (swap! c inc))}}
+             [p (doall
+               (for [w x]
+                 ^{:key {:id (str "word-" (:id w))}} [word (:id w)]))]
+             )))]])))
 
 (comment
+  (subscribe [::model/word 1])
+  (-> (subscribe [::model/word 1]) deref (get 1))
   (map-decorations [:u :b])
   (word {:text "четверг" :text-style [:u :b] :editable true :selected true})
 

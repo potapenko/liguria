@@ -77,7 +77,7 @@
          [recording-button "stop" true #(stop-recording)]
          [recording-button "fiber-manual-record" false #(start-recording)])
        [recording-button "play-arrow" false #()]
-       [recording-button "edit" false #()]])))
+       [recording-button "content-paste" false #()]])))
 
 (comment
   (start-recording)

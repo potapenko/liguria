@@ -24,6 +24,5 @@
 (def rte-actions (.-actions rte-modules))
 
 (comment
-  (js/Object.keys modules)
-  )
+  (js/Object.keys modules))
 

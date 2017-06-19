@@ -36,11 +36,15 @@
      (assoc db
             ::words (into {} (for [x (flatten with-ids)] {(:id x) x}))
             ::transcript (for [p with-ids]
-                           (for [x with-ids] {:id (:id x)}))))))
+                           (for [x p] (select-keys x [:id])))))))
+(reg-sub
+ ::word
+ (fn [db [_ id]]
+   (get-in db [::words id])))
 
 (reg-sub
  ::word-data
- (fn [db id k]
+ (fn [db [_ id k]]
    (get-in db [::words id k])))
 
 (reg-event-db
