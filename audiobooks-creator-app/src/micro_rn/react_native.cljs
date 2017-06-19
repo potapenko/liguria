@@ -140,8 +140,10 @@
 (defn spacer [s]
   [view {:style [(width s) (height s)]}])
 
-(defn flexer []
-  [view {:style [(flex)]}])
+(defn flexer
+  ([] (flexer 1))
+  ([f]
+  [view {:style [(flex f)]}]))
 
 (def default-button-style [(overflow "hidden")
                            (border 1 "rgba(0,0,0,0.2)")

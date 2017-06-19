@@ -51,24 +51,19 @@
        (filter #(-> % nil? not)) flatten vec))
 
 (defn word [id]
-  (let [word (subscribe [::model/word id])
-        selected     (atom false)
+  (let [word         (subscribe [::model/word id])
+        selected     (subscribe [::model/word-data :selected])
         pos          (atom nil)
         gesture-data (atom nil)
-        responder    (rn/pan-responder-create {:on-start-should-set-pan-responder #(do (println "Set pan" text) true)
-                                               :on-pan-responder-grant            #(do (println "Grant" text)
-                                                                                       (println (rn-util/event->pan-data %))
-                                                                                       (reset! selected true))
-                                               :on-pan-responder-move             #(do
-                                                                                     (println "Move" text)
-                                                                                     (println (rn-util/->getsture-state %2))
-                                                                                     #_(println (rn-util/event->pan-data %1)))
-                                               :on-pan-responder-release          #(do (println "Release" text)
-                                                                                       (reset! selected false))})]
+        responder    (rn/pan-responder-create
+                      {:on-start-should-set-pan-responder #(do true)
+                       :on-pan-responder-grant            #(dispatch [::model/start-select id])
+                       :on-pan-responder-move             #(dispatch [::model/select-data id (rn-util/->getsture-state %2)])
+                       :on-pan-responder-release          #(dispatch [::model/end-select id])})]
     (fn []
       (let [{:keys [text background-gray text-style]} @word
-            text-style (-> text-style (conj (when @selected :invert)))
-            text-style (-> text-style map-decorations)]
+            text-style                                (-> text-style (conj (when @selected :invert)))
+            text-style                                (-> text-style map-decorations)]
         [view (merge
                {:on-layout #(reset! pos (rn-util/event->layout %))
                 :style     [(st/padding 2)
@@ -79,33 +74,31 @@
 
 (defn icon-button [icon-name icon-text focused]
   [touchable-opacity {:style [(st/justify-content "center")
-                              (st/align-items "center")]}
+                              (st/align-items "center")
+                              (st/padding 8)]}
    [nm/icon-fa {:color "#ccc" :size 22 :name icon-name}]
    [text {:style [(st/color "#ccc") (st/font-size 8) (st/text-align "center")]} icon-text]])
 
 (defn editor-toolbar []
   [view {:style [(st/flex)]}
-   [flexer]
-   [icon-button "search" "Find"]
+   [icon-button "question-circle-o" "Help"]
    [flexer]
    [icon-button "eye-slash" "Hide deleted"]
    [flexer]
    [icon-button "strikethrough" "Mark as deleted"]
    [flexer]
-   [icon-button "bold" "Volume +"]
+   [icon-button "bold" "Bold"]
    [flexer]
-   [icon-button "italic" "Volume -"]
+   [icon-button "italic" "Italic"]
    [flexer]
    [icon-button "undo" "Undo"]
    [flexer]
-   [icon-button "repeat" "Redo"]
-   [flexer]])
+   [icon-button "repeat" "Redo"]])
 
 (defn text-editor []
   (let [transcript (subscribe [::model/transcript])]
     (dispatch [::model/transcript
-               [
-                [{:text "В"}
+               [[{:text "В"}
                  {:text "четверг" :text-style [:u :b]}
                  {:text "четвертого" :text-style [:u]}
                  {:text "числа"}]

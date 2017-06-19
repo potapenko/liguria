@@ -52,6 +52,21 @@
  (fn [db [_ id k v]]
    (assoc-in db [::words id k] v)))
 
+(reg-event-db
+ ::start-select
+ (fn [db [_ word-id]]
+   db))
+
+(reg-event-db
+ ::end-select
+ (fn [db [_ word-id]]
+   db))
+
+(reg-event-db
+ ::select-data
+ (fn [db [_ word-id gesture-state]]
+   db))
+
 (comment
   (reg-sub
    ::data
