@@ -52,8 +52,6 @@
 
 (defn word [id]
   (let [word         (subscribe [::model/word id])
-        selected     (subscribe [::model/word-data :selected])
-        pos          (atom nil)
         gesture-data (atom nil)
         responder    (rn/pan-responder-create
                       {:on-start-should-set-pan-responder #(do true)
@@ -61,16 +59,19 @@
                        :on-pan-responder-move             #(dispatch [::model/select-data id (rn-util/->getsture-state %2)])
                        :on-pan-responder-release          #(dispatch [::model/end-select id])})]
     (fn []
-      (let [{:keys [text background-gray text-style]} @word
-            text-style                                (-> text-style (conj (when @selected :invert)))
-            text-style                                (-> text-style map-decorations)]
+      (let [{:keys [text
+                    background-gray
+                    text-style
+                    selected]} @word
+            text-style         (-> text-style (conj (when selected :invert)))
+            text-style         (-> text-style map-decorations)]
         [view (merge
-               {:on-layout #(reset! pos (rn-util/event->layout %))
+               {:on-layout #(dispatch [::model/word-data id :layout (rn-util/event->layout %)])
                 :style     [(st/padding 2)
-                            (when @selected (st/gray 9))
+                            (when selected (st/gray 9))
                             (when background-gray (st/gray 1))]}
-               (some-> responder .-panHandlers js->clj))
-         [rn/text {:style text-style} text]]))))
+               (rn-util/->gesture-props responder))
+         [rn/text {:style text-style} text (str (if selected "1" "0"))]]))))
 
 (defn icon-button [icon-name icon-text focused]
   [touchable-opacity {:style [(st/justify-content "center")
@@ -132,7 +133,9 @@
              )))]])))
 
 (comment
-  (subscribe [::model/word 1])
+  (subscribe [::model/word-data 1 :selected])
+  (subscribe [::model/word-data 2 :layout])
+  (subscribe [::model/word 13])
   (-> (subscribe [::model/word 1]) deref (get 1))
   (map-decorations [:u :b])
   (word {:text "четверг" :text-style [:u :b] :editable true :selected true})

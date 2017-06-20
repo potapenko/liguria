@@ -47,24 +47,30 @@
  (fn [db [_ id k]]
    (get-in db [::words id k])))
 
+(defn set-word-data [db id k v]
+  (assoc-in db [::words id k] v))
+
 (reg-event-db
  ::word-data
  (fn [db [_ id k v]]
-   (assoc-in db [::words id k] v)))
+   (set-word-data db id k v)))
 
 (reg-event-db
  ::start-select
  (fn [db [_ word-id]]
-   db))
+   ;; (println "start-select:" word-id)
+   (-> db (set-word-data word-id :selected true))))
 
 (reg-event-db
  ::end-select
  (fn [db [_ word-id]]
-   db))
+   ;; (println "end-select:" word-id)
+   (-> db (set-word-data word-id :selected false))))
 
 (reg-event-db
  ::select-data
  (fn [db [_ word-id gesture-state]]
+   ;; (println "select-data:" word-id gesture-state)
    db))
 
 (comment

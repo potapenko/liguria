@@ -17,3 +17,6 @@
 
 (defn ->getsture-state [state]
   (-> state utils/prepare-to-clj))
+
+(defn ->gesture-props [responder]
+  (some-> responder .-panHandlers js->clj))
