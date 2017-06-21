@@ -124,15 +124,16 @@
        [view {:style [(st/width 48)]}
         [editor-toolbar]]
        [view {:style [(st/gray 1) (st/width 1)]}]
-       [view {:style [(st/padding 8 0 0 0)]}
-        (let [c (atom 0)]
-          (doall
-           (for [x @transcript]
-             ^{:key {:id (str "paragraph-" (swap! c inc))}}
-             [p (doall
-               (for [w x]
-                 ^{:key {:id (str "word-" (:id w))}} [word (:id w)]))]
-             )))]])))
+       [rn/touchable-without-feedback {:on-press #(dispatch [::model/deselect])}
+        [view {:style [(st/padding 0 0 0 0)]}
+         (let [c (atom 0)]
+           (doall
+            (for [x @transcript]
+              ^{:key {:id (str "paragraph-" (swap! c inc))}}
+              [p (doall
+                  (for [w x]
+                    ^{:key {:id (str "word-" (:id w))}} [word (:id w)]))]
+              )))]]])))
 
 (comment
   (subscribe [::model/word-data 1 :selected])
