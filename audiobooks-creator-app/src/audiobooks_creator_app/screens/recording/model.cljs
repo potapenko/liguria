@@ -1,6 +1,7 @@
 (ns audiobooks-creator-app.screens.recording.model
   (:require [re-frame.core :refer [reg-sub reg-event-db]]
-            [clojure.core.reducers :as red]))
+            [clojure.core.reducers :as red])
+  (:require-macros [micro-rn.macros :refer [...]]))
 
 (reg-sub
  ::monitoring
@@ -13,7 +14,7 @@
    (assoc db ::monitoring value)))
 
 (reg-sub ::recording (fn [db _]
-   (get db ::recording false)))
+                       (get db ::recording false)))
 
 (reg-event-db
  ::recording
@@ -37,6 +38,7 @@
             ::words (into {} (for [x (flatten with-ids)] {(:id x) x}))
             ::transcript (for [p with-ids]
                            (for [x p] (select-keys x [:id])))))))
+
 (reg-sub
  ::word
  (fn [db [_ id]]
@@ -57,21 +59,48 @@
 
 (reg-event-db
  ::start-select
- (fn [db [_ word-id]]
-   ;; (println "start-select:" word-id)
-   (-> db (set-word-data word-id :selected true))))
+ (fn [db [_ id]]
+   ;; (println "start-select:" id)
+   (-> db (set-word-data id :selected true))))
 
 (reg-event-db
  ::end-select
- (fn [db [_ word-id]]
-   ;; (println "end-select:" word-id)
-   (-> db (set-word-data word-id :selected false))))
+ (fn [db [_ id]]
+   ;; (println "end-select:" id)
+   (-> db (set-word-data id :selected false))))
+
+(defn deselect-all [db])
+
+(defn calculate-collision [words gesture-state]
+  (let [{:keys [move-x move-y]} gesture-state]
+    (->> words vals
+         (filter (fn [w]
+                   (let [{:keys [width height page-x page-y]} (:layout w)
+                         left                                 page-x
+                         right                                (+ page-x width)
+                         top                                  page-y
+                         bottom                               (+ page-y height)]
+                     (when  (and (<= left move-x right)
+                                 (<= top move-y bottom))
+                       (println (... left move-x right) (... top move-y bottom) (:text w)))
+                     (and (<= left move-x right)
+                          (<= top move-y bottom)))))
+         first)))
 
 (reg-event-db
  ::select-data
  (fn [db [_ word-id gesture-state]]
    ;; (println "select-data:" word-id gesture-state)
-   db))
+   (let [first-word    (-> db ::words (get word-id))
+         last-selected (calculate-collision  (::words db) gesture-state)]
+     (println (... last-selected))
+     (->
+      db
+      #_(assoc (map)))
+     ;; найти слово в коордиднатах
+     ;; убрать селекшен
+     ;; выделить все слова от первого до этого
+     )db))
 
 (comment
   (reg-sub
@@ -82,5 +111,4 @@
   (reg-event-db
    ::data
    (fn [db [_ value]]
-     (assoc db ::data value)))
-  )
+     (assoc db ::data value))))

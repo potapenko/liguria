@@ -64,14 +64,16 @@
                     text-style
                     selected]} @word
             text-style         (-> text-style (conj (when selected :invert)))
-            text-style         (-> text-style map-decorations)]
+            text-style         (-> text-style map-decorations)
+            view-ref           (atom nil)]
         [view (merge
-               {:on-layout #(dispatch [::model/word-data id :layout (rn-util/event->layout %)])
+               {:ref       #(reset! view-ref %)
+                :on-layout #(rn-util/event->layout-ref @view-ref (fn [e] (dispatch [::model/word-data id :layout e])))
                 :style     [(st/padding 2)
                             (when selected (st/gray 9))
-                            (when background-gray (st/gray 1))]}
+                            (when (and (not selected) background-gray) (st/gray 1))]}
                (rn-util/->gesture-props responder))
-         [rn/text {:style text-style} text (str (if selected "1" "0"))]]))))
+         [rn/text {:style text-style} text]]))))
 
 (defn icon-button [icon-name icon-text focused]
   [touchable-opacity {:style [(st/justify-content "center")
@@ -134,7 +136,7 @@
 
 (comment
   (subscribe [::model/word-data 1 :selected])
-  (subscribe [::model/word-data 2 :layout])
+  (subscribe [::model/word-data 1 :layout])
   (subscribe [::model/word 13])
   (-> (subscribe [::model/word 1]) deref (get 1))
   (map-decorations [:u :b])

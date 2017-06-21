@@ -1,9 +1,14 @@
 (ns micro-rn.rn-utils
-  (:require [micro-rn.utils :as utils]))
+  (:require [micro-rn.utils :as utils])
+  (:require-macros [micro-rn.macros :refer [...]]))
 
 (defn event->layout [e]
-  (let [{:strs [x y width height]} (-> e .-nativeEvent .-layout js->clj)]
-    {:w width :h height :x x :y y}))
+  (some-> e .-nativeEvent .-layout utils/prepare-to-clj))
+
+(defn event->layout-ref [ref cb]
+  (some-> ref (.measure
+               (fn [x y width height page-x page-y]
+                 (cb (... x y width height page-x page-y))))))
 
 (defn event->pan-data [e]
   (let [e (-> e .-nativeEvent)]
