@@ -57,19 +57,27 @@
  (fn [db [_ id k v]]
    (set-word-data db id k v)))
 
+(defn deselect-all [db]
+  (assoc db ::words
+         (reduce-kv (fn [m k v]
+                      (assoc m k (assoc v :selected false))) {} (::words db))))
+
+(reg-event-db
+ ::deselect
+ (fn [db [_ id]]
+   (-> db deselect-all)))
+
 (reg-event-db
  ::start-select
  (fn [db [_ id]]
-   ;; (println "start-select:" id)
-   (-> db (set-word-data id :selected true))))
+   (-> db
+       deselect-all
+       (set-word-data id :selected true))))
 
 (reg-event-db
  ::end-select
  (fn [db [_ id]]
-   ;; (println "end-select:" id)
-   (-> db (set-word-data id :selected false))))
-
-(defn deselect-all [db])
+   db))
 
 (defn calculate-collision [words gesture-state]
   (let [{:keys [move-x move-y]} gesture-state]
@@ -87,20 +95,25 @@
                           (<= top move-y bottom)))))
          first)))
 
+
+(defn select-words-range [db from to]
+  (assoc db ::words
+         (reduce-kv (fn [m k v]
+                      (assoc m k
+                       (assoc v :selected
+                              (or (<= (:id from) (:id v) (:id to))
+                                  (<= (:id to) (:id v) (:id from)))))) {} (::words db))))
+
 (reg-event-db
  ::select-data
  (fn [db [_ word-id gesture-state]]
-   ;; (println "select-data:" word-id gesture-state)
    (let [first-word    (-> db ::words (get word-id))
          last-selected (calculate-collision  (::words db) gesture-state)]
-     (println (... last-selected))
-     (->
-      db
-      #_(assoc (map)))
-     ;; найти слово в коордиднатах
-     ;; убрать селекшен
-     ;; выделить все слова от первого до этого
-     )db))
+     (if last-selected
+         (-> db
+             (select-words-range first-word last-selected))
+         db)
+     )))
 
 (comment
   (reg-sub
