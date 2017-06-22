@@ -63,20 +63,26 @@
                       (assoc m k (assoc v :selected false))) {} (::words db))))
 
 (reg-event-db
+ ::editor-on-layout
+ (fn [db [_ id layout-data]]
+   (println "editor on layout:" layout-data)
+   db))
+
+(reg-event-db
  ::deselect
  (fn [db [_ id]]
    (-> db deselect-all)))
 
 (reg-event-db
  ::start-select
- (fn [db [_ id]]
+ (fn [db [_ id gesture-state]]
    (-> db
        deselect-all
        (set-word-data id :selected true))))
 
 (reg-event-db
  ::end-select
- (fn [db [_ id]]
+ (fn [db [_ id gesture-state]]
    db))
 
 (defn calculate-collision [words gesture-state]
@@ -88,9 +94,6 @@
                          right                                (+ page-x width)
                          top                                  page-y
                          bottom                               (+ page-y height)]
-                     (when  (and (<= left move-x right)
-                                 (<= top move-y bottom))
-                       (println (... left move-x right) (... top move-y bottom) (:text w)))
                      (and (<= left move-x right)
                           (<= top move-y bottom)))))
          first)))

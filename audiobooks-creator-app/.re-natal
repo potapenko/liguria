@@ -15,8 +15,8 @@
     "react-native-aws3",
     "react-native-speech-to-text-ios",
     "react-native-couchbase-lite",
-    "react-native-fence-html",
-    "react-addons-shallow-compare"
+    "react-addons-shallow-compare",
+    "react-native-double-click"
   ],
   "imageDirs": [
     "images"

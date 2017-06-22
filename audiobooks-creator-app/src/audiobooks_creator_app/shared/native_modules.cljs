@@ -23,6 +23,8 @@
 (def rte-toolbar (r/adapt-react-class (.-RichTextToolbar rte-modules)))
 (def rte-actions (.-actions rte-modules))
 
+(def double-click (-> (js/require "react-native-double-click") r/adapt-react-class))
+
 (comment
   (js/Object.keys modules))
 

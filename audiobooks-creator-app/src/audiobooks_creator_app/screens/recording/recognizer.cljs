@@ -55,9 +55,9 @@
         gesture-data (atom nil)
         responder    (rn/pan-responder-create
                       {:on-start-should-set-pan-responder #(do true)
-                       :on-pan-responder-grant            #(dispatch [::model/start-select id])
+                       :on-pan-responder-grant            #(dispatch [::model/start-select id (rn-util/->getsture-state %2)])
                        :on-pan-responder-move             #(dispatch [::model/select-data id (rn-util/->getsture-state %2)])
-                       :on-pan-responder-release          #(dispatch [::model/end-select id])})]
+                       :on-pan-responder-release          #(dispatch [::model/end-select id (rn-util/->getsture-state %2)])})]
     (fn []
       (let [{:keys [text
                     background-gray
@@ -68,7 +68,7 @@
             view-ref           (atom nil)]
         [view (merge
                {:ref       #(reset! view-ref %)
-                :on-layout #(rn-util/event->layout-ref @view-ref (fn [e] (dispatch [::model/word-data id :layout e])))
+                :on-layout #(rn-util/event->layout-ref @view-ref (fn [e] (println "word on layout") (dispatch [::model/word-data id :layout e])))
                 :style     [(st/padding 2)
                             (when selected (st/gray 9))
                             (when (and (not selected) background-gray) (st/gray 1))]}
@@ -125,7 +125,7 @@
         [editor-toolbar]]
        [view {:style [(st/gray 1) (st/width 1)]}]
        [rn/touchable-without-feedback {:on-press #(dispatch [::model/deselect])}
-        [view {:style [(st/padding 0 0 0 0)]}
+        [view {:style     [(st/padding 0 0 0 0)]}
          (let [c (atom 0)]
            (doall
             (for [x @transcript]
