@@ -21,7 +21,9 @@
      :timestamp  (-> e .-timestamp)}))
 
 (defn ->getsture-state [state]
-  (-> state utils/prepare-to-clj))
+  (assoc
+   (-> state utils/prepare-to-clj)
+   :timestamp (js/Date.now)))
 
 (defn ->gesture-props [responder]
   (some-> responder .-panHandlers js->clj))
@@ -32,13 +34,15 @@
       (js/Math.pow (- y1 y0) 2))))
 
 (defn double-tap [prev-gesture-state current-gesture-state]
-  (let [distance  (distance (:x0 prev-gesture-state)
-                            (:y0 prev-gesture-state)
-                            (:x0 current-gesture-state)
-                            (:y0 current-gesture-state))
-        delay     (- (:timestamp prev-gesture-state)
-                     (:timestamp current-gesture-state))
-        radius    20
-        max-delay 300]
-    (and (< delay max-delay)
-         (< distance radius))))
+  (when prev-gesture-state
+    (let [dx        (distance (:x-0 prev-gesture-state)
+                              (:y-0 prev-gesture-state)
+                              (:x-0 current-gesture-state)
+                              (:y-0 current-gesture-state))
+          delay     (- (:timestamp current-gesture-state)
+                       (:timestamp prev-gesture-state))
+          radius    20
+          max-delay 300]
+      (println (... dx delay))
+      (and (< delay max-delay)
+           (< dx radius)))))
