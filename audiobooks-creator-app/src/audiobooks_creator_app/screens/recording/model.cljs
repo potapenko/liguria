@@ -98,11 +98,15 @@
             :prev-click id))))
 
 (reg-event-db
+ ::select-words-line
+ (fn [db [_ id]]
+   (let [clicked-y (-> db ::words (get id) :layout :page-y)]
+     (map-words db #(assoc % :selected (= clicked-y (-> % :layout :page-y)))))))
+
+(reg-event-db
  ::word-double-click
  (fn [db [_ id]]
-   (map-words db #(assoc % :selected
-                         (or (<= (:id from) (:id %) (:id to))
-                             (<= (:id to) (:id %) (:id from)))))
+   (dispatch [::select-words-line id])
    db))
 
 (defn calculate-collision [words gesture-state]
