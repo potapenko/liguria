@@ -44,9 +44,10 @@
 
 (defn word [id]
   (let [word         (subscribe [::model/word id])
+        mode         (subscribe [::model/mode])
         gesture-data (atom nil)
         responder    (rn/pan-responder-create
-                      {:on-start-should-set-pan-responder #(do true)
+                      {:on-start-should-set-pan-responder #(= @mode :edit)
                        :on-pan-responder-grant            #(dispatch [::model/word-click id (rn-util/->getsture-state %2)])
                        :on-pan-responder-move             #(dispatch [::model/select-data id (rn-util/->getsture-state %2)])
                        :on-pan-responder-release          #(dispatch [::model/word-release id (rn-util/->getsture-state %2)])})]
@@ -55,15 +56,17 @@
                     background-gray
                     text-style
                     selected]} @word
+            selected           (and selected (= @mode :edit))
+            background-gray    (and (not selected) background-gray)
             text-style         (-> text-style (conj (when selected :invert)))
             text-style         (-> text-style map-decorations)
             view-ref           (atom nil)]
         [view (merge
                {:ref       #(reset! view-ref %)
                 :on-layout #(rn-util/event->layout-ref @view-ref (fn [e] (dispatch [::model/word-data id :layout e])))
-                :style     [(st/padding 2)
+                :style     [(st/padding 4 2)
                             (when selected (st/gray 9))
-                            (when (and (not selected) background-gray) (st/gray 1))]}
+                            (when background-gray (st/gray 1))]}
                (rn-util/->gesture-props responder))
          [rn/text {:style (conj text-style (st/font-size 16))} text]]))))
 
@@ -92,25 +95,24 @@
 
 (defn text-editor []
   (let [transcript (subscribe [::model/transcript])
-        mode (subscribe [::model/mode])]
+        mode       (subscribe [::model/mode])]
     (dispatch [::model/transcript
                [[{:text "В"}
                  {:text "четверг" :text-style [:u :b]}
                  {:text "четвертого" :text-style [:u]}
-                 {:text "числа"}]
-                [{:text "Четыре" :background-gray true}
+                 {:text "числа"}
+                 {:text "четыре" :background-gray true}
                  {:text "c" :background-gray true}
                  {:text "четвертью" :background-gray true}
                  {:text "числа"}]
                 [{:text "В" :text-style [:s]}
                  {:text "четверг" :text-style [:s]}
                  {:text "четвертого" :text-style [:s]}
-                 {:text "числа" :text-style [:s]}]
-                [{:text "Четыре" :selected true}
+                 {:text "числа" :text-style [:s]}
+                 {:text "четыре" :selected true}
                  {:text "c" :selected true}
                  {:text "четвертью"}
-                 {:text "числа"}]
-                ]])
+                 {:text "числа"}]]])
 
     (fn []
       [view {:style [(st/flex) st/row (st/background "white")]}
@@ -119,15 +121,14 @@
           [editor-toolbar]])
        [view {:style [(st/gray 1) (st/width 1)]}]
        [rn/touchable-without-feedback {:on-press #(dispatch [::model/deselect])}
-        [view {:style     [(st/padding 0 0 0 0)]}
+        [view {:style [(st/padding 0 0 0 0) (st/flex)]}
          (let [c (atom 0)]
            (doall
             (for [x @transcript]
               ^{:key {:id (str "paragraph-" (swap! c inc))}}
               [p (doall
                   (for [w x]
-                    ^{:key {:id (str "word-" (:id w))}} [word (:id w)]))]
-              )))]]])))
+                    ^{:key {:id (str "word-" (:id w))}} [word (:id w)]))])))]]])))
 
 (comment
   (subscribe [::model/word-data 1 :selected])
