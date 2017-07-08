@@ -25,6 +25,8 @@
 
 (def double-click (-> (js/require "react-native-double-click") r/adapt-react-class))
 
+(def search-input (-> (js/require "react-native-search-input") .-SearchInput r/adapt-react-class))
+
 (comment
   (js/Object.keys modules))
 

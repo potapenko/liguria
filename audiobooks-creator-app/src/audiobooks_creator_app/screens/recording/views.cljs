@@ -17,9 +17,7 @@
     [view {:style {:flex 1}}
      [recorder/monitor]
      [recorder/recording-controls]
-     [rz/text-editor]
-     #_[view {:style {:flex 1 :padding 8}}
-      [text "Recording:"]]]))
+     [rz/text-editor]]))
 
 (def main
   (nav/create-screen

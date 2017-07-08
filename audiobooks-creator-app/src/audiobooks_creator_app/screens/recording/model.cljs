@@ -140,7 +140,8 @@
 (reg-sub
  ::mode
  (fn [db _]
-   (get db ::mode :idle))) ;; :edit :search :record :idle
+   [:edit :search :record :idle]
+   (get db ::mode :search #_:idle)))
 
 (reg-event-db
  ::mode

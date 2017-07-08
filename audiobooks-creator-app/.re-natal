@@ -16,7 +16,8 @@
     "react-native-speech-to-text-ios",
     "react-native-couchbase-lite",
     "react-addons-shallow-compare",
-    "react-native-double-click"
+    "react-native-double-click",
+    "react-native-search-input"
   ],
   "imageDirs": [
     "images"

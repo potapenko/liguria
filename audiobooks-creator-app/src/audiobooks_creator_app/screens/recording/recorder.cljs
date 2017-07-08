@@ -4,6 +4,7 @@
             [micro-rn.styles :as st]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
+            [reagent.ratom :as ra]
             [micro-rn.utils :as util]
             [audiobooks-creator-app.shared.screens-shared-ui :as sh]
             [re-frame.core :refer [subscribe dispatch]]
@@ -67,19 +68,31 @@
                                       (st/overflow "hidden")]
                            :on-press on-press}
      [view {:style {:justify-content "center" :align-items "center"}}
-      [nm/icon-md {:color (if-not focused "#ccc" #_"#E6532C" "#FB783A") :size 38 :name icon-name}]]]))
+      [nm/icon-md {:color (if-not focused "#ccc" #_"#E6532C" "#FB783A") :size 30 :name icon-name}]]]))
 
 (defn recording-controls []
   (let [in-progress? (subscribe [::model/recording])
-        mode         (subscribe [::model/mode])]
+        mode         (subscribe [::model/mode])
+        edit?        #(= @mode :edit)
+        search?      #(= @mode :search)
+        input-ref    (atom nil)]
     (fn []
-      [view {:style [(st/height 60) st/row (st/padding 0 4)]}
-       (if @in-progress?
-         [recording-button "stop" true #(stop-recording)]
-         [recording-button "fiber-manual-record" false #(start-recording)])
-       [recording-button "play-arrow" false #()]
-       [recording-button "search" (= @mode :search) #(dispatch [::model/mode (if (= @mode :search) :idle :search)])]
-       [recording-button "edit" (= @mode :edit) #(dispatch [::model/mode (if (= @mode :edit) :idle :edit)])]])))
+      [view
+       (if (search?)
+         [view {:style [(st/height 50) (st/gray 1)]}
+          [flexer]
+          [nm/search-input {:ref              #(do (reset! input-ref %) (some-> @input-ref .focus))
+                            :background-color "rgba(0,0,0,0)"
+                            :on-cancel        #(dispatch [::model/mode :idle])
+                            :on-focus         #(dispatch [::model/mode :search])}]
+          [flexer]]
+         [view {:style [(st/height 50) st/row (st/padding 0 4)]}
+        (if @in-progress?
+          [recording-button "stop" true #(stop-recording)]
+          [recording-button "fiber-manual-record" false #(start-recording)])
+        [recording-button "play-arrow" false #(-> @input-ref .focus)]
+          [recording-button "search" (= @mode :search) #(dispatch [::model/mode (if (search?) :idle :search)])]
+        [recording-button "edit" (= @mode :edit) #(dispatch [::model/mode (if (edit?) :idle :edit)])]])])))
 
 (comment
   (start-recording)

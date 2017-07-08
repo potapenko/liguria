@@ -17,6 +17,7 @@
     "react-native-device-info": "^0.10.2",
     "react-native-double-click": "^1.0.3",
     "react-native-fence-html": "^1.0.6",
+    "react-native-search-input": "0.0.4",
     "react-native-speech-to-text-ios": "^1.0.3",
     "react-native-vector-icons": "^4.1.1",
     "react-native-zss-rich-text-editor": "^1.0.2",

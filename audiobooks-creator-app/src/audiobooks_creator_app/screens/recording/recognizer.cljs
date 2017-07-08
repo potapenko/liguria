@@ -58,8 +58,7 @@
                     selected]} @word
             selected           (and selected (= @mode :edit))
             background-gray    (and (not selected) background-gray)
-            text-style         (-> text-style (conj (when selected :invert)))
-            text-style         (-> text-style map-decorations)
+            text-style         (-> text-style (conj (when selected :invert)) map-decorations)
             view-ref           (atom nil)]
         [view (merge
                {:ref       #(reset! view-ref %)
@@ -115,20 +114,24 @@
                  {:text "числа"}]]])
 
     (fn []
-      [view {:style [(st/flex) st/row (st/background "white")]}
-       (when (= @mode :edit)
-         [view {:style [(st/width 48)]}
-          [editor-toolbar]])
-       [view {:style [(st/gray 1) (st/width 1)]}]
-       [rn/touchable-without-feedback {:on-press #(dispatch [::model/deselect])}
-        [view {:style [(st/padding 0 0 0 0) (st/flex)]}
-         (let [c (atom 0)]
-           (doall
-            (for [x @transcript]
-              ^{:key {:id (str "paragraph-" (swap! c inc))}}
-              [p (doall
-                  (for [w x]
-                    ^{:key {:id (str "word-" (:id w))}} [word (:id w)]))])))]]])))
+      [view {:style [(st/flex) (st/background "white")]}
+       [view {:style [st/row (st/flex)]}
+        (when (= @mode :edit)
+          [view {:style [(st/width 48)]}
+           [editor-toolbar]])
+        [view {:style [(st/gray 1) (st/width 1)]}]
+        [rn/touchable-without-feedback {:on-press #(dispatch [::model/deselect])}
+         [view {:style [(st/padding 0 0 0 0) (st/flex)]}
+          (let [c (atom 0)]
+            (doall
+             (for [x @transcript]
+               ^{:key {:id (str "paragraph-" (swap! c inc))}}
+               [p (doall
+                   (for [w x]
+                     ^{:key {:id (str "word-" (:id w))}} [word (:id w)]))])))]]]
+       #_[view {:style [(st/height 60) (st/gray 1)]}
+        [text-input {:style [(st/flex)
+                             (st/padding 16)] :placeholder "Input text here"}]]])))
 
 (comment
   (subscribe [::model/word-data 1 :selected])
