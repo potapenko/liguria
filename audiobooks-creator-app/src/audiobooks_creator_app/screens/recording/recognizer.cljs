@@ -21,14 +21,6 @@
 (defn make-spaces [x]
   (apply str (repeat x " ")))
 
-(def test-text (apply str (repeat 1 (str "
-    Четверг четвертого числа,
-    В четверг четвертого числа,
-    четыре с " (make-spaces 8) "четвертью числа" (make-spaces 18) "
-    Лигурийский регулировщик регулировал в Лигурии
-    Лигурийский регулировщик регулировал в Лигурии
-"))))
-
 (def layout (atom nil))
 
 (deref layout)
@@ -73,7 +65,7 @@
                             (when selected (st/gray 9))
                             (when (and (not selected) background-gray) (st/gray 1))]}
                (rn-util/->gesture-props responder))
-         [rn/text {:style text-style} text]]))))
+         [rn/text {:style (conj text-style (st/font-size 16))} text]]))))
 
 (defn icon-button [icon-name icon-text focused]
   [touchable-opacity {:style [(st/justify-content "center")
@@ -99,7 +91,8 @@
    [icon-button "repeat" "Redo"]])
 
 (defn text-editor []
-  (let [transcript (subscribe [::model/transcript])]
+  (let [transcript (subscribe [::model/transcript])
+        mode (subscribe [::model/mode])]
     (dispatch [::model/transcript
                [[{:text "В"}
                  {:text "четверг" :text-style [:u :b]}
@@ -121,8 +114,9 @@
 
     (fn []
       [view {:style [(st/flex) st/row (st/background "white")]}
-       [view {:style [(st/width 48)]}
-        [editor-toolbar]]
+       (when (= @mode :edit)
+         [view {:style [(st/width 48)]}
+          [editor-toolbar]])
        [view {:style [(st/gray 1) (st/width 1)]}]
        [rn/touchable-without-feedback {:on-press #(dispatch [::model/deselect])}
         [view {:style     [(st/padding 0 0 0 0)]}
