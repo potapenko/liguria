@@ -25,7 +25,7 @@
 
 (deref layout)
 
-(defn p []
+(defn p [{:keys [id]}]
   (let [this      (r/current-component)
         props     (r/props this)
         on-layout (or (:on-layout props) identity)]
@@ -55,42 +55,43 @@
       (let [{:keys [text
                     background-gray
                     text-style
-                    selected]} @word
+                    selected
+                    searched]} @word
             selected           (and selected (= @mode :edit))
             background-gray    (and (not selected) background-gray)
             text-style         (-> text-style (conj (when selected :invert)) map-decorations)
             view-ref           (atom nil)]
-        [view (merge
-               {:ref       #(reset! view-ref %)
-                :on-layout #(rn-util/event->layout-ref @view-ref (fn [e] (dispatch [::model/word-data id :layout e])))
-                :style     [(st/padding 4 2)
-                            (when selected (st/gray 9))
-                            (when background-gray (st/gray 1))]}
-               (rn-util/->gesture-props responder))
-         [rn/text {:style (conj text-style (st/font-size 16))} text]]))))
+        (when-not (and (= @mode :search) (not searched))
+         [view (merge
+                {:ref       #(reset! view-ref %)
+                 :on-layout #(rn-util/event->layout-ref @view-ref (fn [e] (dispatch [::model/word-data id :layout e])))
+                 :style     [(st/padding 4 2)
+                             (when selected (st/gray 9))
+                             (when background-gray (st/gray 1))]}
+                (rn-util/->gesture-props responder))
+          [rn/text {:style (conj text-style (st/font-size 16))} text]])))))
 
 (defn icon-button [icon-name icon-text focused]
   [touchable-opacity {:style [(st/justify-content "center")
                               (st/align-items "center")
-                              (st/padding 8)]}
+                              (st/padding 12 0)]}
    [nm/icon-fa {:color "#ccc" :size 22 :name icon-name}]
    [text {:style [(st/color "#ccc") (st/font-size 8) (st/text-align "center")]} icon-text]])
 
 (defn editor-toolbar []
-  [view {:style [(st/flex)]}
-   [icon-button "question-circle-o" "Help"]
-   [flexer]
-   [icon-button "eye-slash" "Hide deleted"]
-   [flexer]
-   [icon-button "strikethrough" "Mark as deleted"]
-   [flexer]
-   [icon-button "bold" "Bold"]
-   [flexer]
-   [icon-button "italic" "Italic"]
-   [flexer]
-   [icon-button "undo" "Undo"]
-   [flexer]
-   [icon-button "repeat" "Redo"]])
+  [view {:style [(st/width 60)]}
+   [rn/scroll-view {:style [(st/flex)]}
+    [icon-button "question-circle-o" "Help"]
+    [flexer]
+    [icon-button "eye-slash" "Hide deleted"]
+    [flexer]
+    [icon-button "strikethrough" "Mark as deleted"]
+    [flexer]
+    [icon-button "eraser" "Erase recording"]
+    [flexer]
+    [icon-button "undo" "Undo"]
+    [flexer]
+    [icon-button "repeat" "Redo"]]])
 
 (defn text-editor []
   (let [transcript (subscribe [::model/transcript])
@@ -117,21 +118,19 @@
       [view {:style [(st/flex) (st/background "white")]}
        [view {:style [st/row (st/flex)]}
         (when (= @mode :edit)
-          [view {:style [(st/width 48)]}
-           [editor-toolbar]])
+          [editor-toolbar])
         [view {:style [(st/gray 1) (st/width 1)]}]
         [rn/touchable-without-feedback {:on-press #(dispatch [::model/deselect])}
          [view {:style [(st/padding 0 0 0 0) (st/flex)]}
           (let [c (atom 0)]
             (doall
              (for [x @transcript]
-               ^{:key {:id (str "paragraph-" (swap! c inc))}}
-               [p (doall
+               (let [p-id (swap! c inc)]
+                 ^{:key {:id (str "paragraph-" p-id)}}
+                 [p {:id p-id}
+                  (doall
                    (for [w x]
-                     ^{:key {:id (str "word-" (:id w))}} [word (:id w)]))])))]]]
-       #_[view {:style [(st/height 60) (st/gray 1)]}
-        [text-input {:style [(st/flex)
-                             (st/padding 16)] :placeholder "Input text here"}]]])))
+                     ^{:key {:id (str "word-" (:id w))}} [word (:id w)]))]))))]]]])))
 
 (comment
   (subscribe [::model/word-data 1 :selected])
@@ -140,7 +139,6 @@
   (-> (subscribe [::model/word 1]) deref (get 1))
   (map-decorations [:u :b])
   (word {:text "четверг" :text-style [:u :b] :editable true :selected true})
-
   (-> @editor-ref (.showTitle false))
   (go
     (let [[err res] (<! (await (-> @editor-ref .getContentHtml)))]

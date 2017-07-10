@@ -82,19 +82,24 @@
          [view {:style [(st/height 50) (st/gray 1)]}
           [flexer]
           [nm/search-input {:ref              #(do (reset! input-ref %) (some-> @input-ref .focus))
-                            :background-color "rgba(0,0,0,0)"
-                            :on-cancel        #(dispatch [::model/mode :idle])
-                            :on-focus         #(dispatch [::model/mode :search])}]
+                            :background-color st/nil-color
+                            :on-cancel        #(do
+                                                 (dispatch [::model/mode :idle])
+                                                 (dispatch [::model/search-text nil]))
+                            :on-focus         #(dispatch [::model/mode :search])
+                            :on-delete        #(dispatch [::model/search-text ""])
+                            :on-change-text   #(dispatch [::model/search-text %])}]
           [flexer]]
          [view {:style [(st/height 50) st/row (st/padding 0 4)]}
-        (if @in-progress?
-          [recording-button "stop" true #(stop-recording)]
-          [recording-button "fiber-manual-record" false #(start-recording)])
-        [recording-button "play-arrow" false #(-> @input-ref .focus)]
+          (if @in-progress?
+            [recording-button "stop" true #(stop-recording)]
+            [recording-button "fiber-manual-record" false #(start-recording)])
+          [recording-button "play-arrow" false #(-> @input-ref .focus)]
           [recording-button "search" (= @mode :search) #(dispatch [::model/mode (if (search?) :idle :search)])]
-        [recording-button "edit" (= @mode :edit) #(dispatch [::model/mode (if (edit?) :idle :edit)])]])])))
+          [recording-button "edit" (= @mode :edit) #(dispatch [::model/mode (if (edit?) :idle :edit)])]])])))
 
 (comment
+  (subscribe [::model/search-text])
   (start-recording)
   (stop-recording))
 

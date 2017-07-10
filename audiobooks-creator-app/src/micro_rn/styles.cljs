@@ -136,6 +136,8 @@
 (defn background [v]
   (new-style (keyword (str "background-color-" v)) {:background-color v}))
 
+(def nil-color "rgba(0,0,0,0)")
+
 ;; text styles
 
 (defn color [v]

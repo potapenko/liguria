@@ -1,7 +1,8 @@
 (ns audiobooks-creator-app.screens.recording.model
   (:require [re-frame.core :refer [reg-sub reg-event-db dispatch]]
             [clojure.core.reducers :as red]
-            [micro-rn.rn-utils :as rn-utils])
+            [micro-rn.rn-utils :as rn-utils]
+            [clojure.string :as string])
   (:require-macros [micro-rn.macros :refer [...]]))
 
 (defn map-words [db f]
@@ -52,13 +53,16 @@
  (fn [db [_ id]]
    (get-in db [::words id])))
 
-(reg-sub
- ::word-data
- (fn [db [_ id k]]
-   (get-in db [::words id k])))
+(defn get-word-data [db id k]
+  (get-in db [::words id k]))
 
 (defn set-word-data [db id k v]
   (assoc-in db [::words id k] v))
+
+(reg-sub
+ ::word-data
+ (fn [db [_ id k]]
+   (get-word-data db id k)))
 
 (reg-event-db
  ::word-data
@@ -100,8 +104,8 @@
 (reg-event-db
  ::select-words-line
  (fn [db [_ id]]
-   (let [clicked-y (-> db ::words (get id) :layout :page-y)]
-     (map-words db #(assoc % :selected (= clicked-y (-> % :layout :page-y)))))))
+   (let [word-y (-> db ::words (get id) :layout :page-y)]
+     (map-words db #(assoc % :selected (= word-y (-> % :layout :page-y)))))))
 
 (reg-event-db
  ::word-double-click
@@ -140,13 +144,41 @@
 (reg-sub
  ::mode
  (fn [db _]
-   [:edit :search :record :idle]
-   (get db ::mode :search #_:idle)))
+   #{:edit :search :record :idle}
+   (get db ::mode :idle)))
 
 (reg-event-db
  ::mode
  (fn [db [_ value]]
    (assoc db ::mode value)))
+
+(reg-sub
+ ::search-text
+ (fn [db _]
+   (get db ::search-text "")))
+
+(defn filter-searched [db text]
+  (let [rx (re-pattern (str (string/lower-case text) ".+"))]
+    db
+
+    ))
+
+(defn get-words-line [db word-id]
+  )
+
+(defn get-sentence [db word-id]
+  )
+
+(fn [db [_ id]]
+  (let [word-y (-> db ::words (get id) :layout :page-y)]
+    (map-words db #(assoc % :selected (= word-y (-> % :layout :page-y))))))
+
+(reg-event-db
+ ::search-text
+ (fn [db [_ value]]
+   (-> db
+       (assoc ::search-text value)
+       (filter-searched text))))
 
 (comment
   (reg-sub
