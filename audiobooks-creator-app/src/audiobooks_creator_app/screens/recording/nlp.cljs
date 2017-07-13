@@ -7,16 +7,47 @@
 Где хохлатые хохотушки хохотом хохотали и кричали турке, который начерно обкурен трубкой: не кури, турка, трубку, купи лучше кипу пик, лучше пик кипу купи, а то придет бомбардир из Брандебурга, бомбами забомбардирует за то, что некто чернорылый у него полдвора рылом изрыл, вырыл и подрыл. Но на самом деле турка не был в деле. Да и Клара-краля в то время кралась к ларю, пока Карл у Клары кораллы крал, за что Клара у Карла украла кларнет. А потом на дворе деготниковой вдовы Варвары два этих вора дрова воровали. Но грех — не смех, не уложить в орех: о Кларе с Карлом во мраке все раки шумели в драке. Вот и не до бомбардира ворам было, но и не до деготниковой вдовы, и не до деготниковых детей. Зато рассердившаяся вдова убрала в сарай дрова: раз дрова, два дрова, три дрова — не вместились все дрова, и два дровосека, два дровокола-дроворуба для расчувствовавшейся Варвары выдворили дрова вширь двора обратно на дровяной двор, где цапля чахла, цапля сохла, цапля сдохла. Цыпленок же цапли цепко цеплялся за цепь. Молодец против овец, а против молодца - сам овца, которой носит Сеня сено в сани, потом везет Сенька Соньку с Санькой на санках: санки — скок, Сеньку — в бок, Соньку — в лоб, все — в сугроб.
 ")
 
-(defn create-words [s])
+(def one-dot-mark         "#one#" )
+(def one-question-mark    "#question#")
+(def one-exclamation-mark "#exclamation#")
+(def sentence-separator     "#sentence#")
+
+(defn create-words [s]
+  (string/split s #"\s+"))
+
+(defn- person-dots [s]
+  (let [person-words ["Dr" "Prof" "Ms" "Mrs" "Mr" "St"]]
+    (loop [[v t] person-words
+           s s]
+      (if v
+        (recur t (string/replace s (str v ".") (str v one-dot-mark)))
+        s))))
 
 (defn create-sentences [s]
-  (let [one-dot-mark         "#one#"
-        one-question-mark    "#question#"
-        one-exclamation-mark "#exclamation#"
-        phrase-separator     "#phrase#"
-        person-words         ["Dr" "Prof" "Ms" "Mrs" "Mr" "St"]]
-    []
-    #_(-> s)))
+  (-> s
+      person-dots
+      (string/replace #"\.\" " (str one-dot-mark "\"" sentence-separator))
+      (string/replace #"!\" " (str one-exclamation-mark "\"" sentence-separator))
+      (string/replace #"\?\" \" " (str one-question-mark "\"" sentence-separator))
+      (string/replace #"\.' " (str one-dot-mark "'" sentence-separator))
+      (string/replace #"!' " (str one-exclamation-mark "'" sentence-separator))
+      (string/replace #"\?' " (str one-question-mark "'" sentence-separator));
+      (string/replace #"\. " (str "." sentence-separator))
+      (string/replace #"! " (str "!" sentence-separator ))
+      (string/replace #"\? " (str "?" sentence-separator));
+      (string/replace one-dot-mark ".")
+      (string/replace one-question-mark "?")
+      (string/replace one-exclamation-mark "!")
+      (string/split sentence-separator)))
+
+(comment
+
+  (create-sentences " .\" ")
+
+ (-> test-text create-paragraphs first
+     create-sentences count)
+
+ )
 
 (defn create-paragraphs [s]
   (->> s
@@ -24,11 +55,14 @@
        (map string/trim)
        (filter #(-> % empty? not))))
 
-(defn create-text-parts [s]
-  (let [p-counter (atom 0)
-        w-counter (atom 0)
-        s-counter (atom 0)]
-    (for [p (create-paragraphs s)]
+(defn create-text-parts [source]
+  (let [p-counter  (atom 0)
+        w-counter  (atom 0)
+        s-counter  (atom 0)
+        paragraphs (cond
+                     (string? source) (create-paragraphs source)
+                     (seq? source)    source)]
+    (for [p paragraphs]
       {:type      :paragraph
        :id        (swap! p-counter inc)
        :text      p
@@ -42,5 +76,10 @@
                                :text w})})})))
 
 (comment
-  (-> test-text create-text-parts #_count)
-  (-> test-text create-paragraphs #_count))
+  (-> test-text create-text-parts count)
+
+  (-> test-text create-paragraphs first
+      create-sentences #_count)
+
+  (-> test-text create-paragraphs count)
+  )
