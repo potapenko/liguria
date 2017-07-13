@@ -9,8 +9,10 @@
             [re-frame.core :refer [subscribe dispatch]]
             [audiobooks-creator-app.screens.recording.model :as model]
             [audiobooks-creator-app.screens.recording.rte-css :refer [css]]
+            [audiobooks-creator-app.screens.recording.nlp :as nlp]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
-            [micro-rn.utils :as utils])
+            [micro-rn.utils :as utils]
+            [clojure.string :as string])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
@@ -96,24 +98,7 @@
 (defn text-editor []
   (let [transcript (subscribe [::model/transcript])
         mode       (subscribe [::model/mode])]
-    (dispatch [::model/transcript
-               [[{:text "В"}
-                 {:text "четверг" :text-style [:u :b]}
-                 {:text "четвертого" :text-style [:u]}
-                 {:text "числа"}
-                 {:text "четыре" :background-gray true}
-                 {:text "c" :background-gray true}
-                 {:text "четвертью" :background-gray true}
-                 {:text "числа"}]
-                [{:text "В" :text-style [:s]}
-                 {:text "четверг" :text-style [:s]}
-                 {:text "четвертого" :text-style [:s]}
-                 {:text "числа" :text-style [:s]}
-                 {:text "четыре" :selected true}
-                 {:text "c" :selected true}
-                 {:text "четвертью"}
-                 {:text "числа"}]]])
-
+    (dispatch [::model/transcript (nlp/create-text-parts nlp/test-text)])
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
        [view {:style [st/row (st/flex)]}
