@@ -7,7 +7,7 @@
 Где хохлатые хохотушки хохотом хохотали и кричали турке, который начерно обкурен трубкой: не кури, турка, трубку, купи лучше кипу пик, лучше пик кипу купи, а то придет бомбардир из Брандебурга, бомбами забомбардирует за то, что некто чернорылый у него полдвора рылом изрыл, вырыл и подрыл. Но на самом деле турка не был в деле. Да и Клара-краля в то время кралась к ларю, пока Карл у Клары кораллы крал, за что Клара у Карла украла кларнет. А потом на дворе деготниковой вдовы Варвары два этих вора дрова воровали. Но грех — не смех, не уложить в орех: о Кларе с Карлом во мраке все раки шумели в драке. Вот и не до бомбардира ворам было, но и не до деготниковой вдовы, и не до деготниковых детей. Зато рассердившаяся вдова убрала в сарай дрова: раз дрова, два дрова, три дрова — не вместились все дрова, и два дровосека, два дровокола-дроворуба для расчувствовавшейся Варвары выдворили дрова вширь двора обратно на дровяной двор, где цапля чахла, цапля сохла, цапля сдохла. Цыпленок же цапли цепко цеплялся за цепь. Молодец против овец, а против молодца - сам овца, которой носит Сеня сено в сани, потом везет Сенька Соньку с Санькой на санках: санки — скок, Сеньку — в бок, Соньку — в лоб, все — в сугроб.
 ")
 
-(def one-dot-mark         "#one#" )
+(def one-dot-mark         "#one#")
 (def one-question-mark    "#question#")
 (def one-exclamation-mark "#exclamation#")
 (def sentence-separator     "#sentence#")
@@ -33,7 +33,7 @@
       (string/replace #"!' " (str one-exclamation-mark "'" sentence-separator))
       (string/replace #"\?' " (str one-question-mark "'" sentence-separator));
       (string/replace #"\. " (str "." sentence-separator))
-      (string/replace #"! " (str "!" sentence-separator ))
+      (string/replace #"! " (str "!" sentence-separator))
       (string/replace #"\? " (str "?" sentence-separator));
       (string/replace one-dot-mark ".")
       (string/replace one-question-mark "?")
@@ -44,10 +44,8 @@
 
   (create-sentences " .\" ")
 
- (-> test-text create-paragraphs first
-     create-sentences count)
-
- )
+  (-> test-text create-paragraphs first
+      create-sentences count))
 
 (defn create-paragraphs [s]
   (->> s
@@ -62,24 +60,27 @@
         paragraphs (cond
                      (string? source) (create-paragraphs source)
                      (seq? source)    source)]
-    (for [p paragraphs]
-      {:type      :paragraph
-       :id        (swap! p-counter inc)
-       :text      p
-       :sentences (for [s (create-sentences p)]
-                    {:type  :sentence
-                     :id    (swap! s-counter inc)
-                     :text  s
-                     :words (for [w (create-words s)]
-                              {:type :word
-                               :id   (swap! w-counter inc)
-                               :text w})})})))
+    (doall
+     (for [p paragraphs]
+       {:type      :paragraph
+        :id        (swap! p-counter inc)
+        :text      p
+        :sentences (doall
+                    (for [s (create-sentences p)]
+                      {:type  :sentence
+                       :id    (swap! s-counter inc)
+                       :p-id  @p-counter
+                       :text  s
+                       :words (doall
+                               (for [w (create-words s)]
+                                 {:type :word
+                                  :id   (swap! w-counter inc)
+                                  :p-id @p-counter
+                                  :s-id @s-counter
+                                  :text w}))}))}))))
 
 (comment
   (-> test-text create-text-parts count)
-
   (-> test-text create-paragraphs first
       create-sentences #_count)
-
-  (-> test-text create-paragraphs count)
-  )
+  (-> test-text create-paragraphs count))

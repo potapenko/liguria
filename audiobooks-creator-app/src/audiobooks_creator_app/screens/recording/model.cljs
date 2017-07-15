@@ -39,14 +39,17 @@
 (reg-event-db
  ::transcript
  (fn [db [_ value]]
-   (let [c        (atom 0)
-         with-ids (vec (for [p value]
-                         (vec (for [w p]
-                                (assoc w :id (swap! c inc))))))]
-     (assoc db
-            ::words (into {} (for [x (flatten with-ids)] {(:id x) x}))
-            ::transcript (for [p with-ids]
-                           (for [x p] (select-keys x [:id])))))))
+   (assoc db
+          ::words (into {}
+                        (for [x (->> value (map :sentences) flatten
+                                     (map :words) flatten)]
+                          {(:id x) x}))
+          ::transcript value)))
+
+(reg-sub
+ ::words
+ (fn [db [_ id]]
+   (get-in db [::words])))
 
 (reg-sub
  ::word
@@ -178,7 +181,7 @@
  (fn [db [_ value]]
    (-> db
        (assoc ::search-text value)
-       (filter-searched text))))
+       (filter-searched value))))
 
 (comment
   (reg-sub

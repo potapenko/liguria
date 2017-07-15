@@ -27,7 +27,14 @@
 
 (deref layout)
 
-(defn p [{:keys [id]}]
+(defn paragraph [{:keys [id]}]
+  (let [this      (r/current-component)
+        props     (r/props this)
+        on-layout (or (:on-layout props) identity)]
+    (into [view {:on-layout #(on-layout (rn-util/event->layout %))
+                 :style     [st/row st/wrap (st/padding 4 8)]}] (r/children this))))
+
+(defn sentence [{:keys [id]}]
   (let [this      (r/current-component)
         props     (r/props this)
         on-layout (or (:on-layout props) identity)]
@@ -54,15 +61,18 @@
                        :on-pan-responder-move             #(dispatch [::model/select-data id (rn-util/->getsture-state %2)])
                        :on-pan-responder-release          #(dispatch [::model/word-release id (rn-util/->getsture-state %2)])})]
     (fn []
-      (let [{:keys [text
+      (let [{:keys [
+                    text
                     background-gray
                     text-style
                     selected
-                    searched]} @word
+                    searched
+                    ]} @word
             selected           (and selected (= @mode :edit))
             background-gray    (and (not selected) background-gray)
             text-style         (-> text-style (conj (when selected :invert)) map-decorations)
             view-ref           (atom nil)]
+        (println "id:" id)
         (when-not (and (= @mode :search) (not searched))
          [view (merge
                 {:ref       #(reset! view-ref %)
@@ -110,14 +120,20 @@
           (let [c (atom 0)]
             (doall
              (for [x @transcript]
-               (let [p-id (swap! c inc)]
-                 ^{:key {:id (str "paragraph-" p-id)}}
-                 [p {:id p-id}
-                  (doall
-                   (for [w x]
-                     ^{:key {:id (str "word-" (:id w))}} [word (:id w)]))]))))]]]])))
+               ^{:key {:id (str "paragraph-" (:id x))}}
+               [paragraph x
+                (doall
+                 (for [s (:sentences x)]
+                   ^{:key {:id (str "sentence-" (:id s))}}
+                   [sentence s
+                    (doall
+                     (for [w (:words s)]
+                       ^{:key {:id (str "word-" (:id w))}}
+                       #_[text (str w)]
+                       [word (:id w)]))]))])))]]]])))
 
 (comment
+  (subscribe [::model/words])
   (subscribe [::model/word-data 1 :selected])
   (subscribe [::model/word-data 1 :layout])
   (subscribe [::model/word 13])
