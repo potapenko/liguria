@@ -39,7 +39,7 @@
         props     (r/props this)
         on-layout (or (:on-layout props) identity)]
     (into [view {:on-layout #(on-layout (rn-util/event->layout %))
-                 :style     [st/row st/wrap (st/padding 4 8)]}] (r/children this))))
+                 :style     [st/row st/wrap]}] (r/children this))))
 
 (defn- map-decorations [values]
   (->> (map #(case %
@@ -108,9 +108,9 @@
 (defn text-editor []
   (let [transcript (subscribe [::model/transcript])
         mode       (subscribe [::model/mode])]
-    (dispatch [::model/transcript (nlp/create-text-parts nlp/test-text)])
+    (dispatch [::model/transcript (nlp/create-text-parts nlp/test-text2)])
     (fn []
-      [view {:style [(st/flex) (st/background "white")]}
+      [view #_rn/scroll-view {:style [(st/flex) (st/background "white")]}
        [view {:style [st/row (st/flex)]}
         (when (= @mode :edit)
           [editor-toolbar])
@@ -129,7 +129,6 @@
                     (doall
                      (for [w (:words s)]
                        ^{:key {:id (str "word-" (:id w))}}
-                       #_[text (str w)]
                        [word (:id w)]))]))])))]]]])))
 
 (comment

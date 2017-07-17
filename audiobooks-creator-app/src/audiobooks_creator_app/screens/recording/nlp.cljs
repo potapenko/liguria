@@ -7,6 +7,17 @@
 Где хохлатые хохотушки хохотом хохотали и кричали турке, который начерно обкурен трубкой: не кури, турка, трубку, купи лучше кипу пик, лучше пик кипу купи, а то придет бомбардир из Брандебурга, бомбами забомбардирует за то, что некто чернорылый у него полдвора рылом изрыл, вырыл и подрыл. Но на самом деле турка не был в деле. Да и Клара-краля в то время кралась к ларю, пока Карл у Клары кораллы крал, за что Клара у Карла украла кларнет. А потом на дворе деготниковой вдовы Варвары два этих вора дрова воровали. Но грех — не смех, не уложить в орех: о Кларе с Карлом во мраке все раки шумели в драке. Вот и не до бомбардира ворам было, но и не до деготниковой вдовы, и не до деготниковых детей. Зато рассердившаяся вдова убрала в сарай дрова: раз дрова, два дрова, три дрова — не вместились все дрова, и два дровосека, два дровокола-дроворуба для расчувствовавшейся Варвары выдворили дрова вширь двора обратно на дровяной двор, где цапля чахла, цапля сохла, цапля сдохла. Цыпленок же цапли цепко цеплялся за цепь. Молодец против овец, а против молодца - сам овца, которой носит Сеня сено в сани, потом везет Сенька Соньку с Санькой на санках: санки — скок, Сеньку — в бок, Соньку — в лоб, все — в сугроб.
 ")
 
+
+(def test-text2 "
+- Ну а теперь покажи, что там из Караташа выпало, - попросил Митрич, когда Андрюшка закончил свой рассказ, совмещённый с \"демонстрацией фильма\" и мы вдоволь посмеялись.
+Андрюшка показал.
+Минуты две мы неверяще смотрели на ЭТО, а потом Митрич начал орать.
+- Ты что, блин, совсем уже охренел?! – орал Митрич – Ты что притащил?! «Выпала…» Вот просто взяла и выпала?
+- И впрямь, – поддержала приятеля Семеновна. – Ты хочешь сказать, что он такую вещь просто так с собой таскал? Непривязанную? В кармане? Да заклинание от невыпадения стоит в миллион раз дешевле!
+Андрюшка почему-то виновато развел руками:
+- Может, только что приобрел, и привязать еще не успел…
+")
+
 (def one-dot-mark         "#one#")
 (def one-question-mark    "#question#")
 (def one-exclamation-mark "#exclamation#")
@@ -26,15 +37,15 @@
 (defn create-sentences [s]
   (-> s
       person-dots
-      (string/replace #"\.\" " (str one-dot-mark "\"" sentence-separator))
-      (string/replace #"!\" " (str one-exclamation-mark "\"" sentence-separator))
-      (string/replace #"\?\" \" " (str one-question-mark "\"" sentence-separator))
-      (string/replace #"\.' " (str one-dot-mark "'" sentence-separator))
-      (string/replace #"!' " (str one-exclamation-mark "'" sentence-separator))
-      (string/replace #"\?' " (str one-question-mark "'" sentence-separator));
-      (string/replace #"\. " (str "." sentence-separator))
-      (string/replace #"! " (str "!" sentence-separator))
-      (string/replace #"\? " (str "?" sentence-separator));
+      (string/replace #"\.\"\s+" (str one-dot-mark "\"" sentence-separator))
+      (string/replace #"!\"\s+" (str one-exclamation-mark "\"" sentence-separator))
+      (string/replace #"\?\"\s+\" " (str one-question-mark "\"" sentence-separator))
+      (string/replace #"\.'\s+" (str one-dot-mark "'" sentence-separator))
+      (string/replace #"!'\s+" (str one-exclamation-mark "'" sentence-separator))
+      (string/replace #"\?'\s+" (str one-question-mark "'" sentence-separator));
+      (string/replace #"\.\s+" (str "." sentence-separator))
+      (string/replace #"!\s+" (str "!" sentence-separator))
+      (string/replace #"\?\s+" (str "?" sentence-separator));
       (string/replace one-dot-mark ".")
       (string/replace one-question-mark "?")
       (string/replace one-exclamation-mark "!")

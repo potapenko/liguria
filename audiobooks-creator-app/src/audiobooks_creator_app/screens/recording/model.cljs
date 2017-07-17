@@ -181,7 +181,7 @@
  (fn [db [_ value]]
    (-> db
        (assoc ::search-text value)
-       (filter-searched value))))
+       #_(filter-searched value))))
 
 (comment
   (reg-sub
