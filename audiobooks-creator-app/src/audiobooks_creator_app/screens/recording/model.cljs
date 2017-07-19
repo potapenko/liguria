@@ -80,15 +80,33 @@
  (fn [db [_ id layout-data]]
    db))
 
+(reg-sub
+ ::select-in-progress
+ (fn [db _]
+   (get db ::select-in-progress false)))
+
+(reg-sub
+ ::scroll-pos
+ (fn [db _]
+   (get db ::scroll-pos 0)))
+
+(reg-event-db
+ ::scroll-pos
+ (fn [db [_ value]]
+   (assoc db ::scroll-pos value)))
+
 (reg-event-db
  ::deselect
  (fn [db [_ id]]
-   (-> db deselect-all)))
+   (-> db
+       (assoc ::select-in-progress true)
+       deselect-all)))
 
 (reg-event-db
  ::word-click
  (fn [db [_ id gesture-state]]
    (-> db
+       (assoc ::select-in-progress true)
        deselect-all
        (set-word-data id :selected true))))
 
@@ -101,6 +119,7 @@
      (do (dispatch [::word-double-click id])
          (assoc db :prev-gesture-state nil :prev-click id))
      (assoc db
+            ::select-in-progress false
             :prev-gesture-state gesture-state
             :prev-click id))))
 
@@ -192,4 +211,5 @@
   (reg-event-db
    ::data
    (fn [db [_ value]]
-     (assoc db ::data value))))
+     (assoc db ::data value)))
+  )

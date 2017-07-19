@@ -4,7 +4,6 @@
             [micro-rn.styles :as st]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
-            [micro-rn.utils :as util :refer [await]]
             [micro-rn.rn-utils :as rn-util]
             [re-frame.core :refer [subscribe dispatch]]
             [audiobooks-creator-app.screens.recording.model :as model]
@@ -72,7 +71,6 @@
             background-gray    (and (not selected) background-gray)
             text-style         (-> text-style (conj (when selected :invert)) map-decorations)
             view-ref           (atom nil)]
-        (println "id:" id)
         (when-not (and (= @mode :search) (not searched))
          [view (merge
                 {:ref       #(reset! view-ref %)
@@ -106,30 +104,34 @@
     [icon-button "repeat" "Redo"]]])
 
 (defn text-editor []
-  (let [transcript (subscribe [::model/transcript])
-        mode       (subscribe [::model/mode])]
+  (let [transcript         (subscribe [::model/transcript])
+        mode               (subscribe [::model/mode])
+        select-in-progress (subscribe [::model/select-in-progress])]
     (dispatch [::model/transcript (nlp/create-text-parts nlp/test-text2)])
     (fn []
-      [view #_rn/scroll-view {:style [(st/flex) (st/background "white")]}
+      [view {:style [(st/flex) (st/background "white")]}
        [view {:style [st/row (st/flex)]}
         (when (= @mode :edit)
           [editor-toolbar])
         [view {:style [(st/gray 1) (st/width 1)]}]
-        [rn/touchable-without-feedback {:on-press #(dispatch [::model/deselect])}
-         [view {:style [(st/padding 0 0 0 0) (st/flex)]}
-          (let [c (atom 0)]
-            (doall
-             (for [x @transcript]
-               ^{:key {:id (str "paragraph-" (:id x))}}
-               [paragraph x
-                (doall
-                 (for [s (:sentences x)]
-                   ^{:key {:id (str "sentence-" (:id s))}}
-                   [sentence s
-                    (doall
-                     (for [w (:words s)]
-                       ^{:key {:id (str "word-" (:id w))}}
-                       [word (:id w)]))]))])))]]]])))
+        [rn/scroll-view {:style          [(st/padding-right 12)]
+                         :scroll-enabled (not (and @select-in-progress (= @mode :edit)))
+                         :on-scroll      #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])}
+         [rn/touchable-without-feedback {:on-press #(dispatch [::model/deselect])}
+          [view {:style [(st/padding 0 0 0 0) (st/flex)]}
+           (let [c (atom 0)]
+             (doall
+              (for [x @transcript]
+                ^{:key {:id (str "paragraph-" (:id x))}}
+                [paragraph x
+                 (doall
+                  (for [s (:sentences x)]
+                    ^{:key {:id (str "sentence-" (:id s))}}
+                    [sentence s
+                     (doall
+                      (for [w (:words s)]
+                        ^{:key {:id (str "word-" (:id w))}}
+                        [word (:id w)]))]))])))]]]]])))
 
 (comment
   (subscribe [::model/words])

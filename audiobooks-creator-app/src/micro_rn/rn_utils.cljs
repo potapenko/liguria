@@ -46,3 +46,6 @@
       (println (... dx delay))
       (and (< delay max-delay)
            (< dx radius)))))
+
+(defn scroll-y [e]
+  (-> e .-nativeEvent utils/prepare-to-clj :content-offset :y))
