@@ -195,10 +195,6 @@
  (fn [db _]
    (get db ::search-text "")))
 
-(fn [db [_ id]]
-  (let [word-y (-> db ::words (get id) :layout :page-y)]
-    (map-words db #(assoc % :selected (= word-y (-> % :layout :page-y))))))
-
 (reg-event-db
  ::search-text
  (fn [db [_ value]]
