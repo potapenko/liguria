@@ -5,10 +5,50 @@
             [clojure.string :as string])
   (:require-macros [micro-rn.macros :refer [...]]))
 
+;; -------------------------------------------------------------------------------
+
 (defn map-words [db f]
   (assoc db ::words
          (reduce-kv (fn [m k v]
                       (assoc m k (f v))) {} (::words db))))
+
+(defn get-word-data [db id k]
+  (get-in db [::words id k]))
+
+(defn set-word-data [db id k v]
+  (assoc-in db [::words id k] v))
+
+(defn calculate-collision [words gesture-state]
+  (let [{:keys [move-x move-y]} gesture-state]
+    (->> words vals
+         (filter (fn [w]
+                   (let [{:keys [width height page-x page-y]} (:layout w)
+                         left                                 page-x
+                         right                                (+ page-x width)
+                         top                                  page-y
+                         bottom                               (+ page-y height)]
+                     (and (<= left move-x right)
+                          (<= top move-y bottom)))))
+         first)))
+
+(defn select-words-range [db from to]
+  (map-words db #(assoc % :selected
+                        (or (<= (:id from) (:id %) (:id to))
+                            (<= (:id to) (:id %) (:id from))))))
+
+(defn filter-searched [db text]
+  (let [rx (re-pattern (str (string/lower-case text) ".+"))]
+    db
+
+    ))
+
+(defn get-words-line [db word-id]
+  )
+
+(defn get-sentence [db word-id]
+  )
+
+;; -------------------------------------------------------------------------------
 
 (reg-sub
  ::monitoring
@@ -56,12 +96,6 @@
  (fn [db [_ id]]
    (get-in db [::words id])))
 
-(defn get-word-data [db id k]
-  (get-in db [::words id k]))
-
-(defn set-word-data [db id k v]
-  (assoc-in db [::words id k] v))
-
 (reg-sub
  ::word-data
  (fn [db [_ id k]]
@@ -71,9 +105,6 @@
  ::word-data
  (fn [db [_ id k v]]
    (set-word-data db id k v)))
-
-(defn deselect-all [db]
-  (map-words db #(assoc % :selected false)))
 
 (reg-event-db
  ::editor-on-layout
@@ -135,24 +166,6 @@
    (dispatch [::select-words-line id])
    db))
 
-(defn calculate-collision [words gesture-state]
-  (let [{:keys [move-x move-y]} gesture-state]
-    (->> words vals
-         (filter (fn [w]
-                   (let [{:keys [width height page-x page-y]} (:layout w)
-                         left                                 page-x
-                         right                                (+ page-x width)
-                         top                                  page-y
-                         bottom                               (+ page-y height)]
-                     (and (<= left move-x right)
-                          (<= top move-y bottom)))))
-         first)))
-
-(defn select-words-range [db from to]
-  (map-words db #(assoc % :selected
-                        (or (<= (:id from) (:id %) (:id to))
-                            (<= (:id to) (:id %) (:id from))))))
-
 (reg-event-db
  ::select-data
  (fn [db [_ word-id gesture-state]]
@@ -178,18 +191,6 @@
  ::search-text
  (fn [db _]
    (get db ::search-text "")))
-
-(defn filter-searched [db text]
-  (let [rx (re-pattern (str (string/lower-case text) ".+"))]
-    db
-
-    ))
-
-(defn get-words-line [db word-id]
-  )
-
-(defn get-sentence [db word-id]
-  )
 
 (fn [db [_ id]]
   (let [word-y (-> db ::words (get id) :layout :page-y)]
