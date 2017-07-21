@@ -31,6 +31,9 @@
                           (<= top move-y bottom)))))
          first)))
 
+(defn deselect-all [db]
+  (map-words db #(assoc % :selected false)))
+
 (defn select-words-range [db from to]
   (map-words db #(assoc % :selected
                         (or (<= (:id from) (:id %) (:id to))
