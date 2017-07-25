@@ -1,5 +1,5 @@
 (ns audiobooks-creator-app.screens.recording.model
-  (:require [re-frame.core :refer [reg-sub reg-event-db dispatch]]
+  (:require [re-frame.core :refer [reg-sub reg-event-db dispatch dispatch-sync]]
             [clojure.core.reducers :as red]
             [micro-rn.rn-utils :as rn-utils]
             [clojure.string :as string])
@@ -137,37 +137,36 @@
 (reg-event-db
  ::deselect
  (fn [db [_ id]]
-   (-> db
-       (assoc ::select-in-progress true)
-       deselect-all)))
+   (deselect-all db)))
 
 (reg-event-db
  ::word-click
  (fn [db [_ id gesture-state]]
-   (-> db
-       (assoc ::select-in-progress true)
-       deselect-all
-       (set-word-data id :selected true))))
+   (-> db)))
 
 (reg-event-db
  ::word-release
  (fn [db [_ id gesture-state]]
-   (let [double?     (and (= (::prev-click db) id)
-                          (rn-utils/double-tap
-                           (::prev-gesture-state db) gesture-state))
-         count-click (if double? (inc (::count-click db)) 1)]
-     (when double?
-       (case count-click
-         1     (dispatch [::word-one-click id])
-         2     (dispatch [::word-double-click id])
-         3     (dispatch [::word-triple-click id])
-         "nothing"))
-     (-> db
-      (assoc
-       ::select-in-progress false
-       ::prev-gesture-state gesture-state
-       ::prev-click id
-       ::count-click count-click)))))
+   (if (::select-in-progress db)
+     (assoc db
+            ::select-in-progress false
+            ::prev-gesture-state nil
+            ::prev-click nil
+            ::count-click 0)
+     (let [prev?       (= (::prev-click db) id)
+           double?     (and prev?
+                            (rn-utils/double-tap (::prev-gesture-state db) gesture-state))
+           count-click (if double? (inc (::count-click db)) 1)]
+         (case count-click
+           1 (dispatch [::word-one-click id])
+           2 (dispatch [::word-double-click id ])
+           3 (dispatch [::word-triple-click id])
+           "nothing")
+         (assoc db
+                ::select-in-progress false
+                ::prev-gesture-state gesture-state
+                ::prev-click id
+                ::count-click count-click)))))
 
 (reg-event-db
  ::select-words-line
@@ -178,8 +177,10 @@
 (reg-event-db
  ::word-one-click
  (fn [db [_ id]]
-   #_(dispatch [::select-words-line id])
-   db))
+   (let [prev-selected (get-word-data db id :selected)]
+     (-> db
+         deselect-all
+         (set-word-data id :selected (not prev-selected))))))
 
 (reg-event-db
  ::word-double-click
@@ -200,6 +201,7 @@
          last-selected (calculate-collision  (::words db) gesture-state)]
      (if last-selected
        (-> db
+           (assoc ::select-in-progress true)
            (select-words-range first-word last-selected))
        db))))
 

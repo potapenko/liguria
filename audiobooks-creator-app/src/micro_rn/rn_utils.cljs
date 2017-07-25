@@ -43,7 +43,6 @@
                        (:timestamp prev-gesture-state))
           radius    20
           max-delay 300]
-      (println (... dx delay))
       (and (< delay max-delay)
            (< dx radius)))))
 

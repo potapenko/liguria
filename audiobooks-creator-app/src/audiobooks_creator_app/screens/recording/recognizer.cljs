@@ -116,7 +116,9 @@
         [rn/scroll-view {:style          [(st/padding-right 12)]
                          :scroll-enabled (not (and @select-in-progress (= @mode :edit)))
                          :on-scroll      #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])}
-         ;; [text (str "id: " @(subscribe [::model/db [::model/count-click]])))]
+         #_[text (str "id/count: "
+                    @(subscribe [::model/db [::model/prev-click]]) "/"
+                    @(subscribe [::model/db [::model/count-click]]))]
          [rn/touchable-without-feedback {:on-press #(dispatch [::model/deselect])}
           [view {:style [(st/padding 0 0 0 0) (st/flex)]}
            (let [c (atom 0)]
