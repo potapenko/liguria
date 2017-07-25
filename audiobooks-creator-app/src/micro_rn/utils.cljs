@@ -100,6 +100,10 @@
               (clear-lazy)
               (cb)) idle))))
 
+(defn lazy-call-fn
+  ([cb] #(lazy-call cb))
+  ([cb idle] #(lazy-call cb)))
+
 ;; old conv 000
 
 (def do-later-queue (atom []))

@@ -6,9 +6,12 @@
             [reagent.core :as r :refer [atom]]
             [reagent.ratom :as ra]
             [micro-rn.utils :as util]
+            [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [audiobooks-creator-app.shared.screens-shared-ui :as sh]
             [re-frame.core :refer [subscribe dispatch]]
-            [audiobooks-creator-app.screens.recording.model :as model]))
+            [audiobooks-creator-app.screens.recording.model :as model])
+  (:require-macros
+   [cljs.core.async.macros :refer [go go-loop]]))
 
 (defn start-recording []
   (dispatch [::model/recording true])
@@ -83,12 +86,13 @@
           [flexer]
           [nm/search-input {:ref              #(do (reset! input-ref %) (some-> @input-ref .focus))
                             :background-color st/nil-color
-                            :on-cancel        #(do
+                            :on-cancel        #(go
+                                                 (<! (timeout 300))
                                                  (dispatch [::model/mode :idle])
                                                  (dispatch [::model/search-text nil]))
                             :on-focus         #(dispatch [::model/mode :search])
-                            :on-delete        #(dispatch [::model/search-text ""])
-                            :on-change-text   #(dispatch [::model/search-text %])}]
+                            :on-delete        (util/lazy-call-fn #(dispatch [::model/search-text ""]))
+                            :on-change-text   (util/lazy-call-fn #(dispatch [::model/search-text %]))}]
           [flexer]]
          [view {:style [(st/height 50) st/row (st/padding 0 4)]}
           (if @in-progress?

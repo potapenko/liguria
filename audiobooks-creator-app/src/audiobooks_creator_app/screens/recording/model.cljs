@@ -54,6 +54,11 @@
 ;; -------------------------------------------------------------------------------
 
 (reg-sub
+ ::db
+ (fn [db [_ ks]]
+   (get-in db ks 0)))
+
+(reg-sub
  ::monitoring
  (fn [db _]
    (get db ::monitoring 0)))
@@ -147,15 +152,22 @@
 (reg-event-db
  ::word-release
  (fn [db [_ id gesture-state]]
-   (if (and
-        (= (:prev-click db) id)
-        (rn-utils/double-tap (:prev-gesture-state db) gesture-state))
-     (do (dispatch [::word-double-click id])
-         (assoc db :prev-gesture-state nil :prev-click id))
-     (assoc db
-            ::select-in-progress false
-            :prev-gesture-state gesture-state
-            :prev-click id))))
+   (let [double?     (and (= (::prev-click db) id)
+                          (rn-utils/double-tap
+                           (::prev-gesture-state db) gesture-state))
+         count-click (if double? (inc (::count-click db)) 1)]
+     (when double?
+       (case count-click
+         1     (dispatch [::word-one-click id])
+         2     (dispatch [::word-double-click id])
+         3     (dispatch [::word-triple-click id])
+         "nothing"))
+     (-> db
+      (assoc
+       ::select-in-progress false
+       ::prev-gesture-state gesture-state
+       ::prev-click id
+       ::count-click count-click)))))
 
 (reg-event-db
  ::select-words-line
@@ -164,9 +176,21 @@
      (map-words db #(assoc % :selected (= word-y (-> % :layout :page-y)))))))
 
 (reg-event-db
+ ::word-one-click
+ (fn [db [_ id]]
+   #_(dispatch [::select-words-line id])
+   db))
+
+(reg-event-db
  ::word-double-click
  (fn [db [_ id]]
    (dispatch [::select-words-line id])
+   db))
+
+(reg-event-db
+ ::word-triple-click
+ (fn [db [_ id]]
+   #_(dispatch [::select-words-line id])
    db))
 
 (reg-event-db

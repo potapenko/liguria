@@ -60,17 +60,16 @@
                        :on-pan-responder-move             #(dispatch [::model/select-data id (rn-util/->getsture-state %2)])
                        :on-pan-responder-release          #(dispatch [::model/word-release id (rn-util/->getsture-state %2)])})]
     (fn []
-      (let [{:keys [
-                    text
+      (let [{:keys [text
                     background-gray
                     text-style
                     selected
                     searched
-                    ]} @word
-            selected           (and selected (= @mode :edit))
-            background-gray    (and (not selected) background-gray)
-            text-style         (-> text-style (conj (when selected :invert)) map-decorations)
-            view-ref           (atom nil)]
+                    ]}      @word
+            selected        (and selected (= @mode :edit))
+            background-gray (and (not selected) background-gray)
+            text-style      (-> text-style (conj (when selected :invert)) map-decorations)
+            view-ref        (atom nil)]
         (when-not (and (= @mode :search) (not searched))
          [view (merge
                 {:ref       #(reset! view-ref %)
@@ -117,6 +116,7 @@
         [rn/scroll-view {:style          [(st/padding-right 12)]
                          :scroll-enabled (not (and @select-in-progress (= @mode :edit)))
                          :on-scroll      #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])}
+         [text (str "id: " @(subscribe [::model/db [::model/count-click]]) #_", id: " #_@(subscribe [::model/prev-click]))]
          [rn/touchable-without-feedback {:on-press #(dispatch [::model/deselect])}
           [view {:style [(st/padding 0 0 0 0) (st/flex)]}
            (let [c (atom 0)]
