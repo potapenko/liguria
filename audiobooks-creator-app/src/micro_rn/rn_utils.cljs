@@ -48,3 +48,8 @@
 
 (defn scroll-y [e]
   (-> e .-nativeEvent utils/prepare-to-clj :content-offset :y))
+
+(defn gesture-state-distance [a b]
+  (if-not (or (nil? a) (nil? b))
+    (distance (:dx a) (:dy a) (:dx b) (:dy b))
+    0))

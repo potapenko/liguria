@@ -3,7 +3,8 @@
             [clojure.core.reducers :as red]
             [micro-rn.rn-utils :as rn-utils]
             [clojure.string :as string]
-            [audiobooks-creator-app.screens.recording.nlp :as nlp])
+            [audiobooks-creator-app.screens.recording.nlp :as nlp]
+            [micro-rn.react-native :as rn])
   (:require-macros [micro-rn.macros :refer [...]]))
 
 ;; -------------------------------------------------------------------------------
@@ -19,15 +20,17 @@
 (defn set-word-data [db id k v]
   (assoc-in db [::words id k] v))
 
-(defn calculate-collision [words gesture-state]
-  (let [{:keys [move-x move-y]} gesture-state]
+(defn calculate-collision [db gesture-state]
+  (let [words                   (::words db)
+        {:keys [move-x move-y]} gesture-state
+        scroll-diff                     (::scroll-pos db)]
     (->> words vals
          (filter (fn [w]
                    (let [{:keys [width height page-x page-y]} (:layout w)
-                         left                                 page-x
-                         right                                (+ page-x width)
-                         top                                  page-y
-                         bottom                               (+ page-y height)]
+                         left   page-x
+                         right  (+ left width)
+                         top    (- page-y scroll-diff)
+                         bottom (+ top height)]
                      (and (<= left move-x right)
                           (<= top move-y bottom)))))
          first)))
@@ -206,14 +209,17 @@
    (select-paragraph db id)))
 
 (reg-event-db
- ::select-data
+ ::select-progress
  (fn [db [_ word-id gesture-state]]
-   (let [first-word    (-> db ::words (get word-id))
-         last-selected (calculate-collision  (::words db) gesture-state)]
-     (if last-selected
-       (-> db
-           (assoc ::select-in-progress true)
-           (select-words-range first-word last-selected))
+   (let [in-progress (::select-in-progress db)
+         distance (rn-utils/gesture-state-distance (::prev-gesture-state db) gesture-state)]
+     (if (or (not in-progress) (> distance 10))
+       (let [first-word    (-> db ::words (get word-id))
+             last-selected (calculate-collision db gesture-state)]
+         (-> db
+             (assoc ::select-in-progress true
+                    ::prev-gesture-state gesture-state)
+             (#(if last-selected (select-words-range % first-word last-selected) %))))
        db))))
 
 (reg-sub

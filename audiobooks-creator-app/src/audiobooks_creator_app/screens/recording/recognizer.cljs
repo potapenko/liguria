@@ -61,7 +61,7 @@
         responder    (rn/pan-responder-create
                       {:on-start-should-set-pan-responder #(= @mode :edit)
                        :on-pan-responder-grant            #(dispatch [::model/word-click id (rn-util/->getsture-state %2)])
-                       :on-pan-responder-move             #(dispatch [::model/select-data id (rn-util/->getsture-state %2)])
+                       :on-pan-responder-move             #(dispatch [::model/select-progress id (rn-util/->getsture-state %2)])
                        :on-pan-responder-release          #(dispatch [::model/word-release id (rn-util/->getsture-state %2)])})]
     (fn []
       (let [{:keys [text
