@@ -230,10 +230,9 @@
                             (rn-utils/double-tap (::prev-gesture-state db) gesture-state))
            count-click (if double? (inc (::count-click db)) 1)]
          (case count-click
-           1 (dispatch [::word-one-click id])
-           2 (dispatch [::word-double-click id ])
-           3 (dispatch [::word-triple-click id])
-           4 (dispatch [::word-forth-click id])
+           1 (select-sentence db id)
+           2 (select-paragraph db id)
+           3 (select-all db)
            "nothing")
          (assoc db
                 ::select-in-progress false
@@ -248,21 +247,6 @@
      (-> db
          deselect-all
          (set-word-data id :selected (not prev-selected))))))
-
-(reg-event-db
- ::word-double-click
- (fn [db [_ id]]
-   (select-sentence db id)))
-
-(reg-event-db
- ::word-triple-click
- (fn [db [_ id]]
-   (select-paragraph db id)))
-
-(reg-event-db
- ::word-forth-click
- (fn [db [_ id]]
-   (select-all db)))
 
 (reg-event-db
  ::select-progress
