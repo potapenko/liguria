@@ -77,7 +77,7 @@
         (when-not (and (= @mode :search) (not searched))
          [view (merge
                 {:ref       #(do (reset! view-ref %) (dispatch [::model/word-data id :ref %]))
-                 :on-layout #(rn-util/ref->layout @view-ref (fn [e] (dispatch [::model/word-data id :layout e])))
+                 ;; :on-layout #(rn-util/ref->layout @view-ref (fn [e] (dispatch [::model/word-data id :layout e])))
                  :style     [(st/padding 4 2)
                              (when selected (st/gray 9))
                              (when background-gray (st/gray 1))]}
@@ -110,7 +110,7 @@
   (let [transcript         (subscribe [::model/transcript])
         mode               (subscribe [::model/mode])
         select-in-progress (subscribe [::model/select-in-progress])]
-    (dispatch [::model/text-fragment nlp/test-text2])
+    (dispatch [::model/text-fragment nlp/test-text3])
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
        [view {:style [st/row (st/flex)]}

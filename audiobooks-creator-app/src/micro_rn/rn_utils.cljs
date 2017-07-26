@@ -42,7 +42,7 @@
           delay     (- (:timestamp current-gesture-state)
                        (:timestamp prev-gesture-state))
           radius    20
-          max-delay 300]
+          max-delay 1000]
       (and (< delay max-delay)
            (< dx radius)))))
 

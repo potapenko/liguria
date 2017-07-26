@@ -14,6 +14,12 @@
          (reduce-kv (fn [m k v]
                       (assoc m k (f v))) {} (::words db))))
 
+(defn iterate-words [db k f]
+  (doseq [x (-> db ::words vals)]
+    (let [res (f x)]
+      (when (not= res (k x))
+          (dispatch [::word-data (:id x) k res])))))
+
 (defn get-word-data [db id k]
   (get-in db [::words id k]))
 
@@ -58,17 +64,25 @@
 
 (defn select-sentence [db id]
   (let [s-id (get-word-data db id :s-id)]
-    (map-words db #(assoc % :selected (= s-id (-> % :s-id))))))
+    (iterate-words db :selected #(= s-id (-> % :s-id)))
+    #_(map-words db #(assoc % :selected (= s-id (-> % :s-id))))
+    db))
 
 (defn select-paragraph [db id]
   (let [p-id (get-word-data db id :p-id)]
-    (map-words db #(assoc % :selected (= p-id (-> % :p-id))))))
+    (iterate-words db :selected #(= p-id (-> % :p-id)))
+    #_(map-words db #(assoc % :selected (= p-id (-> % :p-id))))
+    db))
 
 (defn select-all [db]
-  (map-words db #(assoc % :selected true)))
+  (iterate-words db :selected #(do true))
+  #_(map-words db #(assoc % :selected true))
+  db)
 
 (defn deselect-all [db]
-  (map-words db #(assoc % :selected false)))
+  (iterate-words db :selected #(do false))
+  #_(map-words db #(assoc % :selected false))
+  db)
 
 ;; -------------------------------------------------------------------------------
 
@@ -165,7 +179,7 @@
 (reg-event-db
  ::scroll-pos
  (fn [db [_ value]]
-   (dispatch [::update-words-layouts])
+   #_(dispatch [::update-words-layouts])
    (assoc db ::scroll-pos value)))
 
 (reg-event-db
@@ -229,7 +243,8 @@
 (reg-event-db
  ::select-progress
  (fn [db [_ word-id gesture-state]]
-   (let [in-progress (::select-in-progress db)
+   db
+   #_(let [in-progress (::select-in-progress db)
          distance (rn-utils/gesture-state-distance (::prev-gesture-state db) gesture-state)]
      (if (or (not in-progress) (> distance 10))
        (let [first-word    (-> db ::words (get word-id))
