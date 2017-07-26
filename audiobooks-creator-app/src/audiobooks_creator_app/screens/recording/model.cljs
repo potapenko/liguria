@@ -31,7 +31,7 @@
          (->> db ::transcript (mapv #(if (= (:id %) id) (assoc % k v) %)))))
 
 (defn get-paragraph-data [db id k]
-  (some-> db ::transcript (filter #(= (:id %) id)) first k))
+  (some->> db ::transcript (filter #(= (:id %) id)) first k))
 
 (defn calculate-collision [db gesture-state]
   (let [words                   (::words db)
@@ -141,16 +141,15 @@
    (assoc db ::text-fragment value)))
 
 (reg-event-db
- ::paraphraph-visible
+ ::paragraph-visible
  (fn [db [_ id value]]
    (set-paragraph-data db id :visible value)))
 
 (reg-sub
- ::paraphraph-visible
+ ::paragraph-visible
  (fn [db [_ id]]
-   (or
-    (get-paragraph-data db id :visible)
-    true)))
+   (let [v (get-paragraph-data db id :visible)]
+     (if (nil? v) true v))))
 
 (reg-sub
  ::words

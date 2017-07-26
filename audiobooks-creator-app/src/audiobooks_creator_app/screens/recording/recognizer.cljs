@@ -5,7 +5,7 @@
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
             [micro-rn.rn-utils :as rn-util]
-            [re-frame.core :refer [subscribe dispatch]]
+            [re-frame.core :refer [subscribe dispatch dispatch-sync]]
             [audiobooks-creator-app.screens.recording.model :as model]
             [audiobooks-creator-app.screens.recording.rte-css :refer [css]]
             [audiobooks-creator-app.screens.recording.nlp :as nlp]
@@ -85,6 +85,10 @@
                 (rn-util/->gesture-props responder))
           [rn/text {:style (conj text-style (st/font-size 14))} text]])))))
 
+(defn word-empty [text]
+  [view {:style [(st/padding 4 2)]}
+   [rn/text {:style [(st/font-size 14)]} text]])
+
 (defn icon-button [icon-name icon-text focused]
   [touchable-opacity {:style [(st/justify-content "center")
                               (st/align-items "center")
@@ -107,26 +111,29 @@
     [flexer]
     [icon-button "repeat" "Redo"]]])
 
+(subscribe [::model/paragraph-visible 1])
+
 (defn one-paragraph [x]
-  (let [item  (-> x .-item utils/prepare-to-clj)
-        index (-> x .-index)
-        layout (atom nil)
-        visible (subscribe [::model/paraphraph-visible (:id item)])]
+  (let [item    (-> x .-item utils/prepare-to-clj)
+        index   (-> x .-index)
+        layout  (atom nil)
+        visible (subscribe [::model/paragraph-visible (:id item)])]
     (fn []
-      [rn/touchable-opacity {
-                             :active-opacity 1
-                             :on-press       #(dispatch [::model/deselect])
-                             :on-layout      #(reset! layout (rn-util/event->layout %))}
-       (when-not (and layout (not visible))
-         [paragraph item
-          (doall
-           (for [s (:sentences item)]
-             ^{:key {:id (str "sentence-" (:id s))}}
-             [sentence s
-              (doall
-               (for [w (:words s)]
-                 ^{:key {:id (str "word-" (:id w))}}
-                 [word (:id w)]))]))])])))
+      [rn/touchable-opacity {:active-opacity 1
+                             :on-press       #(dispatch [::model/deselect])}
+       [paragraph item
+        (doall
+         (for [s (:sentences item)]
+           ^{:key {:id (str "sentence-" (:id s))}}
+           [sentence s
+            (doall
+             (for [w (:words s)]
+               (if @visible
+                 ^{:key {:id (str "word-" (:id w))}} [word (:id w)]
+                 ^{:key {:id (str "word-" (:id w))}} [word-empty (:text w)])))]))]
+       (do
+         (println "hided:" index)
+         [view {:style [(st/width (:width @layout)) (st/height (:height @layout))]}])])))
 
 (defn text-editor []
   (let [transcript         (subscribe [::model/transcript])
@@ -141,27 +148,15 @@
           [editor-toolbar])
         [view {:style [(st/gray 1) (st/width 1)]}]
         [rn/flat-list {:style                     []
-                       :remove-clipped-subviews   true
-                       :on-viewable-items-changed #(println (->> % .-changed
-                                                                 (map (fn [e] [(-> e .-item .-id) (-> e .-isViewable)]))))
-                       ;; :initial-num-to-render 3
+                       ;; :remove-clipped-subviews   true
+                       :on-viewable-items-changed #(doseq [[id visible] (->> % .-changed
+                                                                             (map (fn [e] [(-> e .-item .-id)
+                                                                                           (-> e .-isViewable)])))]
+                                                     (dispatch-sync [::model/paragraph-visible id visible]))
                        :data                      @transcript
                        :render-item               #(r/as-element [one-paragraph %])
                        :key-extractor             #(str "paragraph-" (-> % .-id))}]
-
-        #_(let [c (atom 0)]
-            (doall
-             (for [x @transcript]
-               ^{:key {:id (str "paragraph-" (:id x))}}
-               [paragraph x
-                (doall
-                 (for [s (:sentences x)]
-                   ^{:key {:id (str "sentence-" (:id s))}}
-                   [sentence s
-                    (doall
-                     (for [w (:words s)]
-                       ^{:key {:id (str "word-" (:id w))}}
-                       [word (:id w)]))]))])))]])))
+        ]])))
 
 (comment
   (subscribe [::model/words])
