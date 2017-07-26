@@ -98,16 +98,20 @@
    (get db ::transcript [])))
 
 (reg-event-db
+ ::transcript
+ (fn [db [_ transcript]]
+   (assoc db
+          ::words (into {}
+                        (for [x (->> transcript (map :sentences) flatten
+                                     (map :words) flatten)]
+                          {(:id x) x}))
+          ::transcript transcript)))
+
+(reg-event-db
  ::text-fragment
  (fn [db [_ value]]
-   (let [transcript (nlp/create-text-parts value)]
-     (assoc db
-            ::text-fragment value
-            ::words (into {}
-                          (for [x (->> transcript (map :sentences) flatten
-                                       (map :words) flatten)]
-                            {(:id x) x}))
-            ::transcript transcript))))
+   (dispatch [::transcript (nlp/create-text-parts value)])
+   (assoc db ::text-fragment value)))
 
 (reg-sub
  ::words
