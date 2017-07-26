@@ -35,6 +35,9 @@
 
 (def image (r/adapt-react-class (.-Image ReactNative)))
 (def list-view (r/adapt-react-class (.-ListView ReactNative)))
+(def flat-list (r/adapt-react-class (.-FlatList ReactNative)))
+(def virtualized-list (r/adapt-react-class (.-VirtualizedList ReactNative)))
+(def section-list (r/adapt-react-class (.-SectionList ReactNative)))
 (def refresh-control (r/adapt-react-class (.-RefreshControl ReactNative)))
 (def map-view (r/adapt-react-class (.-MapView ReactNative)))
 (def modal (r/adapt-react-class (.-Modal ReactNative)))
