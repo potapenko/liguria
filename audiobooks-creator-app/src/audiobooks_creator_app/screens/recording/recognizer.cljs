@@ -76,8 +76,8 @@
             view-ref        (atom nil)]
         (when-not (and (= @mode :search) (not searched))
          [view (merge
-                {:ref       #(reset! view-ref %)
-                 :on-layout #(rn-util/event->layout-ref @view-ref (fn [e] (dispatch [::model/word-data id :layout e])))
+                {:ref       #(do (reset! view-ref %) (dispatch [::model/word-data id :ref %]))
+                 :on-layout #(rn-util/ref->layout @view-ref (fn [e] (dispatch [::model/word-data id :layout e])))
                  :style     [(st/padding 4 2)
                              (when selected (st/gray 9))
                              (when background-gray (st/gray 1))]}

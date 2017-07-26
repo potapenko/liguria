@@ -29,14 +29,11 @@
                    (let [{:keys [width height page-x page-y]} (:layout w)
                          left   page-x
                          right  (+ left width)
-                         top    (- page-y scroll-diff)
+                         top    (- page-y 0 #_scroll-diff)
                          bottom (+ top height)]
-                     (and (<= left move-x right)
+                   (and (<= left move-x right)
                           (<= top move-y bottom)))))
          first)))
-
-(defn deselect-all [db]
-  (map-words db #(assoc % :selected false)))
 
 (defn select-words-range [db from to]
   (map-words db #(assoc % :selected
@@ -66,6 +63,12 @@
 (defn select-paragraph [db id]
   (let [p-id (get-word-data db id :p-id)]
     (map-words db #(assoc % :selected (= p-id (-> % :p-id))))))
+
+(defn select-all [db]
+  (map-words db #(assoc % :selected true)))
+
+(defn deselect-all [db]
+  (map-words db #(assoc % :selected false)))
 
 ;; -------------------------------------------------------------------------------
 
@@ -152,8 +155,17 @@
    (get db ::scroll-pos 0)))
 
 (reg-event-db
+ ::update-words-layouts
+ (fn [db [_ value]]
+   (doseq [x (-> db ::words vals)]
+     (let [{:keys [id ref]} x]
+       (rn-utils/ref->layout ref #(dispatch [::word-data id :layout %]))))
+   db))
+
+(reg-event-db
  ::scroll-pos
  (fn [db [_ value]]
+   (dispatch [::update-words-layouts])
    (assoc db ::scroll-pos value)))
 
 (reg-event-db
@@ -183,6 +195,7 @@
            1 (dispatch [::word-one-click id])
            2 (dispatch [::word-double-click id ])
            3 (dispatch [::word-triple-click id])
+           4 (dispatch [::word-forth-click id])
            "nothing")
          (assoc db
                 ::select-in-progress false
@@ -207,6 +220,11 @@
  ::word-triple-click
  (fn [db [_ id]]
    (select-paragraph db id)))
+
+(reg-event-db
+ ::word-forth-click
+ (fn [db [_ id]]
+   (select-all db)))
 
 (reg-event-db
  ::select-progress

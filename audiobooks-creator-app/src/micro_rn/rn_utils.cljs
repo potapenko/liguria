@@ -5,7 +5,7 @@
 (defn event->layout [e]
   (some-> e .-nativeEvent .-layout utils/prepare-to-clj))
 
-(defn event->layout-ref [ref cb]
+(defn ref->layout [ref cb]
   (some-> ref (.measure
                (fn [x y width height page-x page-y]
                  (cb (... x y width height page-x page-y))))))
