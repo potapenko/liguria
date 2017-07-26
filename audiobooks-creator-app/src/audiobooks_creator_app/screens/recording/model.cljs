@@ -176,6 +176,11 @@
        (rn-utils/ref->layout ref #(dispatch [::word-data id :layout %]))))
    db))
 
+(reg-sub
+ ::words-ids
+ (fn [db _]
+   (-> db ::words keys)))
+
 (reg-event-db
  ::scroll-pos
  (fn [db [_ value]]

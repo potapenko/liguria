@@ -50,26 +50,33 @@
    (let [DataSource (.-ListView.DataSource (get-react))]
      (DataSource. #js {:rowHasChanged row-compare-fn}))))
 
-(defn- convert-to-array [vec]
+(defn vec->array [vec]
   (let [arr #js []]
     (doseq [x vec] (.push arr x))
     arr))
+
+(defn- array->vec [arr]
+  (loop [res []
+         [v & t] arr]
+    (if (not (nil? v))
+      (recur (conj res v) t)
+      res)))
 
 (declare empty-ds)
 
 (defn create-list-model
   ([model row-compare-fn]
    (if model
-     (.cloneWithRows (create-list-view-ds row-compare-fn) (convert-to-array model))
+     (.cloneWithRows (create-list-view-ds row-compare-fn) (vec->array model))
      empty-ds))
   ([model]
    (if model
-     (.cloneWithRows (create-list-view-ds) (convert-to-array model))
+     (.cloneWithRows (create-list-view-ds) (vec->array model))
      empty-ds)))
 
 (defn update-model
   [ds model]
-  (.cloneWithRows ds (convert-to-array model)))
+  (.cloneWithRows ds (vec->array model)))
 
 (def empty-ds (create-list-model []))
 

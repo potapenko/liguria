@@ -11,7 +11,8 @@
             [audiobooks-creator-app.screens.recording.nlp :as nlp]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [micro-rn.utils :as utils]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            [micro-rn.utils :as util])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
@@ -106,10 +107,27 @@
     [flexer]
     [icon-button "repeat" "Redo"]]])
 
+(defn one-paragraph [x]
+  (let [item (-> x .-item utils/prepare-to-clj)
+        index (-> x .-index)]
+    (fn []
+      [rn/touchable-opacity {:active-opacity 1
+                             :on-press #(dispatch [::model/deselect])}
+       [paragraph item
+        (doall
+         (for [s (:sentences item)]
+           ^{:key {:id (str "sentence-" (:id s))}}
+           [sentence s
+            (doall
+             (for [w (:words s)]
+               ^{:key {:id (str "word-" (:id w))}}
+               [word (:id w)]))]))]])))
+
 (defn text-editor []
   (let [transcript         (subscribe [::model/transcript])
         mode               (subscribe [::model/mode])
-        select-in-progress (subscribe [::model/select-in-progress])]
+        select-in-progress (subscribe [::model/select-in-progress])
+        words-ids          (subscribe [::model/words-ids])]
     (dispatch [::model/text-fragment nlp/test-text3])
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
@@ -117,27 +135,27 @@
         (when (= @mode :edit)
           [editor-toolbar])
         [view {:style [(st/gray 1) (st/width 1)]}]
-        [rn/scroll-view {:style          [(st/padding-right 12)]
-                         :scroll-enabled (not (and @select-in-progress (= @mode :edit)))
-                         :on-scroll      #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])}
-         #_[text (str "id/count: "
-                    @(subscribe [::model/db [::model/prev-click]]) "/"
-                    @(subscribe [::model/db [::model/count-click]]))]
-         [rn/touchable-without-feedback {:on-press #(dispatch [::model/deselect])}
-          [view {:style [(st/padding 0 0 0 0) (st/flex)]}
-           (let [c (atom 0)]
-             (doall
-              (for [x @transcript]
-                ^{:key {:id (str "paragraph-" (:id x))}}
-                [paragraph x
-                 (doall
-                  (for [s (:sentences x)]
-                    ^{:key {:id (str "sentence-" (:id s))}}
-                    [sentence s
-                     (doall
-                      (for [w (:words s)]
-                        ^{:key {:id (str "word-" (:id w))}}
-                        [word (:id w)]))]))])))]]]]])))
+        [rn/flat-list {:style                     []
+                       :remove-clipped-subviews   true
+                       :on-viewable-items-changed #(println (->> % .-changed (map (fn [e] (-> e .-item .-id)))))
+                       ;; :initial-num-to-render 3
+                       :data                      @transcript
+                       :render-item               #(r/as-element [one-paragraph %])
+                       :key-extractor             #(str "paragraph-" (-> % .-id))}]
+
+        #_(let [c (atom 0)]
+            (doall
+             (for [x @transcript]
+               ^{:key {:id (str "paragraph-" (:id x))}}
+               [paragraph x
+                (doall
+                 (for [s (:sentences x)]
+                   ^{:key {:id (str "sentence-" (:id s))}}
+                   [sentence s
+                    (doall
+                     (for [w (:words s)]
+                       ^{:key {:id (str "word-" (:id w))}}
+                       [word (:id w)]))]))])))]])))
 
 (comment
   (subscribe [::model/words])
