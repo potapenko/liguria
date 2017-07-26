@@ -82,7 +82,7 @@
                              (when selected (st/gray 9))
                              (when background-gray (st/gray 1))]}
                 (rn-util/->gesture-props responder))
-          [rn/text {:style (conj text-style (st/font-size 16))} text]])))))
+          [rn/text {:style (conj text-style (st/font-size 14))} text]])))))
 
 (defn icon-button [icon-name icon-text focused]
   [touchable-opacity {:style [(st/justify-content "center")
