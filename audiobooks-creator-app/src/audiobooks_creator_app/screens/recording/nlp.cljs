@@ -92,6 +92,7 @@
 
 (comment
   (-> test-text create-text-parts count)
+  (-> test-text2 create-text-parts first println)
   (-> test-text create-paragraphs first
       create-sentences #_count)
   (-> test-text create-paragraphs count))

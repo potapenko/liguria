@@ -2,7 +2,8 @@
   (:require [re-frame.core :refer [reg-sub reg-event-db dispatch dispatch-sync]]
             [clojure.core.reducers :as red]
             [micro-rn.rn-utils :as rn-utils]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            [audiobooks-creator-app.screens.recording.nlp :as nlp])
   (:require-macros [micro-rn.macros :refer [...]]))
 
 ;; -------------------------------------------------------------------------------
@@ -51,6 +52,18 @@
 (defn get-sentence [db word-id]
   )
 
+(defn select-line [db id]
+  (let [word-y (-> db ::words (get id) :layout :page-y)]
+    (map-words db #(assoc % :selected (= word-y (-> % :layout :page-y))))))
+
+(defn select-sentence [db id]
+  (let [s-id (get-word-data db id :s-id)]
+    (map-words db #(assoc % :selected (= s-id (-> % :s-id))))))
+
+(defn select-paragraph [db id]
+  (let [p-id (get-word-data db id :p-id)]
+    (map-words db #(assoc % :selected (= p-id (-> % :p-id))))))
+
 ;; -------------------------------------------------------------------------------
 
 (reg-sub
@@ -85,14 +98,16 @@
    (get db ::transcript [])))
 
 (reg-event-db
- ::transcript
+ ::text-fragment
  (fn [db [_ value]]
-   (assoc db
-          ::words (into {}
-                        (for [x (->> value (map :sentences) flatten
-                                     (map :words) flatten)]
-                          {(:id x) x}))
-          ::transcript value)))
+   (let [transcript (nlp/create-text-parts value)]
+     (assoc db
+            ::text-fragment value
+            ::words (into {}
+                          (for [x (->> transcript (map :sentences) flatten
+                                       (map :words) flatten)]
+                            {(:id x) x}))
+            ::transcript transcript))))
 
 (reg-sub
  ::words
@@ -169,12 +184,6 @@
                 ::count-click count-click)))))
 
 (reg-event-db
- ::select-words-line
- (fn [db [_ id]]
-   (let [word-y (-> db ::words (get id) :layout :page-y)]
-     (map-words db #(assoc % :selected (= word-y (-> % :layout :page-y)))))))
-
-(reg-event-db
  ::word-one-click
  (fn [db [_ id]]
    (let [prev-selected (get-word-data db id :selected)]
@@ -185,14 +194,12 @@
 (reg-event-db
  ::word-double-click
  (fn [db [_ id]]
-   (dispatch [::select-words-line id])
-   db))
+   (select-sentence db id)))
 
 (reg-event-db
  ::word-triple-click
  (fn [db [_ id]]
-   #_(dispatch [::select-words-line id])
-   db))
+   (select-paragraph db id)))
 
 (reg-event-db
  ::select-data

@@ -31,7 +31,11 @@
         props     (r/props this)
         on-layout (or (:on-layout props) identity)]
     (into [view {:on-layout #(on-layout (rn-util/event->layout %))
-                 :style     [st/row st/wrap (st/padding 4 8)]}] (r/children this))))
+                 :style     [st/row st/wrap (st/padding 12)
+                             (st/border 1 (st/gray-cl 1) "solid")
+                             (st/border-left 0)
+                             (st/border-right 0)
+                             (st/border-top 0)]}] (r/children this))))
 
 (defn sentence [{:keys [id]}]
   (let [this      (r/current-component)
@@ -106,7 +110,7 @@
   (let [transcript         (subscribe [::model/transcript])
         mode               (subscribe [::model/mode])
         select-in-progress (subscribe [::model/select-in-progress])]
-    (dispatch [::model/transcript (nlp/create-text-parts nlp/test-text2)])
+    (dispatch [::model/text-fragment nlp/test-text2])
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
        [view {:style [st/row (st/flex)]}

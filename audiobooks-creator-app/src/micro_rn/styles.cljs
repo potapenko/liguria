@@ -119,19 +119,25 @@
 
 ; background color
 
+(defn gray-cl [opacity]
+  (str "rgba(0,0,0,0." opacity ")"))
+
 (defn gray
   ([] (gray 2))
   ([opacity]
    (new-style
     (keyword (str "gray-" opacity))
-    {:background-color (str "rgba(0,0,0,0." opacity ")")})))
+    {:background-color (gray-cl opacity)})))
+
+(defn white-cl [opacity]
+  (str "rgba(255,255,255,0." opacity ")"))
 
 (defn white
   ([]  (white 999))
   ([opacity]
    (new-style
     (keyword  (str "white-" opacity))
-    {:background-color (str "rgba(255,255,255,0." opacity ")")})))
+    {:background-color (white-cl opacity)})))
 
 (defn background [v]
   (new-style (keyword (str "background-color-" v)) {:background-color v}))
@@ -226,10 +232,11 @@
 (defn border
   ([] (border 1))
   ([w] (border w "rgba(0,0,0,0.4)"))
-  ([w c]
-   (new-style (keyword (str "border-" w "-" c))
+  ([w c] (border w c "solid"))
+  ([w c s]
+   (new-style (keyword (str "border-" w "-" c "-" (name s)))
               {:border-width w
-               :border-style "solid"
+               :border-style (name s)
                :border-color c})))
 
 (defn border-bottom
@@ -254,7 +261,6 @@
   ([w c]
    (new-style (keyword (str "border-left-" w "-" c))
               {:border-left-width w
-               :border-left-style "solid"
                :border-left-color c})))
 
 (defn border-right
@@ -263,7 +269,6 @@
   ([w c]
    (new-style (keyword (str "border-right-" w "-" c))
               {:border-right-width w
-               :border-right-style "solid"
                :border-right-color c})))
 
 (defn shadow
