@@ -26,6 +26,13 @@
 (defn set-word-data [db id k v]
   (assoc-in db [::words id k] v))
 
+(defn set-paragraph-data [db id k v]
+  (assoc db ::transcript
+         (->> db ::transcript (mapv #(if (= (:id %) id) (assoc % k v) %)))))
+
+(defn get-paragraph-data [db id k]
+  (some-> db ::transcript (filter #(= (:id %) id)) first k))
+
 (defn calculate-collision [db gesture-state]
   (let [words                   (::words db)
         {:keys [move-x move-y]} gesture-state
@@ -133,6 +140,18 @@
    (dispatch [::transcript (nlp/create-text-parts value)])
    (assoc db ::text-fragment value)))
 
+(reg-event-db
+ ::paraphraph-visible
+ (fn [db [_ id value]]
+   (set-paragraph-data db id :visible value)))
+
+(reg-sub
+ ::paraphraph-visible
+ (fn [db [_ id]]
+   (or
+    (get-paragraph-data db id :visible)
+    true)))
+
 (reg-sub
  ::words
  (fn [db [_ id]]
@@ -175,6 +194,7 @@
      (let [{:keys [id ref]} x]
        (rn-utils/ref->layout ref #(dispatch [::word-data id :layout %]))))
    db))
+
 
 (reg-sub
  ::words-ids

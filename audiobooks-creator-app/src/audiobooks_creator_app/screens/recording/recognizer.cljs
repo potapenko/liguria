@@ -108,20 +108,25 @@
     [icon-button "repeat" "Redo"]]])
 
 (defn one-paragraph [x]
-  (let [item (-> x .-item utils/prepare-to-clj)
-        index (-> x .-index)]
+  (let [item  (-> x .-item utils/prepare-to-clj)
+        index (-> x .-index)
+        layout (atom nil)
+        visible (subscribe [::model/paraphraph-visible (:id item)])]
     (fn []
-      [rn/touchable-opacity {:active-opacity 1
-                             :on-press #(dispatch [::model/deselect])}
-       [paragraph item
-        (doall
-         (for [s (:sentences item)]
-           ^{:key {:id (str "sentence-" (:id s))}}
-           [sentence s
-            (doall
-             (for [w (:words s)]
-               ^{:key {:id (str "word-" (:id w))}}
-               [word (:id w)]))]))]])))
+      [rn/touchable-opacity {
+                             :active-opacity 1
+                             :on-press       #(dispatch [::model/deselect])
+                             :on-layout      #(reset! layout (rn-util/event->layout %))}
+       (when-not (and layout (not visible))
+         [paragraph item
+          (doall
+           (for [s (:sentences item)]
+             ^{:key {:id (str "sentence-" (:id s))}}
+             [sentence s
+              (doall
+               (for [w (:words s)]
+                 ^{:key {:id (str "word-" (:id w))}}
+                 [word (:id w)]))]))])])))
 
 (defn text-editor []
   (let [transcript         (subscribe [::model/transcript])
@@ -137,7 +142,8 @@
         [view {:style [(st/gray 1) (st/width 1)]}]
         [rn/flat-list {:style                     []
                        :remove-clipped-subviews   true
-                       :on-viewable-items-changed #(println (->> % .-changed (map (fn [e] (-> e .-item .-id)))))
+                       :on-viewable-items-changed #(println (->> % .-changed
+                                                                 (map (fn [e] [(-> e .-item .-id) (-> e .-isViewable)]))))
                        ;; :initial-num-to-render 3
                        :data                      @transcript
                        :render-item               #(r/as-element [one-paragraph %])
