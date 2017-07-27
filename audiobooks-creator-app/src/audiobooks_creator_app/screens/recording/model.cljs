@@ -33,21 +33,6 @@
 (defn get-paragraph-data [db id k]
   (some->> db ::transcript (filter #(= (:id %) id)) first k))
 
-(defn calculate-collision [db gesture-state]
-  (let [words                   (::words db)
-        {:keys [move-x move-y]} gesture-state
-        scroll-diff                     (::scroll-pos db)]
-    (->> words vals
-         (filter (fn [w]
-                   (let [{:keys [width height page-x page-y]} (:layout w)
-                         left   page-x
-                         right  (+ left width)
-                         top    (- page-y 0 #_scroll-diff)
-                         bottom (+ top height)]
-                   (and (<= left move-x right)
-                          (<= top move-y bottom)))))
-         first)))
-
 (defn select-words-range [db from to]
   (map-words db #(assoc % :selected
                         (or (<= (:id from) (:id %) (:id to))
@@ -65,6 +50,9 @@
 (defn get-sentence [db word-id]
   )
 
+(defn get-paragraph [db word-id]
+  )
+
 (defn select-line [db id]
   (let [word-y (-> db ::words (get id) :layout :page-y)]
     (map-words db #(assoc % :selected (= word-y (-> % :layout :page-y))))))
@@ -72,24 +60,33 @@
 (defn select-sentence [db id]
   (let [s-id (get-word-data db id :s-id)]
     (iterate-words db :selected #(= s-id (-> % :s-id)))
-    #_(map-words db #(assoc % :selected (= s-id (-> % :s-id))))
     db))
 
 (defn select-paragraph [db id]
   (let [p-id (get-word-data db id :p-id)]
     (iterate-words db :selected #(= p-id (-> % :p-id)))
-    #_(map-words db #(assoc % :selected (= p-id (-> % :p-id))))
     db))
 
 (defn select-all [db]
   (iterate-words db :selected #(do true))
-  #_(map-words db #(assoc % :selected true))
   db)
 
 (defn deselect-all [db]
   (iterate-words db :selected #(do false))
-  #_(map-words db #(assoc % :selected false))
   db)
+
+(defn visible-paragraph? [p]
+  (let [v (:visible p)]
+    (if (nil? v) true v)))
+
+(defn get-visible-words [db]
+  (let [words-ids (some->> db ::transcript
+                           (filter #(visible-paragraph? %))
+                           (map :sentences) flatten
+                           (map :words) flatten
+                           (map :id))]
+    (for [id words-ids]
+      (get (::words db) id))))
 
 ;; -------------------------------------------------------------------------------
 
@@ -186,15 +183,6 @@
  (fn [db _]
    (get db ::scroll-pos 0)))
 
-(reg-event-db
- ::update-words-layouts
- (fn [db [_ value]]
-   (doseq [x (-> db ::words vals)]
-     (let [{:keys [id ref]} x]
-       (rn-utils/ref->layout ref #(dispatch [::word-data id :layout %]))))
-   db))
-
-
 (reg-sub
  ::words-ids
  (fn [db _]
@@ -230,9 +218,10 @@
                             (rn-utils/double-tap (::prev-gesture-state db) gesture-state))
            count-click (if double? (inc (::count-click db)) 1)]
          (case count-click
-           1 (select-sentence db id)
-           2 (select-paragraph db id)
-           3 (select-all db)
+           1 (dispatch [::word-one-click id])
+           2 (select-sentence db id)
+           3 (select-paragraph db id)
+           ;; 4 (select-all db)
            "nothing")
          (assoc db
                 ::select-in-progress false
@@ -249,19 +238,41 @@
          (set-word-data id :selected (not prev-selected))))))
 
 (reg-event-db
+ ::find-collision-and-select-word-range
+ (fn [db [_ first-word words gesture-state]]
+   (when (= (::prev-gesture-state db) gesture-state)
+     (let [[cur-word & tail] words]
+       (when cur-word
+         (println "select in progress" (count words))
+         (let [next-word #(dispatch [::find-collision-and-select-word-range
+                                     first-word tail gesture-state])
+               ref       (:ref cur-word)]
+           (if-not (nil? ref)
+             (rn-utils/ref->layout
+              ref
+              #(if (rn-utils/layout-hit-test % gesture-state)
+                 (select-words-range db first-word cur-word)
+                 (next-word)))
+             (next-word))))))
+   db))
+
+(reg-event-db
+ ::prev-gesture-state
+ (fn [db [_ value]]
+   (assoc db ::prev-gesture-state value)))
+
+(reg-event-db
  ::select-progress
  (fn [db [_ word-id gesture-state]]
-   db
-   #_(let [in-progress (::select-in-progress db)
+   (let [in-progress (::select-in-progress db)
          distance (rn-utils/gesture-state-distance (::prev-gesture-state db) gesture-state)]
      (if (or (not in-progress) (> distance 10))
-       (let [first-word    (-> db ::words (get word-id))
-             last-selected (calculate-collision db gesture-state)]
-         (-> db
-             (assoc ::select-in-progress true
-                    ::prev-gesture-state gesture-state)
-             (#(if last-selected (select-words-range % first-word last-selected) %))))
-       db))))
+       (let [first-word    (-> db ::words (get word-id))]
+         (dispatch [::prev-gesture-state gesture-state])
+         #_(dispatch [::find-collision-and-select-word-range
+                    first-word (get-visible-words db) gesture-state])
+         (assoc db ::select-in-progress true)
+       db)))))
 
 (reg-sub
  ::mode

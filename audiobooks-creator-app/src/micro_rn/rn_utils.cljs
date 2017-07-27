@@ -42,7 +42,7 @@
           delay     (- (:timestamp current-gesture-state)
                        (:timestamp prev-gesture-state))
           radius    20
-          max-delay 1000]
+          max-delay 400]
       (and (< delay max-delay)
            (< dx radius)))))
 
@@ -53,3 +53,12 @@
   (if-not (or (nil? a) (nil? b))
     (distance (:dx a) (:dy a) (:dx b) (:dy b))
     0))
+
+(defn layout-hit-test [layout gesture-state]
+  (let [{:keys [width height page-x page-y]} layout
+        left                                 page-x
+        right                                (+ left width)
+        top                                  (- page-y 0)
+        bottom                               (+ top height)]
+    (and (<= left move-x right)
+         (<= top move-y bottom))))

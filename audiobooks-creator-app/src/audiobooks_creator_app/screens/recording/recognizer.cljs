@@ -85,9 +85,11 @@
                 (rn-util/->gesture-props responder))
           [rn/text {:style (conj text-style (st/font-size 14))} text]])))))
 
-(defn word-empty [text]
-  [view {:style [(st/padding 4 2)]}
-   [rn/text {:style [(st/font-size 14)]} text]])
+(defn word-empty [text id]
+  (let []
+    (dispatch [::model/word-data id :ref nil])
+    (fn [] [view {:style [(st/padding 4 2)]}
+            [rn/text {:style [(st/font-size 14)]} text]])))
 
 (defn icon-button [icon-name icon-text focused]
   [touchable-opacity {:style [(st/justify-content "center")
@@ -130,10 +132,8 @@
              (for [w (:words s)]
                (if @visible
                  ^{:key {:id (str "word-" (:id w))}} [word (:id w)]
-                 ^{:key {:id (str "word-" (:id w))}} [word-empty (:text w)])))]))]
-       (do
-         (println "hided:" index)
-         [view {:style [(st/width (:width @layout)) (st/height (:height @layout))]}])])))
+                 ^{:key {:id (str "word-" (:id w))}} [word-empty (:text w) (:id w)])))]))]
+       [view {:style [(st/width (:width @layout)) (st/height (:height @layout))]}]])))
 
 (defn text-editor []
   (let [transcript         (subscribe [::model/transcript])
@@ -148,7 +148,8 @@
           [editor-toolbar])
         [view {:style [(st/gray 1) (st/width 1)]}]
         [rn/flat-list {:style                     []
-                       ;; :remove-clipped-subviews   true
+                       :remove-clipped-subviews   true
+                       :initial-num-to-render 5
                        :on-viewable-items-changed #(doseq [[id visible] (->> % .-changed
                                                                              (map (fn [e] [(-> e .-item .-id)
                                                                                            (-> e .-isViewable)])))]
