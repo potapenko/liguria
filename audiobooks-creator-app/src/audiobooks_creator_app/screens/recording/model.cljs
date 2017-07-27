@@ -88,6 +88,21 @@
     (for [id words-ids]
       (get (::words db) id))))
 
+(defn calculate-collision [db gesture-state]
+  (let [words                   (::words db)
+        {:keys [move-x move-y]} gesture-state
+        scroll-diff                     (::scroll-pos db)]
+    (->> (get-visible-words db)
+         (filter (fn [w]
+                   (let [{:keys [width height page-x page-y]} (:layout w)
+                         left   page-x
+                         right  (+ left width)
+                         top    (- page-y 0 #_scroll-diff)
+                         bottom (+ top height)]
+                     (and (<= left move-x right)
+                          (<= top move-y bottom)))))
+         first)))
+
 ;; -------------------------------------------------------------------------------
 
 (reg-sub
@@ -262,7 +277,30 @@
    (assoc db ::prev-gesture-state value)))
 
 (reg-event-db
+ ::update-words-layouts
+ (fn [db [_ value]]
+   #_(doseq [x (get-visible-words db)]
+     (let [{:keys [id ref]} x]
+       (rn-utils/ref->layout ref #(dispatch [::word-data id :layout %]))))
+   db))
+
+(reg-event-db
  ::select-progress
+ (fn [db [_ word-id gesture-state]]
+   db
+   #_(let [in-progress (::select-in-progress db)
+           distance (rn-utils/gesture-state-distance (::prev-gesture-state db) gesture-state)]
+       (if (or (not in-progress) (> distance 10))
+         (let [first-word    (-> db ::words (get word-id))
+               last-selected (calculate-collision db gesture-state)]
+           (-> db
+               (assoc ::select-in-progress true
+                      ::prev-gesture-state gesture-state)
+               (#(if last-selected (select-words-range % first-word last-selected) %))))
+         db))))
+
+(reg-event-db
+ ::select-progress-new
  (fn [db [_ word-id gesture-state]]
    (let [in-progress (::select-in-progress db)
          distance (rn-utils/gesture-state-distance (::prev-gesture-state db) gesture-state)]

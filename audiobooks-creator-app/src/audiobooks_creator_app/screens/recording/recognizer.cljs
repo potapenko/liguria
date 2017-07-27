@@ -69,21 +69,19 @@
                     background-gray
                     text-style
                     selected
-                    searched
-                    ]}      @word
-            selected        (and selected (= @mode :edit))
-            background-gray (and (not selected) background-gray)
-            text-style      (-> text-style (conj (when selected :invert)) map-decorations)
-            view-ref        (atom nil)]
-        (when-not (and (= @mode :search) (not searched))
-         [view (merge
-                {:ref       #(do (reset! view-ref %) (dispatch [::model/word-data id :ref %]))
-                 ;; :on-layout #(rn-util/ref->layout @view-ref (fn [e] (dispatch [::model/word-data id :layout e])))
-                 :style     [(st/padding 4 2)
-                             (when selected (st/gray 9))
-                             (when background-gray (st/gray 1))]}
-                (rn-util/->gesture-props responder))
-          [rn/text {:style (conj text-style (st/font-size 14))} text]])))))
+                    searched]} @word
+            selected           (and selected (= @mode :edit))
+            background-gray    (and (not selected) background-gray)
+            text-style         (-> text-style (conj (when selected :invert)) map-decorations)
+            view-ref           (atom nil)]
+        [view (merge
+               {:ref   #(do (reset! view-ref %) (dispatch [::model/word-data id :ref %]))
+                ;; :on-layout #(rn-util/ref->layout @view-ref (fn [e] (dispatch [::model/word-data id :layout e])))
+                :style [(st/padding 4 2)
+                        (when selected (st/gray 9))
+                        (when background-gray (st/gray 1))]}
+               (rn-util/->gesture-props responder))
+         [rn/text {:style (conj text-style (st/font-size 14))} text]]))))
 
 (defn word-empty [text id]
   (let []
@@ -150,10 +148,12 @@
         [rn/flat-list {:style                     []
                        :remove-clipped-subviews   true
                        :initial-num-to-render 5
-                       :on-viewable-items-changed #(doseq [[id visible] (->> % .-changed
-                                                                             (map (fn [e] [(-> e .-item .-id)
-                                                                                           (-> e .-isViewable)])))]
-                                                     (dispatch-sync [::model/paragraph-visible id visible]))
+                       :on-viewable-items-changed (fn [data]
+                                                     (doseq [[id visible] (->> data .-changed
+                                                                               (map (fn [e] [(-> e .-item .-id)
+                                                                                             (-> e .-isViewable)])))]
+                                                       (dispatch [::model/paragraph-visible id visible]))
+                                                    (dispatch [::model/update-words-layouts]))
                        :data                      @transcript
                        :render-item               #(r/as-element [one-paragraph %])
                        :key-extractor             #(str "paragraph-" (-> % .-id))}]
