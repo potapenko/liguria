@@ -39,19 +39,19 @@
 
 (defn set-sentence-data [db & id-k-v]
   (assoc db ::transcript
-         (walk/postwalk (fn [x]
-                          (loop [x            x
-                                 [id k v & t] id-k-v]
-                            (if id
-                              (recur
-                               (if (and (map? x)
-                                        (= (:type x) :sentence)
-                                        (= (:id x) id))
-                                 (assoc x k v)
-                                 x)
-                               t)
-                              x)))
-                        (::transcript db))))
+         (vec (for [p (::transcript db)]
+            (assoc p :sentences
+                   (vec
+                    (for [x (:sentences p)]
+                      (loop [x            x
+                             [id k v & t] id-k-v]
+                        (if id
+                          (recur
+                           (if (= (:id x) id)
+                             (assoc x k v)
+                             x)
+                           t)
+                          x)))))))))
 
 (defn get-first [db]
   (->> db ::transcript (map :sentences) flatten first (#(dissoc % :words))))
@@ -63,18 +63,6 @@
   (map-words db #(assoc % :selected
                         (or (<= (:id from) (:id %) (:id to))
                             (<= (:id to) (:id %) (:id from))))))
-
-;; (defn filter-searched [db text]
-;;   )
-
-(defn get-words-line [db word-id]
-  )
-
-(defn get-sentence [db word-id]
-  )
-
-(defn get-paragraph [db word-id]
-  )
 
 (defn select-line [db id]
   (let [word-y (-> db ::words (get id) :layout :page-y)]
