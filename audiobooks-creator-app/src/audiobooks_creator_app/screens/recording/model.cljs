@@ -39,19 +39,19 @@
 
 (defn set-sentence-data [db & id-k-v]
   (assoc db ::transcript
-         (time (walk/postwalk (fn [x]
-                           (loop [x            x
-                                  [id k v & t] id-k-v]
-                             (if id
-                               (recur
-                                (if (and (map? x)
-                                         (= (:type x) :sentence)
-                                         (= (:id x) id))
-                                  (assoc x k v)
-                                  x)
-                                t)
-                               x)))
-                         (::transcript db)))))
+         (walk/postwalk (fn [x]
+                          (loop [x            x
+                                 [id k v & t] id-k-v]
+                            (if id
+                              (recur
+                               (if (and (map? x)
+                                        (= (:type x) :sentence)
+                                        (= (:id x) id))
+                                 (assoc x k v)
+                                 x)
+                               t)
+                              x)))
+                        (::transcript db))))
 
 (defn get-first [db]
   (->> db ::transcript (map :sentences) flatten first (#(dissoc % :words))))
@@ -365,22 +365,20 @@
 (reg-event-db
  ::search-text
  (fn [db [_ text]]
-   (time (if text
-      (let [rx (re-pattern (str (string/lower-case (or text "")) ".+"))]
-        (loop [db      (assoc db ::search-text text)
-               [x & t] (->> db ::transcript (map :sentences) flatten)]
-          (if x
-            (recur
-             (let [res (->>  x :text string/lower-case (re-find rx) nil? not)]
-               (set-sentence-data db (:id x) :visible res))
-             t)
-            (do
-              (reset! test-db db)
-              db)
-            )))
-      db))))
-
-;; (get-sentence-data @test-db )
+   (if text
+     (let [rx (re-pattern (str (string/lower-case (or text "")) ".+"))]
+       (loop [args    [(assoc db ::search-text text)]
+              [x & t] (->> db ::transcript (map :sentences) flatten)]
+         (if x
+           (recur
+            (let [res (->>  x :text string/lower-case (re-find rx) nil? not)]
+              (concat args [(:id x) :visible res]))
+            t)
+           (do
+             (reset! test-db db)
+             (time (apply set-sentence-data args)))
+           )))
+     db)))
 
 (comment
   (reg-sub
