@@ -4,10 +4,14 @@
             [micro-rn.rn-utils :as rn-utils]
             [clojure.string :as string]
             [audiobooks-creator-app.screens.recording.nlp :as nlp]
-            [micro-rn.react-native :as rn])
+            [micro-rn.react-native :as rn]
+            [clojure.walk :as walk]
+            [micro-rn.utils :as utils])
   (:require-macros [micro-rn.macros :refer [...]]))
 
 ;; -------------------------------------------------------------------------------
+
+(def test-db (atom nil))
 
 (defn map-words [db f]
   (assoc db ::words
@@ -33,16 +37,35 @@
 (defn get-paragraph-data [db id k]
   (some->> db ::transcript (filter #(= (:id %) id)) first k))
 
+(defn set-sentence-data [db & id-k-v]
+  (assoc db ::transcript
+         (time (walk/postwalk (fn [x]
+                           (loop [x            x
+                                  [id k v & t] id-k-v]
+                             (if id
+                               (recur
+                                (if (and (map? x)
+                                         (= (:type x) :sentence)
+                                         (= (:id x) id))
+                                  (assoc x k v)
+                                  x)
+                                t)
+                               x)))
+                         (::transcript db)))))
+
+(defn get-first [db]
+  (->> db ::transcript (map :sentences) flatten first (#(dissoc % :words))))
+
+(defn get-sentence-data [db id k]
+  (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first k))
+
 (defn select-words-range [db from to]
   (map-words db #(assoc % :selected
                         (or (<= (:id from) (:id %) (:id to))
                             (<= (:id to) (:id %) (:id from))))))
 
-(defn filter-searched [db text]
-  (let [rx (re-pattern (str (string/lower-case text) ".+"))]
-    db
-
-    ))
+;; (defn filter-searched [db text]
+;;   )
 
 (defn get-words-line [db word-id]
   )
@@ -161,6 +184,17 @@
  ::paragraph-visible
  (fn [db [_ id]]
    (let [v (get-paragraph-data db id :visible)]
+     (if (nil? v) true v))))
+
+(reg-event-db
+ ::sentence-visible
+ (fn [db [_ id value]]
+   (set-sentence-data db id :visible value)))
+
+(reg-sub
+ ::sentence-visible
+ (fn [db [_ id]]
+   (let [v (get-sentence-data db id :visible)]
      (if (nil? v) true v))))
 
 (reg-sub
@@ -330,10 +364,23 @@
 
 (reg-event-db
  ::search-text
- (fn [db [_ value]]
-   (-> db
-       (assoc ::search-text value)
-       #_(filter-searched value))))
+ (fn [db [_ text]]
+   (time (if text
+      (let [rx (re-pattern (str (string/lower-case (or text "")) ".+"))]
+        (loop [db      (assoc db ::search-text text)
+               [x & t] (->> db ::transcript (map :sentences) flatten)]
+          (if x
+            (recur
+             (let [res (->>  x :text string/lower-case (re-find rx) nil? not)]
+               (set-sentence-data db (:id x) :visible res))
+             t)
+            (do
+              (reset! test-db db)
+              db)
+            )))
+      db))))
+
+;; (get-sentence-data @test-db )
 
 (comment
   (reg-sub

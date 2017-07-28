@@ -109,7 +109,7 @@
 
 (defn lazy-call-fn
   ([cb] #(lazy-call cb))
-  ([cb idle] #(lazy-call cb)))
+  ([cb idle] #(lazy-call cb idle)))
 
 ;; old conv 000
 

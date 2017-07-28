@@ -55,7 +55,8 @@
     0))
 
 (defn layout-hit-test [layout gesture-state]
-  (let [{:keys [width height page-x page-y]} layout
+  (let [{:keys [move-x move-y]} gesture-state
+        {:keys [width height page-x page-y]} layout
         left                                 page-x
         right                                (+ left width)
         top                                  (- page-y 0)

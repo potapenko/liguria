@@ -41,9 +41,12 @@
 (defn sentence [{:keys [id]}]
   (let [this      (r/current-component)
         props     (r/props this)
-        on-layout (or (:on-layout props) identity)]
-    (into [view {:on-layout #(on-layout (rn-util/event->layout %))
-                 :style     [st/row st/wrap]}] (r/children this))))
+        on-layout (or (:on-layout props) identity)
+        visible   (subscribe [::model/sentence-visible id])]
+    (fn []
+      (when @visible
+        (into [view {:on-layout #(on-layout (rn-util/event->layout %))
+                     :style     [st/row st/wrap]}] (r/children this))))))
 
 (defn- map-decorations [values]
   (->> (map #(case %
@@ -60,7 +63,7 @@
         mode         (subscribe [::model/mode])
         gesture-data (atom nil)
         responder    (rn/pan-responder-create
-                      {:on-start-should-set-pan-responder #(= @mode :edit)
+                      {:on-start-should-set-pan-responder #(do (println "on-start" id) (= @mode :edit))
                        :on-pan-responder-grant            #(dispatch [::model/word-click id (rn-util/->getsture-state %2)])
                        :on-pan-responder-move             #(dispatch [::model/select-progress id (rn-util/->getsture-state %2)])
                        :on-pan-responder-release          #(dispatch [::model/word-release id (rn-util/->getsture-state %2)])})]

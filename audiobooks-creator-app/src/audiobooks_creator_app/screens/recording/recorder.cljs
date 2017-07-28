@@ -91,8 +91,8 @@
                                                  (dispatch [::model/mode :idle])
                                                  (dispatch [::model/search-text nil]))
                             :on-focus         #(dispatch [::model/mode :search])
-                            :on-delete        (util/lazy-call-fn #(dispatch [::model/search-text ""]))
-                            :on-change-text   (util/lazy-call-fn #(dispatch [::model/search-text %]))}]
+                            :on-delete        #(util/lazy-call (fn [] (dispatch [::model/search-text ""])))
+                            :on-change-text   #(util/lazy-call (fn [] (dispatch [::model/search-text %])))}]
           [flexer]]
          [view {:style [(st/height 50) st/row (st/padding 0 4)]}
           (if @in-progress?
