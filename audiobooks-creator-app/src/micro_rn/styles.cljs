@@ -88,6 +88,11 @@
 
 ; layout
 
+(defn display [v]
+  [:flex :none]
+  (let [v (name v)]
+    (new-style (keyword (str "display-" v)) {:display v})))
+
 (defn flex
   ([] (flex 1))
   ([v]

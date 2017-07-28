@@ -30,13 +30,17 @@
 (defn paragraph [{:keys [id]}]
   (let [this      (r/current-component)
         props     (r/props this)
-        on-layout (or (:on-layout props) identity)]
-    (into [view {:on-layout #(on-layout (rn-util/event->layout %))
-                 :style     [st/row st/wrap (st/padding 12)
-                             (st/border 1 (st/gray-cl 1) "solid")
-                             (st/border-left 0)
-                             (st/border-right 0)
-                             (st/border-top 0)]}] (r/children this))))
+        on-layout (or (:on-layout props) identity)
+        sentences (subscribe [::model/paragraph-data id :sentences])]
+    (fn []
+      (let [hide? (every? #(not (let [v (:visible %)] (if (nil? v) true v))) @sentences)]
+        (into [view {:on-layout #(on-layout (rn-util/event->layout %))
+                     :style     [(when hide? (st/display :none))
+                                 st/row st/wrap (st/padding 12)
+                                 (st/border 1 (st/gray-cl 1) "solid")
+                                 (st/border-left 0)
+                                 (st/border-right 0)
+                                 (st/border-top 0)]}] (r/children this))))))
 
 (defn sentence [{:keys [id]}]
   (let [this      (r/current-component)
@@ -46,7 +50,8 @@
     (fn []
       (when @visible
         (into [view {:on-layout #(on-layout (rn-util/event->layout %))
-                     :style     [st/row st/wrap]}] (r/children this))))))
+                     :style     [(when-not @visible (st/display :none))
+                                 st/row st/wrap]}] (r/children this))))))
 
 (defn- map-decorations [values]
   (->> (map #(case %
@@ -121,6 +126,7 @@
         index   (-> x .-index)
         layout  (atom nil)
         visible (subscribe [::model/paragraph-visible (:id item)])]
+    (println "build one paragraph:" index)
     (fn []
       [rn/touchable-opacity {:active-opacity 1
                              :on-press       #(dispatch [::model/deselect])}
