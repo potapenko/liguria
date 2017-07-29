@@ -32,9 +32,9 @@
         props     (r/props this)
         on-layout (or (:on-layout props) identity)
         sentences (subscribe [::model/paragraph-data id :sentences])
-        hidden    (subscribe [::model/paragraph-data id :hidden])]
+        hidden?   (subscribe [::model/paragraph-data id :hidden])]
     (fn []
-      (let [hide? (every? #(let [v (:hidden %)] (if (nil? v) true v)) @sentences)]
+      (let [hide? (every? #(:hidden %) @sentences)]
         (into [view {:on-layout #(on-layout (rn-util/event->layout %))
                      :style     [(when hide? (st/display :none))
                                  st/row st/wrap (st/padding 12)
@@ -119,13 +119,11 @@
     [flexer]
     [icon-button "repeat" "Redo"]]])
 
-(subscribe [::model/paragraph-visible 1])
-
 (defn one-paragraph [x]
   (let [item    (-> x .-item utils/prepare-to-clj)
         index   (-> x .-index)
         layout  (atom nil)
-        visible (subscribe [::model/paragraph-visible (:id item)])]
+        hidden? (subscribe [::model/paragraph-data (:id item) :hidden])]
     (println "build one paragraph:" index)
     (fn []
       [rn/touchable-opacity {:active-opacity 1
@@ -137,7 +135,7 @@
            [sentence s
             (doall
              (for [w (:words s)]
-               (if @visible
+               (if-not @hidden?
                  ^{:key {:id (str "word-" (:id w))}} [word (:id w)]
                  ^{:key {:id (str "word-" (:id w))}} [word-empty (:text w) (:id w)])))]))]
        [view {:style [(st/width (:width @layout)) (st/height (:height @layout))]}]])))
@@ -156,12 +154,12 @@
         [view {:style [(st/gray 1) (st/width 1)]}]
         [rn/flat-list {:style                     []
                        :remove-clipped-subviews   true
-                       :initial-num-to-render 5
+                       :initial-num-to-render     5
                        :on-viewable-items-changed (fn [data]
-                                                     (doseq [[id visible] (->> data .-changed
-                                                                               (map (fn [e] [(-> e .-item .-id)
-                                                                                             (-> e .-isViewable)])))]
-                                                       (dispatch [::model/paragraph-visible id visible]))
+                                                    (doseq [[id visible] (->> data .-changed
+                                                                              (map (fn [e] [(-> e .-item .-id)
+                                                                                            (-> e .-isViewable)])))]
+                                                      (dispatch [::model/paragraph-hidden id (not visible)]))
                                                     (dispatch [::model/update-words-layouts]))
                        :data                      @transcript
                        :render-item               #(r/as-element [one-paragraph %])

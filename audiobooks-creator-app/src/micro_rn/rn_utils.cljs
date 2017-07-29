@@ -1,5 +1,6 @@
 (ns micro-rn.rn-utils
-  (:require [micro-rn.utils :as utils])
+  (:require [micro-rn.utils :as utils]
+            [re-frame.loggers :as rf-log])
   (:require-macros [micro-rn.macros :refer [...]]))
 
 (defn event->layout [e]
@@ -69,9 +70,8 @@
         (clj->js (vec ignored))))
 
 (defn disable-overwriting-warnings []
-  (require '[re-frame.loggers :as rf.log])
   (def warn (js/console.warn.bind js/console))
-  (rf.log/set-loggers!
+  (rf-log/set-loggers!
    {:warn (fn [& args]
             (cond
               (= "re-frame: overwriting " (first args)) nil

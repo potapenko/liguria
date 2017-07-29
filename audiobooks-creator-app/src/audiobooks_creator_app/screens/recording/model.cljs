@@ -38,7 +38,7 @@
   (some->> db ::transcript (filter #(= (:id %) id)) first k))
 
 (defn get-sentence-data [db id k]
-  (some->> db ::transcript (filter #(= (:id %) id)) first k))
+  (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first k))
 
 (defn set-sentence-data [db & id-k-v]
   (assoc db ::transcript
@@ -58,9 +58,6 @@
 
 (defn get-first [db]
   (->> db ::transcript (map :sentences) flatten first (#(dissoc % :words))))
-
-(defn get-sentence-data [db id k]
-  (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first k))
 
 (defn select-words-range [db from to]
   (map-words db #(assoc % :selected
@@ -91,7 +88,13 @@
 
 (defn get-visible-words [db]
   (let [words-ids (some->> db ::transcript
-                           (filter #(visible-paragraph? %))
+                           (filter #(-> % :hidden not))
+                           (defn get-sentence-data [db id k]
+                             (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first k))
+
+                           (defn get-sentence-data [db id k]
+                             (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first k))
+
                            (map :sentences) flatten
                            (map :words) flatten
                            (map :id))]
@@ -162,11 +165,16 @@
    (dispatch [::transcript (nlp/create-text-parts value)])
    (assoc db ::text-fragment value)))
 
+(reg-event-db
+ ::paragraph-hidden
+ (fn [db [_ id value]]
+   (set-paragraph-data db id :hidden value)))
+
 (reg-sub
  ::paragraph-data
  (fn [db [_ id k]]
    (get-paragraph-data db id k)))
-
+ 
 (reg-sub
  ::sentence-data
  (fn [db [_ id k]]
