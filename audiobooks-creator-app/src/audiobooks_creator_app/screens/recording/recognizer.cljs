@@ -31,9 +31,10 @@
   (let [this      (r/current-component)
         props     (r/props this)
         on-layout (or (:on-layout props) identity)
-        sentences (subscribe [::model/paragraph-data id :sentences])]
+        sentences (subscribe [::model/paragraph-data id :sentences])
+        hidden    (subscribe [::model/paragraph-data id :hidden])]
     (fn []
-      (let [hide? (every? #(not (let [v (:visible %)] (if (nil? v) true v))) @sentences)]
+      (let [hide? (every? #(let [v (:hidden %)] (if (nil? v) true v)) @sentences)]
         (into [view {:on-layout #(on-layout (rn-util/event->layout %))
                      :style     [(when hide? (st/display :none))
                                  st/row st/wrap (st/padding 12)
@@ -46,12 +47,11 @@
   (let [this      (r/current-component)
         props     (r/props this)
         on-layout (or (:on-layout props) identity)
-        visible   (subscribe [::model/sentence-visible id])]
+        hidden   (subscribe [::model/sentence-data id :hidden])]
     (fn []
-      (when @visible
-        (into [view {:on-layout #(on-layout (rn-util/event->layout %))
-                     :style     [(when-not @visible (st/display :none))
-                                 st/row st/wrap]}] (r/children this))))))
+      (into [view {:on-layout #(on-layout (rn-util/event->layout %))
+                   :style     [(when @hidden (st/display :none))
+                               st/row st/wrap]}] (r/children this)))))
 
 (defn- map-decorations [values]
   (->> (map #(case %

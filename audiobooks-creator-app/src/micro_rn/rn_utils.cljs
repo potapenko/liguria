@@ -63,3 +63,16 @@
         bottom                               (+ top height)]
     (and (<= left move-x right)
          (<= top move-y bottom))))
+
+(defn yellowbox [& ignored]
+  (set! js/console.ignoredYellowBox
+        (clj->js (vec ignored))))
+
+(defn disable-overwriting-warnings []
+  (require '[re-frame.loggers :as rf.log])
+  (def warn (js/console.warn.bind js/console))
+  (rf.log/set-loggers!
+   {:warn (fn [& args]
+            (cond
+              (= "re-frame: overwriting " (first args)) nil
+              :else (apply warn args)))}))

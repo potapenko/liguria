@@ -22,7 +22,7 @@
   (doseq [x (-> db ::words vals)]
     (let [res (f x)]
       (when (not= res (k x))
-          (dispatch [::word-data (:id x) k res])))))
+        (dispatch [::word-data (:id x) k res])))))
 
 (defn get-word-data [db id k]
   (get-in db [::words id k]))
@@ -37,21 +37,24 @@
 (defn get-paragraph-data [db id k]
   (some->> db ::transcript (filter #(= (:id %) id)) first k))
 
+(defn get-sentence-data [db id k]
+  (some->> db ::transcript (filter #(= (:id %) id)) first k))
+
 (defn set-sentence-data [db & id-k-v]
   (assoc db ::transcript
          (vec (for [p (::transcript db)]
-            (assoc p :sentences
-                   (vec
-                    (for [x (:sentences p)]
-                      (loop [x            x
-                             [id k v & t] id-k-v]
-                        (if id
-                          (recur
-                           (if (= (:id x) id)
-                             (assoc x k v)
-                             x)
-                           t)
-                          x)))))))))
+                (assoc p :sentences
+                       (vec
+                        (for [x (:sentences p)]
+                          (loop [x            x
+                                 [id k v & t] id-k-v]
+                            (if id
+                              (recur
+                               (if (= (:id x) id)
+                                 (assoc x k v)
+                                 x)
+                               t)
+                              x)))))))))
 
 (defn get-first [db]
   (->> db ::transcript (map :sentences) flatten first (#(dissoc % :words))))
@@ -85,10 +88,6 @@
 (defn deselect-all [db]
   (iterate-words db :selected #(do false))
   db)
-
-(defn visible-paragraph? [p]
-  (let [v (:visible p)]
-    (if (nil? v) true v)))
 
 (defn get-visible-words [db]
   (let [words-ids (some->> db ::transcript
@@ -163,33 +162,15 @@
    (dispatch [::transcript (nlp/create-text-parts value)])
    (assoc db ::text-fragment value)))
 
-
 (reg-sub
  ::paragraph-data
  (fn [db [_ id k]]
    (get-paragraph-data db id k)))
 
-(reg-event-db
- ::paragraph-visible
- (fn [db [_ id value]]
-   (set-paragraph-data db id :visible value)))
-
 (reg-sub
- ::paragraph-visible
- (fn [db [_ id]]
-   (let [v (get-paragraph-data db id :visible)]
-     (if (nil? v) true v))))
-
-(reg-event-db
- ::sentence-visible
- (fn [db [_ id value]]
-   (set-sentence-data db id :visible value)))
-
-(reg-sub
- ::sentence-visible
- (fn [db [_ id]]
-   (let [v (get-sentence-data db id :visible)]
-     (if (nil? v) true v))))
+ ::sentence-data
+ (fn [db [_ id k]]
+   (get-sentence-data db id k)))
 
 (reg-sub
  ::words
@@ -260,17 +241,17 @@
            double?     (and prev?
                             (rn-utils/double-tap (::prev-gesture-state db) gesture-state))
            count-click (if double? (inc (::count-click db)) 1)]
-         (case count-click
-           1 (dispatch [::word-one-click id])
-           2 (select-sentence db id)
-           3 (select-paragraph db id)
+       (case count-click
+         1 (dispatch [::word-one-click id])
+         2 (select-sentence db id)
+         3 (select-paragraph db id)
            ;; 4 (select-all db)
-           "nothing")
-         (assoc db
-                ::select-in-progress false
-                ::prev-gesture-state gesture-state
-                ::prev-click id
-                ::count-click count-click)))))
+         "nothing")
+       (assoc db
+              ::select-in-progress false
+              ::prev-gesture-state gesture-state
+              ::prev-click id
+              ::count-click count-click)))))
 
 (reg-event-db
  ::word-one-click
@@ -308,8 +289,8 @@
  ::update-words-layouts
  (fn [db [_ value]]
    #_(doseq [x (get-visible-words db)]
-     (let [{:keys [id ref]} x]
-       (rn-utils/ref->layout ref #(dispatch [::word-data id :layout %]))))
+       (let [{:keys [id ref]} x]
+         (rn-utils/ref->layout ref #(dispatch [::word-data id :layout %]))))
    db))
 
 (reg-event-db
@@ -336,9 +317,9 @@
        (let [first-word    (-> db ::words (get word-id))]
          (dispatch [::prev-gesture-state gesture-state])
          #_(dispatch [::find-collision-and-select-word-range
-                    first-word (get-visible-words db) gesture-state])
+                      first-word (get-visible-words db) gesture-state])
          (assoc db ::select-in-progress true)
-       db)))))
+         db)))))
 
 (reg-sub
  ::mode
@@ -360,18 +341,17 @@
  ::search-text
  (fn [db [_ text]]
    (if text
-     (let [rx (re-pattern (str (string/lower-case (or text "")) ".+"))]
+     (let [rx (re-pattern (str (string/lower-case (or text ""))))]
        (loop [args    [(assoc db ::search-text text)]
               [x & t] (->> db ::transcript (map :sentences) flatten)]
          (if x
            (recur
-            (let [res (->>  x :text string/lower-case (re-find rx) nil? not)]
-              (concat args [(:id x) :visible res]))
+            (let [found? (->>  x :text string/lower-case (re-find rx) nil? not)]
+              (concat args [(:id x) :hidden (not found?)]))
             t)
            (do
              (reset! test-db db)
-             (time (apply set-sentence-data args)))
-           )))
+             (time (apply set-sentence-data args))))))
      db)))
 
 (comment
@@ -383,5 +363,5 @@
   (reg-event-db
    ::data
    (fn [db [_ value]]
-     (assoc db ::data value)))
-  )
+     (assoc db ::data value))))
+
