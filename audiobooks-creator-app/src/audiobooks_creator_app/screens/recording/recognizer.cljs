@@ -31,27 +31,27 @@
   (let [this      (r/current-component)
         props     (r/props this)
         on-layout (or (:on-layout props) identity)
-        sentences (subscribe [::model/paragraph-data id :sentences])
-        hidden?   (subscribe [::model/paragraph-data id :hidden])]
+        sentences (subscribe [::model/paragraph-data id :sentences])]
     (fn []
       (let [hide? (every? #(:hidden %) @sentences)]
-        (into [view {:on-layout #(on-layout (rn-util/event->layout %))
-                     :style     [(when hide? (st/display :none))
-                                 st/row st/wrap (st/padding 12)
-                                 (st/border 1 (st/gray-cl 1) "solid")
-                                 (st/border-left 0)
-                                 (st/border-right 0)
-                                 (st/border-top 0)]}] (r/children this))))))
+        (when-not hide?
+          (into [view {:on-layout #(on-layout (rn-util/event->layout %))
+                       :style     [st/row st/wrap (st/padding 12)
+                                   (st/border 1 (st/gray-cl 1) "solid")
+                                   (st/border-left 0)
+                                   (st/border-right 0)
+                                   (st/border-top 0)]}] (r/children this)))))))
 
 (defn sentence [{:keys [id]}]
   (let [this      (r/current-component)
         props     (r/props this)
         on-layout (or (:on-layout props) identity)
-        hidden   (subscribe [::model/sentence-data id :hidden])]
+        hidden?   (subscribe [::model/sentence-data id :hidden])]
     (fn []
-      (into [view {:on-layout #(on-layout (rn-util/event->layout %))
-                   :style     [(when @hidden (st/display :none))
-                               st/row st/wrap]}] (r/children this)))))
+      (when-not @hidden?
+          (into [view {:on-layout #(on-layout (rn-util/event->layout %))
+                       :style     [(when @hidden? (st/display :none))
+                                   st/row st/wrap]}] (r/children this))))))
 
 (defn- map-decorations [values]
   (->> (map #(case %
@@ -66,9 +66,10 @@
 (defn word [id]
   (let [word         (subscribe [::model/word id])
         mode         (subscribe [::model/mode])
+        text-size    (subscribe [::model/text-size])
         gesture-data (atom nil)
         responder    (rn/pan-responder-create
-                      {:on-start-should-set-pan-responder #(do (println "on-start" id) (= @mode :edit))
+                      {:on-start-should-set-pan-responder #(do (println "on-start" id) true #_(= @mode :edit))
                        :on-pan-responder-grant            #(dispatch [::model/word-click id (rn-util/->getsture-state %2)])
                        :on-pan-responder-move             #(dispatch [::model/select-progress id (rn-util/->getsture-state %2)])
                        :on-pan-responder-release          #(dispatch [::model/word-release id (rn-util/->getsture-state %2)])})]
@@ -78,7 +79,7 @@
                     text-style
                     selected
                     searched]} @word
-            selected           (and selected (= @mode :edit))
+            selected           (and selected #_(= @mode :edit))
             background-gray    (and (not selected) background-gray)
             text-style         (-> text-style (conj (when selected :invert)) map-decorations)
             view-ref           (atom nil)]
@@ -89,13 +90,13 @@
                         (when selected (st/gray 9))
                         (when background-gray (st/gray 1))]}
                (rn-util/->gesture-props responder))
-         [rn/text {:style (conj text-style (st/font-size 14))} text]]))))
+         [rn/text {:style (conj text-style (st/font-size @text-size))} text]]))))
 
 (defn word-empty [text id]
   (let []
     (dispatch [::model/word-data id :ref nil])
     (fn [] [view {:style [(st/padding 4 2)]}
-            [rn/text {:style [(st/font-size 14)]} text]])))
+            [rn/text {:style [(st/font-size @(subscribe [::model/text-size]))]} text]])))
 
 (defn icon-button [icon-name icon-text focused]
   [touchable-opacity {:style [(st/justify-content "center")
@@ -107,16 +108,17 @@
 (defn editor-toolbar []
   [view {:style [(st/width 60)]}
    [rn/scroll-view {:style [(st/flex)]}
+    [spacer 8]
     [icon-button "question-circle-o" "Help"]
-    [flexer]
+    [spacer 8]
     [icon-button "eye-slash" "Hide deleted"]
-    [flexer]
+    [spacer 8]
     [icon-button "strikethrough" "Mark as deleted"]
-    [flexer]
+    [spacer 8]
     [icon-button "eraser" "Erase recording"]
-    [flexer]
+    [spacer 8]
     [icon-button "undo" "Undo"]
-    [flexer]
+    [spacer 8]
     [icon-button "repeat" "Redo"]]])
 
 (defn one-paragraph [x]
@@ -149,7 +151,7 @@
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
        [view {:style [st/row (st/flex)]}
-        (when (= @mode :edit)
+        (when true #_(= @mode :edit)
           [editor-toolbar])
         [view {:style [(st/gray 1) (st/width 1)]}]
         [rn/flat-list {:style                     []

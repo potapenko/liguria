@@ -141,8 +141,10 @@
 (reg-event-db
  ::recording
  (fn [db [_ value]]
-   (assoc db ::monitoring 0)
-   (assoc db ::recording value)))
+   (assoc db
+          ::mode (if value :record :idle)
+          ::monitoring 0
+          ::recording value)))
 
 (reg-sub
  ::transcript
@@ -362,6 +364,16 @@
              (time (apply set-sentence-data args))))))
      db)))
 
+(reg-sub
+ ::text-size
+ (fn [db _]
+   (get db ::text-size 16)))
+
+(reg-event-db
+ ::text-size
+ (fn [db [_ value]]
+   (assoc db ::text-size value)))
+
 (comment
   (reg-sub
    ::data
@@ -371,5 +383,6 @@
   (reg-event-db
    ::data
    (fn [db [_ value]]
-     (assoc db ::data value))))
+     (assoc db ::data value)))
+  )
 

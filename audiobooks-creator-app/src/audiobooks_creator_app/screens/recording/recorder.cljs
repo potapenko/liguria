@@ -28,6 +28,12 @@
   (dispatch [::model/recording false])
   (-> nm/audio-recorder .stopRecording))
 
+
+(defn toggle-play []
+  (if (= @(subscribe [::model/mode]) :playing)
+    (dispatch [::model/mode :idle])
+    (dispatch [::model/mode :playing])))
+
 (defn monitor-line []
   (let [monitor-value (subscribe [::model/monitoring])
         in-progress?  (subscribe [::model/recording])
@@ -76,7 +82,7 @@
 (defn recording-controls []
   (let [in-progress? (subscribe [::model/recording])
         mode         (subscribe [::model/mode])
-        edit?        #(= @mode :edit)
+        ;; edit?        #(= @mode :edit)
         search?      #(= @mode :search)
         input-ref    (atom nil)]
     (fn []
@@ -98,9 +104,9 @@
           (if @in-progress?
             [recording-button "stop" true #(stop-recording)]
             [recording-button "fiber-manual-record" false #(start-recording)])
-          [recording-button "play-arrow" false #(-> @input-ref .focus)]
+          [recording-button "play-arrow" (= @mode :playing) toggle-play]
           [recording-button "search" (= @mode :search) #(dispatch [::model/mode (if (search?) :idle :search)])]
-          [recording-button "edit" (= @mode :edit) #(dispatch [::model/mode (if (edit?) :idle :edit)])]])])))
+          #_[recording-button "edit" (= @mode :edit) #(dispatch [::model/mode (if (edit?) :idle :edit)])]])])))
 
 (comment
   (subscribe [::model/search-text])
