@@ -30,28 +30,28 @@
 (defn paragraph [{:keys [id]}]
   (let [this      (r/current-component)
         props     (r/props this)
-        on-layout (or (:on-layout props) identity)
         sentences (subscribe [::model/paragraph-data id :sentences])]
     (fn []
       (let [hide? (every? #(:hidden %) @sentences)]
         (when-not hide?
-          (into [view {:on-layout #(on-layout (rn-util/event->layout %))
-                       :style     [st/row st/wrap (st/padding 12)
+          (into [view {:on-layout #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
+                       :style     [(when @layout (st/size (:width @layout) (:height @layout)))
+                                   st/row st/wrap (st/padding 12)
                                    (st/border 1 (st/gray-cl 1) "solid")
                                    (st/border-left 0)
                                    (st/border-right 0)
                                    (st/border-top 0)]}] (r/children this)))))))
 
 (defn sentence [{:keys [id]}]
-  (let [this      (r/current-component)
-        props     (r/props this)
-        on-layout (or (:on-layout props) identity)
-        hidden?   (subscribe [::model/sentence-data id :hidden])]
+  (let [this    (r/current-component)
+        props   (r/props this)
+        layout  (subscribe [::model/sentence-data id :layout])
+        hidden? (subscribe [::model/sentence-data id :hidden])]
     (fn []
       (when-not @hidden?
-          (into [view {:on-layout #(on-layout (rn-util/event->layout %))
-                       :style     [(when @hidden? (st/display :none))
-                                   st/row st/wrap]}] (r/children this))))))
+        (into [view {:on-layout #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])
+                     :style     [(when @layout (st/size (:width @layout) (:height @layout)))
+                                 st/row st/wrap]}] (r/children this))))))
 
 (defn- map-decorations [values]
   (->> (map #(case %
@@ -101,24 +101,18 @@
 (defn icon-button [icon-name icon-text focused]
   [touchable-opacity {:style [(st/justify-content "center")
                               (st/align-items "center")
-                              (st/padding 12 0)]}
+                              (st/padding 22 0 0 0)]}
    [nm/icon-fa {:color "#ccc" :size 22 :name icon-name}]
    [text {:style [(st/color "#ccc") (st/font-size 8) (st/text-align "center")]} icon-text]])
 
 (defn editor-toolbar []
   [view {:style [(st/width 60)]}
    [rn/scroll-view {:style [(st/flex)]}
-    [spacer 8]
     [icon-button "question-circle-o" "Help"]
-    [spacer 8]
     [icon-button "eye-slash" "Hide deleted"]
-    [spacer 8]
     [icon-button "strikethrough" "Mark as deleted"]
-    [spacer 8]
     [icon-button "eraser" "Erase recording"]
-    [spacer 8]
     [icon-button "undo" "Undo"]
-    [spacer 8]
     [icon-button "repeat" "Redo"]]])
 
 (defn one-paragraph [x]
@@ -129,7 +123,7 @@
     (println "build one paragraph:" index)
     (fn []
       [rn/touchable-opacity {:active-opacity 1
-                             :on-press       #(dispatch [::model/deselect])}
+                             :on-press       #(dispatch [::model/paragraph-click (:id item)])}
        [paragraph item
         (doall
          (for [s (:sentences item)]

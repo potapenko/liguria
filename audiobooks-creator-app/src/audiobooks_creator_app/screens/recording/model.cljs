@@ -176,11 +176,26 @@
  ::paragraph-data
  (fn [db [_ id k]]
    (get-paragraph-data db id k)))
- 
+
+(reg-event-db
+ ::paragraph-data
+ (fn [db [_ id k value]]
+   (set-paragraph-data db id k value)))
+
+(reg-event-db
+ ::paragraph-click
+ (fn [db [_ id value]]
+   (dispatch [::deselect])))
+
 (reg-sub
  ::sentence-data
  (fn [db [_ id k]]
    (get-sentence-data db id k)))
+
+(reg-event-db
+ ::sentence-data
+ (fn [db [_ id k value]]
+   (set-sentence-data db id k value)))
 
 (reg-sub
  ::words

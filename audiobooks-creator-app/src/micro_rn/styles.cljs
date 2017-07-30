@@ -219,6 +219,9 @@
 (defn width [v]
   (new-style (keyword (str "width-" v)) {:width v}))
 
+(defn size [w h]
+  (new-style (keyword (str "width-" w "-height-" h)) {:width w :height h}))
+
 ;; borders
 
 (defn rounded
