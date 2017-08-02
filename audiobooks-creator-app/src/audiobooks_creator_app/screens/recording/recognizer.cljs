@@ -45,7 +45,7 @@
         hidden? (subscribe [::model/sentence-data id :hidden])]
     (fn []
       (when-not @hidden?
-        (into [view {:on-layout #(dispatch [::model/sentence-data id :layout %])
+        (into [view {:on-layout #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])
                      :style     [(st/width "100%")
                                  (st/margin 6 0)
                                  st/row st/wrap]}] (r/children this))))))
@@ -117,7 +117,7 @@
         index   (-> x .-index)
         layout  (atom nil)
         hidden? (subscribe [::model/paragraph-data (:id item) :hidden])]
-    (println "build one paragraph:" index)
+    ;; (println "build one paragraph:" index)
     (fn []
       [rn/touchable-opacity {:active-opacity 1
                              :on-press       #(dispatch [::model/paragraph-click (:id item)])}
@@ -142,10 +142,10 @@
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
        [view {:style [st/row (st/flex)]}
-        (when true #_(= @mode :edit)
-          [editor-toolbar])
+        [editor-toolbar]
         [view {:style [(st/gray 1) (st/width 1)]}]
-        [rn/flat-list {:style                     []
+        [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
+                       :on-layout                 #(dispatch [::model/list-layout-event])
                        :remove-clipped-subviews   true
                        :initial-num-to-render     5
                        :on-viewable-items-changed (fn [data]

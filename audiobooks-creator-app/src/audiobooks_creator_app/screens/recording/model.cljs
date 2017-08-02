@@ -34,8 +34,14 @@
   (assoc db ::transcript
          (->> db ::transcript (mapv #(if (= (:id %) id) (assoc % k v) %)))))
 
+(defn get-paragraph [db id]
+  (some->> db ::transcript (filter #(= (:id %) id)) first))
+
 (defn get-paragraph-data [db id k]
   (some->> db ::transcript (filter #(= (:id %) id)) first k))
+
+(defn get-sentence [db id]
+  (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first))
 
 (defn get-sentence-data [db id k]
   (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first k))
@@ -250,6 +256,11 @@
    (deselect-all db)))
 
 (reg-event-db
+ ::word-click
+ (fn [db [_ id]]
+   db))
+
+(reg-event-db
  ::word-release
  (fn [db [_ id gesture-state]]
    (if (::select-in-progress db)
@@ -266,7 +277,7 @@
          1 (dispatch [::word-one-click id])
          2 (select-sentence db id)
          3 (select-paragraph db id)
-           ;; 4 (select-all db)
+         ;; 4 (select-all db)
          "nothing")
        (assoc db
               ::select-in-progress false
@@ -275,18 +286,26 @@
               ::count-click count-click)))))
 
 (reg-event-db
- ::word-click
- (fn [db [_ id gesture-state]]
-   (-> db)))
-
-(reg-event-db
  ::word-one-click
  (fn [db [_ id]]
-   (dispatch [::word-click])
-   (let [prev-selected (get-word-data db id :selected)]
-     (-> db
-         deselect-all
-         (set-word-data id :selected (not prev-selected))))))
+   (if (= (::mode db) :search)
+     (let [ref (::list-ref db)
+           p   (as-> id _ (get-word-data db _ :p-id) (get-paragraph db _))
+           s   (as-> id _ (get-word-data db _ :s-id) (get-sentence db _))
+           p-l-y (-> p :layout)
+           s-l-y (-> s :layout)
+           p-y (-> p :layout :y)
+           s-y (-> s :layout :y)
+           ]
+       (println (... p-l-y s-l-y p-y s-y))
+       (-> ref (.scrollToOffset #js {:offset (- (+ p-y s-y))}))
+       (dispatch [::mode :idle])
+       db)
+     (let [prev-selected (get-word-data db id :selected)]
+       (-> db
+           deselect-all
+           (set-word-data id :selected (not prev-selected)))))))
+
 
 (reg-event-db
  ::find-collision-and-select-word-range
@@ -358,6 +377,30 @@
  ::mode
  (fn [db [_ value]]
    (assoc db ::mode value)))
+
+(reg-event-db
+ ::list-ref
+ (fn [db [_ value]]
+   (println "set:" (... value))
+   (assoc db ::list-ref value)))
+
+(reg-sub
+ ::list-ref
+ (fn [db _]
+   (get db ::list-ref)))
+
+(reg-event-db
+ ::list-layout-event
+ (fn [db [_]]
+   #_(when-let [ref (::list-ref db)]
+     (println ">>> get:"(... ref))
+     (rn-utils/ref->layout ref (fn [l] (dispatch [::list-layout l]))))
+   db))
+
+(reg-event-db
+ ::list-layout
+ (fn [db [_ value]]
+   (assoc db ::list-layout value)))
 
 (reg-sub
  ::search-text
