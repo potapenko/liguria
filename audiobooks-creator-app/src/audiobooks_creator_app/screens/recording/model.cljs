@@ -125,7 +125,6 @@
          first)))
 
 (defn scroll-to-ref [db ref]
-  (println (... db ref))
   (let [list-ref    (::list-ref db)
         list-layout (::list-layout db)
         scroll-pos  (get db ::scroll-pos 0)
