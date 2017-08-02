@@ -6,8 +6,10 @@
             [audiobooks-creator-app.screens.recording.nlp :as nlp]
             [micro-rn.react-native :as rn]
             [clojure.walk :as walk]
+            [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [micro-rn.utils :as utils])
-  (:require-macros [micro-rn.macros :refer [...]]))
+  (:require-macros [micro-rn.macros :refer [...]]
+                   [cljs.core.async.macros :refer [go go-loop]]))
 
 ;; -------------------------------------------------------------------------------
 
@@ -122,6 +124,19 @@
                           (<= top move-y bottom)))))
          first)))
 
+(defn scroll-to-ref [db ref]
+  (println (... db ref))
+  (let [list-ref    (::list-ref db)
+        list-layout (::list-layout db)
+        scroll-pos  (get db ::scroll-pos 0)
+        list-page-y 146]
+    (go
+      (let [[layout]       (<! (utils/await-cb rn-utils/ref->layout ref))
+            new-scroll-pos (-> layout :page-y (- list-page-y) (+ scroll-pos))]
+        (-> list-ref (.scrollToOffset (clj->js {:offset new-scroll-pos})))
+        ))
+    db))
+
 ;; -------------------------------------------------------------------------------
 
 (reg-sub
@@ -191,8 +206,14 @@
 (reg-event-db
  ::paragraph-click
  (fn [db [_ id value]]
-   (dispatch [::deselect])
-   db))
+   (println "paragraph cilck:" id)
+   (if (= (::mode db) :search)
+     (do
+       (dispatch [::scroll-and-select (get-paragraph-data db id :ref)])
+       db)
+     (do
+       (dispatch [::deselect])
+       db))))
 
 (reg-sub
  ::sentence-data
@@ -286,20 +307,24 @@
               ::count-click count-click)))))
 
 (reg-event-db
+ ::scroll-to-ref
+ (fn [db [_ ref]]
+   (scroll-to-ref db ref)))
+
+(reg-event-db
+ ::scroll-and-select
+ (fn [db [_ ref]]
+   (dispatch [::search-text ""])
+   (dispatch [::mode :idle])
+   (dispatch [::scroll-to-ref ref])
+   db))
+
+(reg-event-db
  ::word-one-click
  (fn [db [_ id]]
    (if (= (::mode db) :search)
-     (let [ref (::list-ref db)
-           p   (as-> id _ (get-word-data db _ :p-id) (get-paragraph db _))
-           s   (as-> id _ (get-word-data db _ :s-id) (get-sentence db _))
-           p-l-y (-> p :layout)
-           s-l-y (-> s :layout)
-           p-y (-> p :layout :y)
-           s-y (-> s :layout :y)
-           ]
-       (println (... p-l-y s-l-y p-y s-y))
-       (-> ref (.scrollToOffset #js {:offset (- (+ p-y s-y))}))
-       (dispatch [::mode :idle])
+     (do
+       (dispatch [::scroll-and-select (as-> id _ (get-word-data db _ :s-id) (get-sentence db _) (:ref _))])
        db)
      (let [prev-selected (get-word-data db id :selected)]
        (-> db
@@ -381,7 +406,6 @@
 (reg-event-db
  ::list-ref
  (fn [db [_ value]]
-   (println "set:" (... value))
    (assoc db ::list-ref value)))
 
 (reg-sub
@@ -390,17 +414,14 @@
    (get db ::list-ref)))
 
 (reg-event-db
- ::list-layout-event
- (fn [db [_]]
-   #_(when-let [ref (::list-ref db)]
-     (println ">>> get:"(... ref))
-     (rn-utils/ref->layout ref (fn [l] (dispatch [::list-layout l]))))
-   db))
-
-(reg-event-db
  ::list-layout
  (fn [db [_ value]]
    (assoc db ::list-layout value)))
+
+(reg-sub
+ ::list-layout
+ (fn [db _]
+   (get db ::list-layout)))
 
 (reg-sub
  ::search-text

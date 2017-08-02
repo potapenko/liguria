@@ -180,6 +180,11 @@
         (.catch (fn [err] (put! port [err nil]))))
     port))
 
+(defn await-cb [fnc & args]
+  (let [port (chan)]
+    (apply fnc (concat args [(fn [& a] (put! port a))]))
+    port))
+
 (defn pmap [f col]
   (let [chans (repeatedly (count col) chan)]
     (doseq [[c e] (map vector chans col)]

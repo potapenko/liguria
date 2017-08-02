@@ -31,7 +31,8 @@
     (fn []
       (let [hide? (every? #(:hidden %) @sentences)]
         (when-not hide?
-          (into [view {:on-layout #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
+          (into [view {:ref       #(dispatch [::model/paragraph-data id :ref %])
+                       :on-layout #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
                        :style     [(when @layout (st/layout->size @layout))
                                    (st/padding 6 12)
                                    (st/border 1 (st/gray-cl 1) "solid")
@@ -45,10 +46,10 @@
         hidden? (subscribe [::model/sentence-data id :hidden])]
     (fn []
       (when-not @hidden?
-        (into [view {:on-layout #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])
-                     :style     [(st/width "100%")
-                                 (st/margin 6 0)
-                                 st/row st/wrap]}] (r/children this))))))
+        (into [view {:ref   #(dispatch [::model/sentence-data id :ref %])
+                     :style [(st/width "100%")
+                             (st/margin 6 0)
+                             st/row st/wrap]}] (r/children this))))))
 
 (defn- map-decorations [values]
   (->> (map #(case %
@@ -66,7 +67,7 @@
         text-size    (subscribe [::model/text-size])
         gesture-data (atom nil)
         responder    (rn/pan-responder-create
-                      {:on-start-should-set-pan-responder #(do (println "on-start" id) true #_(= @mode :edit))
+                      {:on-start-should-set-pan-responder #(do true #_(= @mode :edit))
                        :on-pan-responder-grant            #(dispatch [::model/word-click id (rn-util/->getsture-state %2)])
                        :on-pan-responder-move             #(dispatch [::model/select-progress id (rn-util/->getsture-state %2)])
                        :on-pan-responder-release          #(dispatch [::model/word-release id (rn-util/->getsture-state %2)])})]
@@ -138,6 +139,7 @@
         mode               (subscribe [::model/mode])
         select-in-progress (subscribe [::model/select-in-progress])
         words-ids          (subscribe [::model/words-ids])]
+    (println "build text-editor")
     (dispatch [::model/text-fragment nlp/test-text3])
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
@@ -145,7 +147,8 @@
         [editor-toolbar]
         [view {:style [(st/gray 1) (st/width 1)]}]
         [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
-                       :on-layout                 #(dispatch [::model/list-layout-event])
+                       :on-layout #(dispatch [::model/list-layout (rn-util/event->layout %)])
+                       :on-scroll #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
                        :remove-clipped-subviews   true
                        :initial-num-to-render     5
                        :on-viewable-items-changed (fn [data]

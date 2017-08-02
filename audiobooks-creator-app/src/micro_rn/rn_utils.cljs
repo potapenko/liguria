@@ -7,9 +7,11 @@
   (some-> e .-nativeEvent .-layout utils/prepare-to-clj))
 
 (defn ref->layout [ref cb]
-  (some-> ref (.measure
-               (fn [x y width height page-x page-y]
-                 (cb (... x y width height page-x page-y))))))
+  (if ref
+      (-> ref (.measure
+                   (fn [x y width height page-x page-y]
+                     (cb (... x y width height page-x page-y)))))
+      (cb nil)))
 
 (defn event->pan-data [e]
   (let [e (-> e .-nativeEvent)]
