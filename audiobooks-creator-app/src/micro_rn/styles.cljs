@@ -119,6 +119,7 @@
 (def align-center (align-items "center"))
 (def align-right (align-items "flex-end"))
 (def stretch (align-items "stretch"))
+(def justify-center (justify-content "center"))
 (def wrap (new-style :flex-wrap {:flex-wrap "wrap"}))
 (def no-wrap (new-style :flex-wrap {:flex-wrap "nowrap"}))
 
@@ -221,6 +222,10 @@
 
 (defn size [w h]
   (new-style (keyword (str "width-" w "-height-" h)) {:width w :height h}))
+
+(defn layout->size [layout]
+  (new-style (keyword (str "width-" (:widht layout) "-height-" (:height layout)))
+             (select-keys layout [:width :height])))
 
 ;; borders
 

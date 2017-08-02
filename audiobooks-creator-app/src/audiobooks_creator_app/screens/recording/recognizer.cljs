@@ -23,20 +23,17 @@
 (defn make-spaces [x]
   (apply str (repeat x " ")))
 
-(def layout (atom nil))
-
-(deref layout)
-
 (defn paragraph [{:keys [id]}]
   (let [this      (r/current-component)
         props     (r/props this)
-        sentences (subscribe [::model/paragraph-data id :sentences])]
+        sentences (subscribe [::model/paragraph-data id :sentences])
+        layout    (subscribe [::model/paragraph-data id :layout])]
     (fn []
       (let [hide? (every? #(:hidden %) @sentences)]
         (when-not hide?
           (into [view {:on-layout #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
-                       :style     [(when @layout (st/size (:width @layout) (:height @layout)))
-                                   st/row st/wrap (st/padding 12)
+                       :style     [(when @layout (st/layout->size @layout))
+                                   (st/padding 6 12)
                                    (st/border 1 (st/gray-cl 1) "solid")
                                    (st/border-left 0)
                                    (st/border-right 0)
@@ -45,12 +42,12 @@
 (defn sentence [{:keys [id]}]
   (let [this    (r/current-component)
         props   (r/props this)
-        layout  (subscribe [::model/sentence-data id :layout])
         hidden? (subscribe [::model/sentence-data id :hidden])]
     (fn []
       (when-not @hidden?
-        (into [view {:on-layout #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])
-                     :style     [(when @layout (st/size (:width @layout) (:height @layout)))
+        (into [view {:on-layout #(dispatch [::model/sentence-data id :layout %])
+                     :style     [(st/width "100%")
+                                 (st/margin 6 0)
                                  st/row st/wrap]}] (r/children this))))))
 
 (defn- map-decorations [values]
