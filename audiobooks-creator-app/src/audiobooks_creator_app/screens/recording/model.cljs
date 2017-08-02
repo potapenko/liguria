@@ -185,7 +185,8 @@
 (reg-event-db
  ::paragraph-click
  (fn [db [_ id value]]
-   (dispatch [::deselect])))
+   (dispatch [::deselect])
+   db))
 
 (reg-sub
  ::sentence-data
@@ -249,11 +250,6 @@
    (deselect-all db)))
 
 (reg-event-db
- ::word-click
- (fn [db [_ id gesture-state]]
-   (-> db)))
-
-(reg-event-db
  ::word-release
  (fn [db [_ id gesture-state]]
    (if (::select-in-progress db)
@@ -279,8 +275,14 @@
               ::count-click count-click)))))
 
 (reg-event-db
+ ::word-click
+ (fn [db [_ id gesture-state]]
+   (-> db)))
+
+(reg-event-db
  ::word-one-click
  (fn [db [_ id]]
+   (dispatch [::word-click])
    (let [prev-selected (get-word-data db id :selected)]
      (-> db
          deselect-all
