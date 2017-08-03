@@ -22,29 +22,23 @@
 
 (defn paragraph [{:keys [id]}]
   (let [this      (r/current-component)
-        props     (r/props this)
-        sentences (subscribe [::model/paragraph-data id :sentences])
-        layout    (subscribe [::model/paragraph-data id :layout])]
+        props     (r/props this)]
     (fn []
-      (let [hide? (every? #(:hidden %) @sentences)]
-        (into [view {:ref       #(dispatch [::model/paragraph-data id :ref %])
-                     :on-layout #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
-                     :style     [(when hide? [st/position-absolute (st/top -1000)])
-                                 [(st/padding 6 12)
-                                  (st/border 1 (st/gray-cl 1) "solid")
-                                  (st/border-left 0)
-                                  (st/border-right 0)
-                                  (st/border-top 0)]]}] (r/children this))))))
+      (into [view {:ref       #(dispatch [::model/paragraph-data id :ref %])
+                   :on-layout #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
+                   :style     [(st/padding 6 12)
+                               (st/border 1 (st/gray-cl 1) "solid")
+                               (st/border-left 0)
+                               (st/border-right 0)
+                               (st/border-top 0)]}] (r/children this)))))
 
 (defn sentence [{:keys [id]}]
   (let [this    (r/current-component)
-        props   (r/props this)
-        hidden? (subscribe [::model/sentence-data id :hidden])]
+        props   (r/props this)]
     (fn []
       (into [view {:ref       #(dispatch [::model/sentence-data id :ref %])
                    :on-layout #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])
-                   :style     [(when @hidden? [st/position-absolute (st/top -1200)])
-                               (st/width "100%")
+                   :style     [(st/width "100%")
                                (st/margin 6 0)
                                st/row st/wrap]}] (r/children this)))))
 
@@ -110,18 +104,37 @@
     [icon-button "undo" "Undo"]
     [icon-button "repeat" "Redo"]]])
 
+(defn build-search-rx [search-text]
+  (re-pattern (string/lower-case search-text)))
+
+(defn- filter-paragraphs [paragraphs search-text]
+  (println "filter-paragraphs:" (count paragraphs) (string/blank? search-text) (str "'" search-text "'"))
+  (if (string/blank? search-text)
+    paragraphs
+    (let [rx (build-search-rx search-text)]
+      (->> paragraphs
+           (filter #(->> % :sentences
+                         (some (fn [s] (->> s :text string/lower-case (re-find rx) nil? not)))))))))
+
+(defn- filter-sentences [sentences search-text]
+  (if (string/blank? search-text)
+    sentences
+    (let [rx (re-pattern (build-search-rx search-text))]
+      (->> sentences (filter #(->> % :text string/lower-case (re-find rx) nil? not))))))
+
 (defn one-paragraph [x]
-  (let [id        (-> x .-item .-id)
-        index     (-> x .-index)
-        hidden?   (subscribe [::model/paragraph-data id :hidden])
-        sentences (subscribe [::model/paragraph-data id :sentences])]
-    (println "build one paragraph:" id)
+  (let [id          (-> x .-item .-id)
+        index       (-> x .-index)
+        hidden?     (subscribe [::model/paragraph-data id :hidden])
+        sentences   (subscribe [::model/paragraph-data id :sentences])
+        search-text (subscribe [::model/search-text])]
+    ;; (println "build one paragraph:" id)
     (fn []
       [rn/touchable-opacity {:active-opacity 1
                              :on-press       #(dispatch [::model/paragraph-click id])}
        [paragraph {:id id}
         (doall
-         (for [s @sentences]
+         (for [s (filter-sentences @sentences @search-text)]
            ^{:key {:id (str "sentence-" (:id s))}}
            [sentence s
             (doall
@@ -130,11 +143,13 @@
                  ^{:key {:id (str "word-" (:id w))}} [word (:id w)]
                  ^{:key {:id (str "word-" (:id w))}} [word-empty (:text w) (:id w)])))]))]])))
 
+
 (defn text-editor []
   (let [transcript         (subscribe [::model/transcript])
         mode               (subscribe [::model/mode])
         select-in-progress (subscribe [::model/select-in-progress])
-        words-ids          (subscribe [::model/words-ids])]
+        words-ids          (subscribe [::model/words-ids])
+        search-text        (subscribe [::model/search-text])]
     (println "build text-editor")
     (dispatch [::model/text-fragment nlp/test-text3])
     (fn []
@@ -146,27 +161,13 @@
                        :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                        :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
                        :remove-clipped-subviews   true
-                       :get-item-layout2           (fn [items index]
-                                                    (let [x      (get items index)
-                                                          id     (-> x .-id)
-                                                          p      (->> @transcript (filter #(= (:id %) id)) first)
-                                                          h      (->> p :sentences flatten
-                                                                      (filter #(-> % :hidden not))
-                                                                      (map #(-> % :layout :height))
-                                                                      (reduce +))
-                                                          result {:length h
-                                                                  :offset (* index h)
-                                                                  :index  index}]
-                                                      (println "get items layout:" id "->" h)
-                                                      (clj->js result)))
                        :initial-num-to-render     5
                        :on-viewable-items-changed (fn [data]
                                                     (doseq [[id visible] (->> data .-changed
                                                                               (map (fn [e] [(-> e .-item .-id)
                                                                                             (-> e .-isViewable)])))]
-                                                      (dispatch [::model/paragraph-hidden id (not visible)]))
-                                                    (dispatch [::model/update-words-layouts]))
-                       :data                      (map #(select-keys % [:id]) @transcript)
+                                                      (dispatch [::model/paragraph-hidden id (not visible)])))
+                       :data                      (map #(select-keys % [:id]) (filter-paragraphs @transcript @search-text))
                        :render-item               #(r/as-element [one-paragraph %])
                        :key-extractor             #(str "paragraph-" (-> % .-id))}]]])))
 

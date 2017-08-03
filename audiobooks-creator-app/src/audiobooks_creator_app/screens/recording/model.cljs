@@ -356,14 +356,6 @@
    (assoc db ::prev-gesture-state value)))
 
 (reg-event-db
- ::update-words-layouts
- (fn [db [_ value]]
-   #_(doseq [x (get-visible-words db)]
-       (let [{:keys [id ref]} x]
-         (rn-utils/ref->layout ref #(dispatch [::word-data id :layout %]))))
-   db))
-
-(reg-event-db
  ::select-progress
  (fn [db [_ word-id gesture-state]]
    db
@@ -430,19 +422,7 @@
 (reg-event-db
  ::search-text
  (fn [db [_ text]]
-   (if text
-     (let [rx (re-pattern (str (string/lower-case (or text ""))))]
-       (loop [args    [(assoc db ::search-text text)]
-              [x & t] (->> db ::transcript (map :sentences) flatten)]
-         (if x
-           (recur
-            (let [found? (->>  x :text string/lower-case (re-find rx) nil? not)]
-              (concat args [(:id x) :hidden (not found?)]))
-            t)
-           (do
-             (reset! test-db db)
-             (time (apply set-sentence-data args))))))
-     db)))
+   (assoc db ::search-text text)))
 
 (reg-sub
  ::text-size
