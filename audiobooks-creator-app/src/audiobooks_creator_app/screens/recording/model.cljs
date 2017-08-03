@@ -125,27 +125,29 @@
                           (<= top move-y bottom)))))
          first)))
 
-(defn scroll-to-ref
-  ([ref-fn] (scroll-to-ref ref-fn 0))
-  ([ref-fn offset]
+(defn scroll-to-sentence [id]
   (go
     (<! (utils/await-cb rn/run-after-interactions))
     (<! (utils/await-cb rn/request-animation-frame))
-
-    (let [ref         (ref-fn)
-          list-ref    @(subscribe [::list-ref])
-          list-layout @(subscribe [::list-layout])
-          scroll-pos  @(subscribe [::scroll-pos])]
-      (let [list-page-y        (:page-y (<! (utils/await-cb rn-utils/ref->layout list-ref)))
-            [{:keys [page-y]}] (<! (utils/await-cb rn-utils/ref->layout ref))
-            new-scroll-pos     (-> page-y #_(- list-page-y) (+ scroll-pos) (- offset))]
-        (println (...  page-y list-page-y scroll-pos offset))
-        (-> list-ref (.scrollToOffset (clj->js {:offset new-scroll-pos}))))))))
+    (let [list-ref @(subscribe [::list-ref])]
+      (if (= id 1)
+        (-> list-ref (.scrollToOffset 0))
+        (let [ref         @(subscribe [::sentence-data id :ref])
+              list-layout @(subscribe [::list-layout])
+              scroll-pos  @(subscribe [::scroll-pos])
+              list-page-y 146
+              [{:keys [page-y]}] (<! (utils/await-cb rn-utils/ref->layout ref))
+              new-scroll-pos (-> page-y #_(- list-page-y) (+ scroll-pos) (- 8))
+              ;; list-page-y (:page-y (<! (utils/await-cb rn-utils/ref->layout list-ref)))]
+          (println (...  page-y list-page-y scroll-pos))
+          (-> list-ref (.scrollToOffset (clj->js {:offset new-scroll-pos}))))))))
 
 (comment
   @(subscribe [::sentence-data 17 :text])
 
-  (scroll-to-ref #(deref (subscribe [::sentence-data 17 :ref])))
+  (scroll-to-sentence 1)
+
+  (scroll-to-sentence 17)
 
   (dispatch [::sentence-click 17])
 
@@ -221,14 +223,8 @@
  ::paragraph-click
  (fn [db [_ id value]]
    (println "paragraph click:" id)
-   (if (and (= (::mode db) :search)
-            (-> db ::search-text string/blank? not))
-     (do
-       (dispatch [::scroll-and-select #(deref (subscribe [::paragraph-data id :ref]))])
-       db)
-     (do
-       (dispatch [::deselect])
-       db))))
+   (dispatch [::deselect])
+   db))
 
 (reg-event-db
  ::sentence-click
@@ -239,7 +235,7 @@
        (if true #_(and
             (-> db ::search-text string/blank? not)
             (not= id 1))
-         (dispatch [::scroll-and-select #(deref (subscribe [::sentence-data id :ref])) 8])
+         (dispatch [::scroll-and-select id])
          (dispatch [::mode :idle]))
        db)
      (do
@@ -338,16 +334,16 @@
               ::count-click count-click)))))
 
 (reg-event-db
- ::scroll-to-ref
- (fn [db [_ ref-fn offset]]
-   (scroll-to-ref ref-fn offset)
+ ::scroll-to-sentence
+ (fn [db [_ id]]
+   (scroll-to-sentence id)
    db))
 
 (reg-event-db
  ::scroll-and-select
- (fn [db [_ ref-fn offset]]
+ (fn [db [_ id]]
    (dispatch [::mode :idle])
-   (dispatch [::scroll-to-ref ref-fn (or offset 0)])
+   (dispatch [::scroll-to-sentence id])
    db))
 
 (reg-event-db
