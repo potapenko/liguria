@@ -108,7 +108,7 @@
   (re-pattern (string/lower-case search-text)))
 
 (defn- filter-paragraphs [paragraphs search-text]
-  (println "filter-paragraphs:" (count paragraphs) (string/blank? search-text) (str "'" search-text "'"))
+  ;; (println "filter-paragraphs:" (count paragraphs) (string/blank? search-text) (str "'" search-text "'"))
   (if (string/blank? search-text)
     paragraphs
     (let [rx (build-search-rx search-text)]

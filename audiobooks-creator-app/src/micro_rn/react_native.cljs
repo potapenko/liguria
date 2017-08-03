@@ -138,6 +138,9 @@
 (defn animated-value [& args] (let [constructor (.-Value (.-Animated ReactNative))] (apply constructor. args)))
 (defn animated-value-xy [& args] (let [constructor (.-ValueXY (.-Animated ReactNative))] (apply constructor. args)))
 
+(def request-animation-frame js/requestAnimationFrame)
+(def run-after-interactions (-> ReactNative .-InteractionManager .-runAfterInteractions))
+
 ;; custom
 
 (defn spacer [s]

@@ -182,7 +182,7 @@
 
 (defn await-cb [fnc & args]
   (let [port (chan)]
-    (apply fnc (concat args [(fn [& a] (put! port a))]))
+    (apply fnc (concat args [(fn [& a] (put! port (or a [])))]))
     port))
 
 (defn pmap [f col]

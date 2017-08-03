@@ -1,5 +1,5 @@
 (ns audiobooks-creator-app.screens.recording.model
-  (:require [re-frame.core :refer [reg-sub reg-event-db dispatch dispatch-sync]]
+  (:require [re-frame.core :refer [reg-sub reg-event-db dispatch dispatch-sync subscribe]]
             [clojure.core.reducers :as red]
             [micro-rn.rn-utils :as rn-utils]
             [clojure.string :as string]
@@ -9,7 +9,8 @@
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [micro-rn.utils :as utils])
   (:require-macros [micro-rn.macros :refer [...]]
-                   [cljs.core.async.macros :refer [go go-loop]]))
+                   [cljs.core.async.macros :refer [go go-loop]]
+                   [natal-shell.interaction-manager :as interaction-manager]))
 
 ;; -------------------------------------------------------------------------------
 
@@ -124,17 +125,20 @@
                           (<= top move-y bottom)))))
          first)))
 
-(defn scroll-to-ref [db ref]
-  (let [list-ref    (::list-ref db)
-        list-layout (::list-layout db)
-        scroll-pos  (get db ::scroll-pos 0)
-        list-page-y 146]
-    (go
+(defn scroll-to-ref [ref-fn]
+  (go
+    (<! (timeout 1000))
+    (<! (utils/await-cb rn/run-after-interactions))
+    (<! (utils/await-cb rn/request-animation-frame))
+
+    (let [ref         (ref-fn)
+          list-ref    @(subscribe [::list-ref])
+          list-layout @(subscribe [::list-layout])
+          scroll-pos  @(subscribe [::scroll-pos])
+          list-page-y 146]
       (let [[layout]       (<! (utils/await-cb rn-utils/ref->layout ref))
-            new-scroll-pos (-> layout :page-y (- list-page-y) (+ scroll-pos))]
-        (-> list-ref (.scrollToOffset (clj->js {:offset new-scroll-pos})))
-        ))
-    db))
+            new-scroll-pos (-> layout :page-y (- list-page-y) (+ scroll-pos) (- 8))]
+        (-> list-ref (.scrollToOffset (clj->js {:offset new-scroll-pos})))))))
 
 ;; -------------------------------------------------------------------------------
 
@@ -208,7 +212,7 @@
    (println "paragraph cilck:" id)
    (if (= (::mode db) :search)
      (do
-       (dispatch [::scroll-and-select (get-paragraph-data db id :ref)])
+       (dispatch [::scroll-and-select #(get-paragraph-data db id :ref)])
        db)
      (do
        (dispatch [::deselect])
@@ -307,15 +311,16 @@
 
 (reg-event-db
  ::scroll-to-ref
- (fn [db [_ ref]]
-   (scroll-to-ref db ref)))
+ (fn [db [_ ref-fn]]
+   (scroll-to-ref ref-fn)
+   db))
 
 (reg-event-db
  ::scroll-and-select
- (fn [db [_ ref]]
+ (fn [db [_ ref-fn]]
    (dispatch [::search-text ""])
    (dispatch [::mode :idle])
-   (dispatch [::scroll-to-ref ref])
+   (dispatch [::scroll-to-ref ref-fn])
    db))
 
 (reg-event-db
@@ -323,7 +328,7 @@
  (fn [db [_ id]]
    (if (= (::mode db) :search)
      (do
-       (dispatch [::scroll-and-select (as-> id _ (get-word-data db _ :s-id) (get-sentence db _) (:ref _))])
+       (dispatch [::scroll-and-select #(as-> id _ (get-word-data db _ :s-id) (get-sentence db _) (:ref _))])
        db)
      (let [prev-selected (get-word-data db id :selected)]
        (-> db
