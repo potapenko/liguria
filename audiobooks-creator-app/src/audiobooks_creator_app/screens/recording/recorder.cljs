@@ -94,8 +94,7 @@
                             :background-color st/nil-color
                             :on-cancel        #(go
                                                  (<! (timeout 300))
-                                                 (dispatch [::model/mode :idle])
-                                                 (dispatch [::model/search-text nil]))
+                                                 (dispatch [::model/mode :idle]))
                             :on-focus         #(dispatch [::model/mode :search])
                             :on-delete        #(util/lazy-call (fn [] (dispatch [::model/search-text ""])))
                             :on-change-text   #(util/lazy-call (fn [] (dispatch [::model/search-text %])))}]

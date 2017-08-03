@@ -21,8 +21,8 @@
 (def editor-ref (atom nil))
 
 (defn paragraph [{:keys [id]}]
-  (let [this      (r/current-component)
-        props     (r/props this)]
+  (let [this  (r/current-component)
+        props (r/props this)]
     (fn []
       (into [view {:ref       #(dispatch [::model/paragraph-data id :ref %])
                    :on-layout #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
@@ -33,14 +33,17 @@
                                (st/border-top 0)]}] (r/children this)))))
 
 (defn sentence [{:keys [id]}]
-  (let [this    (r/current-component)
-        props   (r/props this)]
+  (let [this  (r/current-component)
+        props (r/props this)
+        mode  (subscribe [::model/mode])]
     (fn []
-      (into [view {:ref       #(dispatch [::model/sentence-data id :ref %])
-                   :on-layout #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])
-                   :style     [(st/width "100%")
-                               (st/margin 6 0)
-                               st/row st/wrap]}] (r/children this)))))
+      [rn/touchable-opacity {:active-opacity 1
+                             :on-press       #(dispatch [::model/sentence-click id])}
+       (into [view             {:ref       #(dispatch [::model/sentence-data id :ref %])
+                                :on-layout #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])
+                                :style     [(st/width "100%")
+                                            (st/margin 6 0)
+                                            st/row st/wrap]}] (r/children this))])))
 
 (defn- map-decorations [values]
   (->> (map #(case %
@@ -56,9 +59,8 @@
   (let [word         (subscribe [::model/word id])
         mode         (subscribe [::model/mode])
         text-size    (subscribe [::model/text-size])
-        gesture-data (atom nil)
         responder    (rn/pan-responder-create
-                      {:on-start-should-set-pan-responder #(do true #_(= @mode :edit))
+                      {:on-start-should-set-pan-responder #(not= @mode :search)
                        :on-pan-responder-grant            #(dispatch [::model/word-click id (rn-util/->getsture-state %2)])
                        :on-pan-responder-move             #(dispatch [::model/select-progress id (rn-util/->getsture-state %2)])
                        :on-pan-responder-release          #(dispatch [::model/word-release id (rn-util/->getsture-state %2)])})]

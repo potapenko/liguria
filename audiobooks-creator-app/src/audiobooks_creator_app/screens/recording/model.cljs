@@ -60,7 +60,7 @@
                             (if id
                               (recur
                                (if (= (:id x) id)
-                                 (assoc x k v)
+                                (assoc x k v)
                                  x)
                                t)
                               x)))))))))
@@ -125,20 +125,31 @@
                           (<= top move-y bottom)))))
          first)))
 
-(defn scroll-to-ref [ref-fn]
+(defn scroll-to-ref
+  ([ref-fn] (scroll-to-ref ref-fn 0))
+  ([ref-fn offset]
   (go
-    (<! (timeout 1000))
     (<! (utils/await-cb rn/run-after-interactions))
     (<! (utils/await-cb rn/request-animation-frame))
 
     (let [ref         (ref-fn)
           list-ref    @(subscribe [::list-ref])
           list-layout @(subscribe [::list-layout])
-          scroll-pos  @(subscribe [::scroll-pos])
-          list-page-y 146]
-      (let [[layout]       (<! (utils/await-cb rn-utils/ref->layout ref))
-            new-scroll-pos (-> layout :page-y (- list-page-y) (+ scroll-pos) (- 8))]
-        (-> list-ref (.scrollToOffset (clj->js {:offset new-scroll-pos})))))))
+          scroll-pos  @(subscribe [::scroll-pos])]
+      (let [list-page-y        (:page-y (<! (utils/await-cb rn-utils/ref->layout list-ref)))
+            [{:keys [page-y]}] (<! (utils/await-cb rn-utils/ref->layout ref))
+            new-scroll-pos     (-> page-y #_(- list-page-y) (+ scroll-pos) (- offset))]
+        (println (...  page-y list-page-y scroll-pos offset))
+        (-> list-ref (.scrollToOffset (clj->js {:offset new-scroll-pos}))))))))
+
+(comment
+  @(subscribe [::sentence-data 17 :text])
+
+  (scroll-to-ref #(deref (subscribe [::sentence-data 17 :ref])))
+
+  (dispatch [::sentence-click 17])
+
+  )
 
 ;; -------------------------------------------------------------------------------
 
@@ -209,10 +220,27 @@
 (reg-event-db
  ::paragraph-click
  (fn [db [_ id value]]
-   (println "paragraph cilck:" id)
+   (println "paragraph click:" id)
+   (if (and (= (::mode db) :search)
+            (-> db ::search-text string/blank? not))
+     (do
+       (dispatch [::scroll-and-select #(deref (subscribe [::paragraph-data id :ref]))])
+       db)
+     (do
+       (dispatch [::deselect])
+       db))))
+
+(reg-event-db
+ ::sentence-click
+ (fn [db [_ id value]]
+   (println "sentence click:" id)
    (if (= (::mode db) :search)
      (do
-       (dispatch [::scroll-and-select #(get-paragraph-data db id :ref)])
+       (if true #_(and
+            (-> db ::search-text string/blank? not)
+            (not= id 1))
+         (dispatch [::scroll-and-select #(deref (subscribe [::sentence-data id :ref])) 8])
+         (dispatch [::mode :idle]))
        db)
      (do
        (dispatch [::deselect])
@@ -311,30 +339,24 @@
 
 (reg-event-db
  ::scroll-to-ref
- (fn [db [_ ref-fn]]
-   (scroll-to-ref ref-fn)
+ (fn [db [_ ref-fn offset]]
+   (scroll-to-ref ref-fn offset)
    db))
 
 (reg-event-db
  ::scroll-and-select
- (fn [db [_ ref-fn]]
-   (dispatch [::search-text ""])
+ (fn [db [_ ref-fn offset]]
    (dispatch [::mode :idle])
-   (dispatch [::scroll-to-ref ref-fn])
+   (dispatch [::scroll-to-ref ref-fn (or offset 0)])
    db))
 
 (reg-event-db
  ::word-one-click
  (fn [db [_ id]]
-   (if (= (::mode db) :search)
-     (do
-       (dispatch [::scroll-and-select #(as-> id _ (get-word-data db _ :s-id) (get-sentence db _) (:ref _))])
-       db)
-     (let [prev-selected (get-word-data db id :selected)]
-       (-> db
-           deselect-all
-           (set-word-data id :selected (not prev-selected)))))))
-
+   (let [prev-selected (get-word-data db id :selected)]
+     (-> db
+         deselect-all
+         (set-word-data id :selected (not prev-selected))))))
 
 (reg-event-db
  ::find-collision-and-select-word-range
@@ -397,7 +419,9 @@
 (reg-event-db
  ::mode
  (fn [db [_ value]]
-   (assoc db ::mode value)))
+   (merge db
+          {::mode value}
+          (when (= value :idle) {::search-text ""}))))
 
 (reg-event-db
  ::list-ref
