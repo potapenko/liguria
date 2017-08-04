@@ -125,6 +125,16 @@
                           (<= top move-y bottom)))))
          first)))
 
+(defn get-paragraph-y [id]
+  (loop [id (dec id)
+         y  0]
+    (if (pos? id)
+      (do
+        (println "y:" @(subscribe [::paragraph-data id :layout]))
+        (recur (dec id)
+               (+ y (:height @(subscribe [::paragraph-data id :layout])))))
+      y)))
+
 (defn scroll-to-sentence [id]
   (go
     (<! (utils/await-cb rn/run-after-interactions))
@@ -135,13 +145,16 @@
         (let [list-layout    @(subscribe [::list-layout])
               s-y            (:y @(subscribe [::sentence-data id :layout]))
               p-id           @(subscribe [::sentence-data id :p-id])
-              p-y            (:y @(subscribe [::paragraph-data p-id :layout]))
+              p-y            (get-paragraph-y p-id)
               new-scroll-pos (+ p-y s-y)]
           (println (...  p-y s-y new-scroll-pos))
           (-> list-ref (.scrollToOffset (clj->js {:offset new-scroll-pos}))))))))
 
 (comment
   @(subscribe [::sentence-data 17 :text])
+  @(subscribe [::scroll-pos])
+
+  (get-paragraph-y 3)
 
   (scroll-to-sentence 1)
 
