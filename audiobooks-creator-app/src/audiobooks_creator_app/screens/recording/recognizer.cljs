@@ -20,31 +20,6 @@
 
 (def editor-ref (atom nil))
 
-(defn paragraph [{:keys [id]}]
-  (let [this  (r/current-component)
-        props (r/props this)]
-    (fn []
-      (into [view {:ref       #(dispatch [::model/paragraph-data id :ref %])
-                   :on-layout #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
-                   :style     [(st/padding 6 12)
-                               (st/border 1 (st/gray-cl 1) "solid")
-                               (st/border-left 0)
-                               (st/border-right 0)
-                               (st/border-top 0)]}] (r/children this)))))
-
-(defn sentence [{:keys [id]}]
-  (let [this  (r/current-component)
-        props (r/props this)
-        mode  (subscribe [::model/mode])]
-    (fn []
-      [rn/touchable-opacity {:active-opacity 1
-                             :on-press       #(dispatch [::model/sentence-click id])}
-       (into [view             {:ref       #(dispatch [::model/sentence-data id :ref %])
-                                :on-layout #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])
-                                :style     [(st/width "100%")
-                                            (st/margin 6 0)
-                                            st/row st/wrap]}] (r/children this))])))
-
 (defn- map-decorations [values]
   (->> (map #(case %
                :invert (st/color "white")
@@ -124,26 +99,50 @@
     (let [rx (re-pattern (build-search-rx search-text))]
       (->> sentences (filter #(->> % :text string/lower-case (re-find rx) nil? not))))))
 
+(defn sentence [{:keys [id]}]
+  (let [this  (r/current-component)
+        props (r/props this)
+        mode  (subscribe [::model/mode])]
+    (fn []
+      [rn/touchable-opacity {:active-opacity 1
+                             :on-press       #(dispatch [::model/sentence-click id])
+                             :ref            #(dispatch [::model/sentence-data id :ref %])
+                             :on-layout      #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])}
+       (into [view {:style [(st/width "100%")
+                            (st/margin 6 0)
+                            st/row st/wrap]}] (r/children this))])))
+
+(defn paragraph [{:keys [id]}]
+  (let [this  (r/current-component)
+        props (r/props this)]
+    (fn []
+      [rn/touchable-opacity {:active-opacity 1
+                             :on-press       #(dispatch [::model/paragraph-click id])
+                             :on-layout      #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
+                             :ref            #(dispatch [::model/paragraph-data id :ref %])}
+       (into [view {:style [(st/padding 6 12)
+                            (st/border 1 (st/gray-cl 1) "solid")
+                            (st/border-left 0)
+                            (st/border-right 0)
+                            (st/border-top 0)]}] (r/children this))])))
+
 (defn one-paragraph [x]
   (let [id          (-> x .-item .-id)
         index       (-> x .-index)
         hidden?     (subscribe [::model/paragraph-data id :hidden])
         sentences   (subscribe [::model/paragraph-data id :sentences])
         search-text (subscribe [::model/search-text])]
-    ;; (println "build one paragraph:" id)
     (fn []
-      [rn/touchable-opacity {:active-opacity 1
-                             :on-press       #(dispatch [::model/paragraph-click id])}
-       [paragraph {:id id}
-        (doall
-         (for [s (filter-sentences @sentences @search-text)]
-           ^{:key {:id (str "sentence-" (:id s))}}
-           [sentence s
-            (doall
-             (for [w (:words s)]
-               (if-not @hidden?
-                 ^{:key {:id (str "word-" (:id w))}} [word (:id w)]
-                 ^{:key {:id (str "word-" (:id w))}} [word-empty (:text w) (:id w)])))]))]])))
+      [paragraph {:id id}
+       (doall
+        (for [s (filter-sentences @sentences @search-text)]
+          ^{:key {:id (str "sentence-" (:id s))}}
+          [sentence s
+           (doall
+            (for [w (:words s)]
+              (if-not @hidden?
+                ^{:key {:id (str "word-" (:id w))}} [word (:id w)]
+                ^{:key {:id (str "word-" (:id w))}} [word-empty (:text w) (:id w)])))]))])))
 
 
 (defn text-editor []
