@@ -132,14 +132,12 @@
     (let [list-ref @(subscribe [::list-ref])]
       (if (= id 1)
         (-> list-ref (.scrollToOffset 0))
-        (let [ref                @(subscribe [::sentence-data id :ref])
-              list-layout        @(subscribe [::list-layout])
-              scroll-pos         @(subscribe [::scroll-pos])
-              list-page-y        146
-              ;; list-page-y     (:page-y (<! (utils/await-cb rn-utils/ref->layout list-ref)))
-              [{:keys [page-y]}] (<! (utils/await-cb rn-utils/ref->layout ref))
-              new-scroll-pos     (-> page-y #_(- list-page-y) (+ scroll-pos) (- 8))]
-          (println (...  page-y list-page-y scroll-pos))
+        (let [list-layout    @(subscribe [::list-layout])
+              s-y            (:y @(subscribe [::sentence-data id :layout]))
+              p-id           @(subscribe [::sentence-data id :p-id])
+              p-y            (:y @(subscribe [::paragraph-data p-id :layout]))
+              new-scroll-pos (+ p-y s-y)]
+          (println (...  p-y s-y new-scroll-pos))
           (-> list-ref (.scrollToOffset (clj->js {:offset new-scroll-pos}))))))))
 
 (comment
