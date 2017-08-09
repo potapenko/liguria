@@ -46,11 +46,9 @@
                     searched]} word
             selected           (and selected #_(= @mode :edit))
             background-gray    (and (not selected) background-gray)
-            text-style         (-> text-style (conj (when selected :invert)) map-decorations)
-            view-ref           (atom nil)]
+            text-style         (-> text-style (conj (when selected :invert)) map-decorations)]
         [view (merge
-               {:ref   #(do (reset! view-ref %) (dispatch [::model/word-data id :ref %]))
-                ;; :on-layout #(rn-util/ref->layout @view-ref (fn [e] (dispatch [::model/word-data id :layout e])))
+               {:ref   #(dispatch [::model/word-data id :ref %])
                 :style [(st/padding 4 2)
                         (when selected (st/gray 9))
                         (when background-gray (st/gray 1))]}
