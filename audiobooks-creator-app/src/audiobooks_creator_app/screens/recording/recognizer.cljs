@@ -149,7 +149,6 @@
   (let [transcript         (subscribe [::model/transcript])
         mode               (subscribe [::model/mode])
         select-in-progress (subscribe [::model/select-in-progress])
-        words-ids          (subscribe [::model/words-ids])
         search-text        (subscribe [::model/search-text])]
     (println "build text-editor")
     (dispatch [::model/text-fragment nlp/test-text3])
@@ -173,7 +172,6 @@
                        :key-extractor             #(str "paragraph-" (-> % .-id))}]]])))
 
 (comment
-  (subscribe [::model/words])
   (subscribe [::model/word-data 1 :selected])
   (subscribe [::model/word-data 1 :layout])
   (subscribe [::model/word 13])

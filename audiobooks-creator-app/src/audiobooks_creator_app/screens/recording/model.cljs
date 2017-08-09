@@ -17,21 +17,35 @@
 (def test-db (atom nil))
 
 (defn map-words [db f]
-  (assoc db ::words
-         (reduce-kv (fn [m k v]
-                      (assoc m k (f v))) {} (::words db))))
+  (assoc db ::transcript
+         (for [p (::transcript db)]
+           (assoc p :sentences
+                  (for [s (:sentences p)]
+                    (assoc s :words
+                           (for [w (:words s)]
+                             (f w))))))))
 
-(defn iterate-words [db k f]
-  (doseq [x (-> db ::words vals)]
-    (let [res (f x)]
-      (when (not= res (k x))
-        (dispatch [::word-data (:id x) k res])))))
+(defn get-word [db id]
+  (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first))
 
 (defn get-word-data [db id k]
-  (get-in db [::words id k]))
+  (get (get-word db id) k))
 
 (defn set-word-data [db id k v]
-  (assoc-in db [::words id k] v))
+  (let [{:keys [s-id p-id]} (get-word db id)]
+    (assoc db ::transcript
+           (for [p (::transcript db)]
+             (if (= p-id (:p-id p))
+               (assoc p :sentences
+                      (for [s (:sentences p)]
+                        (if (= (:id s) s-id)
+                          (assoc s :words
+                                 (for [w (:words s)]
+                                   (if (= id (:id w))
+                                     (assoc w k v)
+                                     w)))
+                          s)))
+               p)))))
 
 (defn set-paragraph-data [db id k v]
   (assoc db ::transcript
@@ -41,7 +55,7 @@
   (some->> db ::transcript (filter #(= (:id %) id)) first))
 
 (defn get-paragraph-data [db id k]
-  (some->> db ::transcript (filter #(= (:id %) id)) first k))
+  (get (get-paragraph db id) k))
 
 (defn get-sentence [db id]
   (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first))
@@ -49,21 +63,18 @@
 (defn get-sentence-data [db id k]
   (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first k))
 
-(defn set-sentence-data [db & id-k-v]
-  (assoc db ::transcript
-         (vec (for [p (::transcript db)]
-                (assoc p :sentences
-                       (vec
+(defn set-sentence-data [db id k v]
+  (let [p-id (get-sentence-data db id :p-id)]
+    (assoc db ::transcript
+           (for [p (::transcript db)]
+             (if (= p-id (:p-id p))
+                 (assoc p :sentences
                         (for [x (:sentences p)]
-                          (loop [x            x
-                                 [id k v & t] id-k-v]
-                            (if id
-                              (recur
-                               (if (= (:id x) id)
-                                (assoc x k v)
-                                 x)
-                               t)
-                              x)))))))))
+                          (if (= (:id x) id)
+                            (assoc x k v)
+                            x)
+                          ))
+                 p)))))
 
 (defn get-first [db]
   (->> db ::transcript (map :sentences) flatten first (#(dissoc % :words))))
@@ -74,36 +85,26 @@
                             (<= (:id to) (:id %) (:id from))))))
 
 (defn select-line [db id]
-  (let [word-y (-> db ::words (get id) :layout :page-y)]
+  (let [word-y (-> (get-word-data db id :layout) :page-y)]
     (map-words db #(assoc % :selected (= word-y (-> % :layout :page-y))))))
 
 (defn select-sentence [db id]
   (let [s-id (get-word-data db id :s-id)]
-    (iterate-words db :selected #(= s-id (-> % :s-id)))
-    db))
+    (map-words db #(assoc % :selected (= s-id (-> % :s-id))))))
 
 (defn select-paragraph [db id]
   (let [p-id (get-word-data db id :p-id)]
-    (iterate-words db :selected #(= p-id (-> % :p-id)))
-    db))
+    (map-words db #(assoc % :selected (= p-id (-> % :p-id))))))
 
 (defn select-all [db]
-  (iterate-words db :selected #(do true))
-  db)
+  (map-words db #(assoc % :selected true)))
 
 (defn deselect-all [db]
-  (iterate-words db :selected #(do false))
-  db)
+  (map-words db #(assoc % :selected false)))
 
 (defn get-visible-words [db]
   (let [words-ids (some->> db ::transcript
                            (filter #(-> % :hidden not))
-                           (defn get-sentence-data [db id k]
-                             (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first k))
-
-                           (defn get-sentence-data [db id k]
-                             (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first k))
-
                            (map :sentences) flatten
                            (map :words) flatten
                            (map :id))]
@@ -196,10 +197,6 @@
  ::transcript
  (fn [db [_ transcript]]
    (assoc db
-          ::words (into {}
-                        (for [x (->> transcript (map :sentences) flatten
-                                     (map :words) flatten)]
-                          {(:id x) x}))
           ::transcript transcript)))
 
 (reg-event-db
@@ -256,15 +253,11 @@
  (fn [db [_ id k value]]
    (set-sentence-data db id k value)))
 
-(reg-sub
- ::words
- (fn [db [_ id]]
-   (get-in db [::words])))
-
+;; TODO remove
 (reg-sub
  ::word
- (fn [db [_ id]]
-   (get-in db [::words id])))
+ (fn [db [_ id k]]
+   (get-word db id)))
 
 (reg-sub
  ::word-data
@@ -290,11 +283,6 @@
  ::scroll-pos
  (fn [db _]
    (get db ::scroll-pos 0)))
-
-(reg-sub
- ::words-ids
- (fn [db _]
-   (-> db ::words keys)))
 
 (reg-event-db
  ::scroll-pos
