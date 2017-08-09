@@ -129,10 +129,8 @@
   (loop [id (dec id)
          y  0]
     (if (pos? id)
-      (do
-        (println "y:" @(subscribe [::paragraph-data id :layout]))
-        (recur (dec id)
-               (+ y (:height @(subscribe [::paragraph-data id :layout])))))
+      (recur (dec id)
+             (+ y (:height @(subscribe [::paragraph-data id :layout]))))
       y)))
 
 (defn scroll-to-sentence [id]
@@ -153,15 +151,10 @@
 (comment
   @(subscribe [::sentence-data 17 :text])
   @(subscribe [::scroll-pos])
-
   (get-paragraph-y 3)
-
   (scroll-to-sentence 1)
-
   (scroll-to-sentence 17)
-
   (dispatch [::sentence-click 17])
-
   )
 
 ;; -------------------------------------------------------------------------------
