@@ -253,12 +253,6 @@
  (fn [db [_ id k value]]
    (set-sentence-data db id k value)))
 
-;; TODO remove
-(reg-sub
- ::word
- (fn [db [_ id k]]
-   (get-word db id)))
-
 (reg-sub
  ::word-data
  (fn [db [_ id k]]

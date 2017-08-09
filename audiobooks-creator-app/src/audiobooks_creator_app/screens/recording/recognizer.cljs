@@ -30,21 +30,20 @@
 
        (filter #(-> % nil? not)) flatten vec))
 
-(defn word [id]
-  (let [word         (subscribe [::model/word id])
-        mode         (subscribe [::model/mode])
+(defn word [{:keys [id]}]
+  (let [mode         (subscribe [::model/mode])
         text-size    (subscribe [::model/text-size])
         responder    (rn/pan-responder-create
                       {:on-start-should-set-pan-responder #(not= @mode :search)
                        :on-pan-responder-grant            #(dispatch [::model/word-click id (rn-util/->getsture-state %2)])
                        :on-pan-responder-move             #(dispatch [::model/select-progress id (rn-util/->getsture-state %2)])
                        :on-pan-responder-release          #(dispatch [::model/word-release id (rn-util/->getsture-state %2)])})]
-    (fn []
+    (fn [word]
       (let [{:keys [text
                     background-gray
                     text-style
                     selected
-                    searched]} @word
+                    searched]} word
             selected           (and selected #_(= @mode :edit))
             background-gray    (and (not selected) background-gray)
             text-style         (-> text-style (conj (when selected :invert)) map-decorations)
@@ -112,7 +111,7 @@
       (doall
        (for [w words]
          (if-not @hidden?
-           ^{:key {:id (str "word-" (:id w))}} [word (:id w)]
+           ^{:key {:id (str "word-" (:id w))}} [word w]
            ^{:key {:id (str "word-" (:id w))}} [word-empty (:text w) (:id w)])))]]))
 
 (defn paragraph [{:keys [id]}]
