@@ -90,11 +90,12 @@
   (let [word-y (-> (get-word-data db id :layout) :page-y)]
     (map-words db #(assoc % :selected (= word-y (-> % :layout :page-y))))))
 
-(defn select-sentence [db id]
+(defn select-sentence-with-word [db id]
   (let [s-id (get-word-data db id :s-id)]
+    (println "select sentence:" id s-id)
     (map-words db #(assoc % :selected (= s-id (-> % :s-id))))))
 
-(defn select-paragraph [db id]
+(defn select-paragraph-with-word [db id]
   (let [p-id (get-word-data db id :p-id)]
     (map-words db #(assoc % :selected (= p-id (-> % :p-id))))))
 
@@ -105,13 +106,10 @@
   (map-words db #(assoc % :selected false)))
 
 (defn get-visible-words [db]
-  (let [words-ids (some->> db ::transcript
-                           (filter #(-> % :hidden not))
-                           (map :sentences) flatten
-                           (map :words) flatten
-                           (map :id))]
-    (for [id words-ids]
-      (get (::words db) id))))
+  (some->> db ::transcript
+           (filter #(-> % :hidden not))
+           (map :sentences) flatten
+           (map :words) flatten))
 
 (defn calculate-collision [db gesture-state]
   (let [words                   (::words db)
@@ -315,8 +313,8 @@
            count-click (if double? (inc (::count-click db)) 1)]
        (case count-click
          1 (dispatch [::word-one-click id])
-         2 (select-sentence db id)
-         3 (select-paragraph db id)
+         2 (select-sentence-with-word db id)
+         3 (select-paragraph-with-word db id)
          ;; 4 (select-all db)
          "nothing")
        (assoc db
