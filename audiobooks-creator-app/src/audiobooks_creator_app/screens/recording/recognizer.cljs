@@ -38,17 +38,22 @@
     :on-pan-responder-move             #(dispatch [::model/select-progress id (rn-util/->getsture-state %2)])
     :on-pan-responder-release          #(dispatch [::model/word-release id (rn-util/->getsture-state %2)])}))
 
-(defn word [{:keys [id text background-gray text-style selected searched]}]
-  (let [text-size @(subscribe [::model/text-size])
-        responder (create-responder id)
-        background-gray (and (not selected) background-gray)
-        text-style      (-> text-style (conj (when selected :invert)) map-decorations)]
-    [view (merge
-           {:style [(st/padding 4 2)
-                    (when selected (st/gray 9))
-                    (when background-gray (st/gray 1))]}
-           (rn-util/->gesture-props responder))
-     [rn/text {:style (conj text-style (st/font-size text-size))} text]]))
+(defn word [{:keys [id]}]
+  (r/create-class
+   {:component-will-mount   #(dispatch [::model/word-state id :mounted true])
+    :component-will-unmount #(dispatch [::model/word-state id :mounted false])
+    :reagent-render         (fn [{:keys [id text background-gray text-style selected searched]}]
+                              (let [text-size       @(subscribe [::model/text-size])
+                                    responder       (create-responder id)
+                                    background-gray (and (not selected) background-gray)
+                                    text-style      (-> text-style (conj (when selected :invert)) map-decorations)]
+                                [view (merge
+                                       {:ref   #(dispatch [::model/word-state id :ref %])
+                                        :style [(st/padding 4 2)
+                                                (when selected (st/gray 9))
+                                                (when background-gray (st/gray 1))]}
+                                       (rn-util/->gesture-props responder))
+                                 [rn/text {:style (conj text-style (st/font-size text-size))} text]]))}))
 
 (defn word-empty [text id]
   (let []
@@ -91,8 +96,7 @@
       (->> sentences (filter #(->> % :text string/lower-case (re-find rx) nil? not))))))
 
 (defn sentence [{:keys [id p-id]}]
-  (let [mode    (subscribe [::model/mode])
-        hidden? (subscribe [::model/paragraph-data p-id :hidden])]
+  (let [mode    (subscribe [::model/mode])]
     (fn [{:keys [words]}]
       [rn/touchable-opacity {:active-opacity 1
                              :on-press       #(dispatch [::model/sentence-click id])
@@ -101,10 +105,7 @@
        [view {:style [(st/width "100%") (st/margin 6 0) st/row st/wrap]}
         (doall
          (for [w words]
-           (do
-             (if-not @hidden?
-               ^{:key (str "word-" (:id w))} [word w]
-               ^{:key (str "word-" (:id w))} [word-empty (:text w) (:id w)]))))]])))
+           ^{:key (str "word-" (:id w))} [word w]))]])))
 
 (defn paragraph [{:keys [id]}]
   (let [sentences   (subscribe [::model/paragraph-data id :sentences])
