@@ -26,7 +26,8 @@
                              (f w))))))))
 
 (defn get-word [db id]
-  (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first))
+  (some->> db ::transcript
+           (map :sentences) flatten (map :words) flatten (filter #(= (:id %) id)) first))
 
 (defn get-word-data [db id k]
   (get (get-word db id) k))
@@ -35,17 +36,18 @@
   (let [{:keys [s-id p-id]} (get-word db id)]
     (assoc db ::transcript
            (for [p (::transcript db)]
-             (if (= p-id (:p-id p))
-               (assoc p :sentences
-                      (for [s (:sentences p)]
-                        (if (= (:id s) s-id)
-                          (assoc s :words
-                                 (for [w (:words s)]
-                                   (if (= id (:id w))
-                                     (assoc w k v)
-                                     w)))
-                          s)))
-               p)))))
+             (do
+               (if (= p-id (:id p))
+                 (assoc p :sentences
+                        (for [s (:sentences p)]
+                          (if (= s-id (:id s))
+                            (assoc s :words
+                                   (for [w (:words s)]
+                                     (if (= id (:id w))
+                                       (assoc w k v)
+                                       w)))
+                            s)))
+                 p))))))
 
 (defn set-paragraph-data [db id k v]
   (assoc db ::transcript
@@ -100,7 +102,7 @@
   (map-words db #(assoc % :selected true)))
 
 (defn deselect-all [db]
-  (map-words db #(assoc % :selected false)))
+  (map-words db #(assoc % :selected (if (nil? (:selected %)) nil false))))
 
 (defn get-visible-words [db]
   (let [words-ids (some->> db ::transcript
@@ -146,7 +148,6 @@
               p-id           @(subscribe [::sentence-data id :p-id])
               p-y            (get-paragraph-y p-id)
               new-scroll-pos (+ p-y s-y)]
-          (println (...  p-y s-y new-scroll-pos))
           (-> list-ref (.scrollToOffset (clj->js {:offset new-scroll-pos}))))))))
 
 (comment
@@ -252,6 +253,11 @@
  ::sentence-data
  (fn [db [_ id k value]]
    (set-sentence-data db id k value)))
+
+(reg-sub
+ ::word
+ (fn [db [_ id]]
+   (get-word db id)))
 
 (reg-sub
  ::word-data

@@ -30,30 +30,25 @@
 
        (filter #(-> % nil? not)) flatten vec))
 
-(defn word [{:keys [id]}]
-  (let [mode         (subscribe [::model/mode])
-        text-size    (subscribe [::model/text-size])
-        responder    (rn/pan-responder-create
-                      {:on-start-should-set-pan-responder #(not= @mode :search)
-                       :on-pan-responder-grant            #(dispatch [::model/word-click id (rn-util/->getsture-state %2)])
-                       :on-pan-responder-move             #(dispatch [::model/select-progress id (rn-util/->getsture-state %2)])
-                       :on-pan-responder-release          #(dispatch [::model/word-release id (rn-util/->getsture-state %2)])})]
-    (fn [word]
-      (let [{:keys [text
-                    background-gray
-                    text-style
-                    selected
-                    searched]} word
-            selected           (and selected #_(= @mode :edit))
-            background-gray    (and (not selected) background-gray)
-            text-style         (-> text-style (conj (when selected :invert)) map-decorations)]
-        [view (merge
-               {:ref   #(dispatch [::model/word-data id :ref %])
-                :style [(st/padding 4 2)
-                        (when selected (st/gray 9))
-                        (when background-gray (st/gray 1))]}
-               (rn-util/->gesture-props responder))
-         [rn/text {:style (conj text-style (st/font-size @text-size))} text]]))))
+
+(defn create-responder [id]
+  (rn/pan-responder-create
+   {:on-start-should-set-pan-responder #(not= @(subscribe [::model/mode]) :search)
+    :on-pan-responder-grant            #(dispatch [::model/word-click id (rn-util/->getsture-state %2)])
+    :on-pan-responder-move             #(dispatch [::model/select-progress id (rn-util/->getsture-state %2)])
+    :on-pan-responder-release          #(dispatch [::model/word-release id (rn-util/->getsture-state %2)])}))
+
+(defn word [{:keys [id text background-gray text-style selected searched]}]
+  (let [text-size @(subscribe [::model/text-size])
+        responder (create-responder id)
+        background-gray (and (not selected) background-gray)
+        text-style      (-> text-style (conj (when selected :invert)) map-decorations)]
+    [view (merge
+           {:style [(st/padding 4 2)
+                    (when selected (st/gray 9))
+                    (when background-gray (st/gray 1))]}
+           (rn-util/->gesture-props responder))
+     [rn/text {:style (conj text-style (st/font-size text-size))} text]]))
 
 (defn word-empty [text id]
   (let []
@@ -82,7 +77,6 @@
   (re-pattern (string/lower-case search-text)))
 
 (defn- filter-paragraphs [paragraphs search-text]
-  ;; (println "filter-paragraphs:" (count paragraphs) (string/blank? search-text) (str "'" search-text "'"))
   (if (string/blank? search-text)
     paragraphs
     (let [rx (build-search-rx search-text)]
@@ -96,26 +90,28 @@
     (let [rx (re-pattern (build-search-rx search-text))]
       (->> sentences (filter #(->> % :text string/lower-case (re-find rx) nil? not))))))
 
-(defn sentence [{:keys [id p-id words]}]
+(defn sentence [{:keys [id p-id]}]
   (let [mode    (subscribe [::model/mode])
         hidden? (subscribe [::model/paragraph-data p-id :hidden])]
-    [rn/touchable-opacity {:active-opacity 1
-                           :on-press       #(dispatch [::model/sentence-click id])
-                           :ref            #(dispatch [::model/sentence-data id :ref %])
-                           :on-layout      #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])}
-     [view {:style [(st/width "100%")
-                    (st/margin 6 0)
-                    st/row st/wrap]}
-      (doall
-       (for [w words]
-         (if-not @hidden?
-           ^{:key {:id (str "word-" (:id w))}} [word w]
-           ^{:key {:id (str "word-" (:id w))}} [word-empty (:text w) (:id w)])))]]))
+    (fn [{:keys [words]}]
+      ;; (println "render sentence:" id)
+      [rn/touchable-opacity {:active-opacity 1
+                             :on-press       #(dispatch [::model/sentence-click id])
+                             :ref            #(dispatch [::model/sentence-data id :ref %])
+                             :on-layout      #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])}
+       [view {:style [(st/width "100%") (st/margin 6 0) st/row st/wrap]}
+        (doall
+         (for [w words]
+           (do
+             (if-not @hidden?
+               ^{:key (str "word-" (:id w))} [word w]
+               ^{:key (str "word-" (:id w))} [word-empty (:text w) (:id w)]))))]])))
 
 (defn paragraph [{:keys [id]}]
   (let [sentences   (subscribe [::model/paragraph-data id :sentences])
         search-text (subscribe [::model/search-text])]
     (fn []
+      ;; (println "render paragraph:" id)
       [rn/touchable-opacity {:active-opacity 1
                              :on-press       #(dispatch [::model/paragraph-click id])
                              :on-layout      #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
@@ -127,8 +123,7 @@
                       (st/border-top 0)]}
         (doall
          (for [s (filter-sentences @sentences @search-text)]
-           ^{:key {:id (str "sentence-" (:id s))}}
-           [sentence s]))]])))
+           ^{:key (str "sentence-" (:id s))} [sentence s]))]])))
 
 (defn one-list-line [x]
   (let [id    (-> x .-item .-id)
