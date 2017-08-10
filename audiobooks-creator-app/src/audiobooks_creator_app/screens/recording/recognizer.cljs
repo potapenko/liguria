@@ -94,7 +94,6 @@
   (let [mode    (subscribe [::model/mode])
         hidden? (subscribe [::model/paragraph-data p-id :hidden])]
     (fn [{:keys [words]}]
-      ;; (println "render sentence:" id)
       [rn/touchable-opacity {:active-opacity 1
                              :on-press       #(dispatch [::model/sentence-click id])
                              :ref            #(dispatch [::model/sentence-data id :ref %])
@@ -111,7 +110,6 @@
   (let [sentences   (subscribe [::model/paragraph-data id :sentences])
         search-text (subscribe [::model/search-text])]
     (fn []
-      ;; (println "render paragraph:" id)
       [rn/touchable-opacity {:active-opacity 1
                              :on-press       #(dispatch [::model/paragraph-click id])
                              :on-layout      #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])

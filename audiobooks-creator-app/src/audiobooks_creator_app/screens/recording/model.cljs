@@ -102,7 +102,7 @@
   (map-words db #(assoc % :selected true)))
 
 (defn deselect-all [db]
-  (map-words db #(assoc % :selected (if (nil? (:selected %)) nil false))))
+  (map-words db #(assoc % :selected false)))
 
 (defn get-visible-words [db]
   (let [words-ids (some->> db ::transcript
@@ -197,8 +197,8 @@
 (reg-event-db
  ::transcript
  (fn [db [_ transcript]]
-   (assoc db
-          ::transcript transcript)))
+   (deselect-all
+    (assoc db ::transcript transcript))))
 
 (reg-event-db
  ::text-fragment
