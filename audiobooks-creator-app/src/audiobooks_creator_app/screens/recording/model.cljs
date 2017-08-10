@@ -70,13 +70,13 @@
     (assoc db ::transcript
            (for [p (::transcript db)]
              (if (= p-id (:p-id p))
-                 (assoc p :sentences
-                        (for [x (:sentences p)]
-                          (if (= (:id x) id)
-                            (assoc x k v)
-                            x)
-                          ))
-                 p)))))
+               (assoc p :sentences
+                      (for [x (:sentences p)]
+                        (if (= (:id x) id)
+                          (assoc x k v)
+                          x)
+                        ))
+               p)))))
 
 (defn get-first [db]
   (->> db ::transcript (map :sentences) flatten first (#(dissoc % :words))))
@@ -91,9 +91,10 @@
     (map-words db #(assoc % :selected (= word-y (-> % :layout :page-y))))))
 
 (defn select-sentence-with-word [db id]
+  (println "select sentence with word" (... id))
   (let [s-id (get-word-data db id :s-id)]
-    (println "select sentence:" id s-id)
-    (map-words db #(assoc % :selected (= s-id (-> % :s-id))))))
+    (println (... id s-id))
+    (map-words db #(assoc % :selected (= s-id (:s-id %))))))
 
 (defn select-paragraph-with-word [db id]
   (let [p-id (get-word-data db id :p-id)]
@@ -313,9 +314,8 @@
            count-click (if double? (inc (::count-click db)) 1)]
        (case count-click
          1 (dispatch [::word-one-click id])
-         2 (select-sentence-with-word db id)
-         3 (select-paragraph-with-word db id)
-         ;; 4 (select-all db)
+         2 (dispatch [::select-sentence-with-word id])
+         3 (dispatch [::select-paragraph-with-word id])
          "nothing")
        (assoc db
               ::select-in-progress false
@@ -343,6 +343,17 @@
      (-> db
          deselect-all
          (set-word-data id :selected (not prev-selected))))))
+
+(reg-event-db
+ ::select-sentence-with-word
+ (fn [db [_ id]]
+   (println ::select-sentence-with-word id)
+   (select-sentence-with-word db id)))
+
+(reg-event-db
+ ::select-paragraph-with-word
+ (fn [db [_ id]]
+   (select-paragraph-with-word db id)))
 
 (reg-event-db
  ::find-collision-and-select-word-range
