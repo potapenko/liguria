@@ -92,8 +92,8 @@
 
 (defn select-words-range [db from to]
   (map-words db #(assoc % :selected
-                        (or (<= (:id from) (:id %) (:id to))
-                            (<= (:id to) (:id %) (:id from))))))
+                        (or (<= from (:id %) to)
+                            (<= to (:id %) from)))))
 
 (defn select-line [db id]
   (let [word-y (-> (get-word-data db id :layout) :page-y)]
@@ -122,16 +122,23 @@
 
 (defn calculate-collision-and-select [first-word-id gesture-state]
   (let [{:keys [move-x move-y]} gesture-state]
-    (->> (get-visible-words)
-         (filter (fn [w]
-                   (let [{:keys [width height page-x page-y]} (:layout w)
-                         left                                 page-x
-                         right                                (+ left width)
-                         top                                  (- page-y 0)
-                         bottom                               (+ top height)]
-                     (and (<= left move-x right)
-                          (<= top move-y bottom)))))
-         first)))
+    (go-loop [[word & t] (get-visible-words)
+              found false]
+      (when (and word (not found) (= @(subscribe [::prev-gesture-state]) gesture-state))
+        (let [{:keys [id]}            word
+              ref                     @(subscribe [::word-state id :ref])
+              [layout]                (<! (utils/await-cb rn-utils/ref->layout ref))
+              {:keys [width height
+                      page-x page-y]} layout
+              left                    page-x
+              right                   (+ left width)
+              top                     (- page-y 0)
+              bottom                  (+ top height)
+              collision?              (and (<= left move-x right)
+                                           (<= top move-y bottom))]
+          (when collision?
+            (dispatch [::select-words-range first-word-id id]))
+          (recur t collision?))))))
 
 (defn get-paragraph-y [id]
   (loop [id (dec id)
@@ -376,6 +383,11 @@
  (fn [db [_ value]]
    (assoc db ::prev-gesture-state value)))
 
+(reg-sub
+ ::prev-gesture-state
+ (fn [db _]
+   (get db ::prev-gesture-state :idle)))
+
 (reg-event-db
  ::select-progress
  (fn [db [_ word-id gesture-state]]
@@ -388,6 +400,11 @@
              (assoc ::select-in-progress true
                     ::prev-gesture-state gesture-state)))
        db))))
+
+(reg-event-db
+ ::select-words-range
+ (fn [db [_ from to]]
+   (select-words-range db from to)))
 
 (reg-sub
  ::mode
