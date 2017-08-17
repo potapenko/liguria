@@ -164,7 +164,6 @@
               p-id           @(subscribe [::sentence-data id :p-id])
               p-y            (get-paragraph-y p-id)
               new-scroll-pos (+ p-y s-y)]
-          (println (... new-scroll-pos id))
           (-> list-ref (.scrollToOffset (clj->js {:offset new-scroll-pos}))))))))
 
 (comment
