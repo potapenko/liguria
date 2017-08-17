@@ -153,6 +153,7 @@
       y)))
 
 (defn scroll-to-sentence [id]
+  (println "scroll-to-sentence" id)
   (go
     (<! (utils/await-cb rn/run-after-interactions))
     (<! (utils/await-cb rn/request-animation-frame))
@@ -336,7 +337,7 @@
                         :selected true
                         :long-press true)
          (assoc ::long-press true))
-     (assoc ::long-press false))))
+     (assoc db ::long-press false))))
 
 (reg-sub
  ::long-press
@@ -385,7 +386,7 @@
  (fn [db [_ id]]
    (println "(get-word-data db id :long-press)" (get-word-data db id :long-press) (get-word-data db id :selected))
    (if (get-word-data db id :long-press)
-     (set set-word-data db id :long-press false)
+     (set-word-data db id :long-press false)
      (let [prev-selected (get-word-data db id :selected)]
        (-> db
            deselect-all
