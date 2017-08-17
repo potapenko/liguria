@@ -153,7 +153,6 @@
       y)))
 
 (defn scroll-to-sentence [id]
-  (println "scroll-to-sentence" id)
   (go
     (<! (utils/await-cb rn/run-after-interactions))
     (<! (utils/await-cb rn/request-animation-frame))
@@ -165,6 +164,7 @@
               p-id           @(subscribe [::sentence-data id :p-id])
               p-y            (get-paragraph-y p-id)
               new-scroll-pos (+ p-y s-y)]
+          (println (... new-scroll-pos id))
           (-> list-ref (.scrollToOffset (clj->js {:offset new-scroll-pos}))))))))
 
 (comment
