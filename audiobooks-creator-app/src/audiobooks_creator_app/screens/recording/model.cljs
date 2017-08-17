@@ -41,22 +41,26 @@
 (defn get-word-data [db id k]
   (get (get-word db id) k))
 
-(defn set-word-data [db id k v]
-  (let [{:keys [s-id p-id]} (get-word db id)]
-    (assoc db ::transcript
-           (for [p (::transcript db)]
-             (do
-               (if (= p-id (:id p))
-                 (assoc p :sentences
-                        (for [s (:sentences p)]
-                          (if (= s-id (:id s))
-                            (assoc s :words
-                                   (for [w (:words s)]
-                                     (if (= id (:id w))
-                                       (assoc w k v)
-                                       w)))
-                            s)))
-                 p))))))
+(defn set-word-data [db id k v & kv]
+  (let [db (let [{:keys [s-id p-id]} (get-word db id)]
+             (assoc db ::transcript
+                    (for [p (::transcript db)]
+                      (do
+                        (if (= p-id (:id p))
+                          (assoc p :sentences
+                                 (for [s (:sentences p)]
+                                   (if (= s-id (:id s))
+                                     (assoc s :words
+                                            (for [w (:words s)]
+                                              (if (= id (:id w))
+                                                (assoc w k v)
+                                                w)))
+                                     s)))
+                          p)))))]
+    (if kv
+      (let [[k v & kv] kv]
+        (recur db id k v kv))
+      db)))
 
 (defn set-paragraph-data [db id k v]
   (assoc db ::transcript
@@ -309,7 +313,6 @@
 (reg-event-db
  ::scroll-pos
  (fn [db [_ value]]
-   #_(dispatch [::update-words-layouts])
    (assoc db ::scroll-pos value)))
 
 (reg-event-db
@@ -324,9 +327,21 @@
 
 (reg-event-db
  ::word-long-press
- (fn [db [_ id]]
-   (println "word long press")
-   db))
+ (fn [db [_ id value]]
+   (println ::word-long-press id value)
+   (if value
+     (-> db
+         deselect-all
+         (set-word-data id
+                        :selected true
+                        :long-press true)
+         (assoc ::long-press true))
+     (assoc ::long-press false))))
+
+(reg-sub
+ ::long-press
+ (fn [db _]
+   (get db ::long-press false)))
 
 (reg-event-db
  ::word-release
@@ -368,10 +383,13 @@
 (reg-event-db
  ::word-one-click
  (fn [db [_ id]]
-   (let [prev-selected (get-word-data db id :selected)]
-     (-> db
-         deselect-all
-         (set-word-data id :selected (not prev-selected))))))
+   (println "(get-word-data db id :long-press)" (get-word-data db id :long-press) (get-word-data db id :selected))
+   (if (get-word-data db id :long-press)
+     (set set-word-data db id :long-press false)
+     (let [prev-selected (get-word-data db id :selected)]
+       (-> db
+           deselect-all
+           (set-word-data id :selected (not prev-selected)))))))
 
 (reg-event-db
  ::select-sentence-with-word
@@ -399,7 +417,7 @@
  (fn [db [_ word-id gesture-state]]
    (let [in-progress (::select-in-progress db)
          distance    (rn-utils/gesture-state-distance (::prev-gesture-state db) gesture-state)]
-     (if (or (not in-progress) (> distance 10))
+     (if (and (::long-press db) (or (not in-progress) (> distance 10)))
        (do
          (calculate-collision-and-select word-id gesture-state)
          (-> db

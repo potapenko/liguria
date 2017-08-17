@@ -36,17 +36,22 @@
     (rn/pan-responder-create
      {:on-start-should-set-pan-responder #(not= @(subscribe [::model/mode]) :search)
       :on-pan-responder-grant            (fn [e g] (reset! long-press-timeout
-                                                        (utils/set-timeout
-                                                         #(dispatch [::model/word-long-press id
-                                                                     (rn-util/->getsture-state g)]) 600))
-                                              (dispatch [::model/word-click id (rn-util/->getsture-state g)]))
+                                                           (utils/set-timeout
+                                                            #(dispatch [::model/word-long-press id true]) 600))
+                                           (dispatch [::model/word-click id (rn-util/->getsture-state g)]))
       :on-pan-responder-move             (fn [e g]
-                                            (utils/clear-timeout @long-press-timeout)
-                                            (dispatch [::model/select-progress id (rn-util/->getsture-state g)]))
+                                           (utils/clear-timeout @long-press-timeout)
+                                           (when @(subscribe [::model/long-press])
+                                             (dispatch [::model/select-progress id (rn-util/->getsture-state g)])))
       :on-pan-responder-release          (fn [e g]
-                                            (utils/clear-timeout @long-press-timeout)
-                                            (dispatch [::model/word-release id (rn-util/->getsture-state g)]))
-      :on-pan-responder-terminate        #(utils/clear-timeout @long-press-timeout)
+                                           (utils/clear-timeout @long-press-timeout)
+                                           (dispatch [::model/word-release id (rn-util/->getsture-state g)])
+                                           (when @(subscribe [::model/long-press])
+                                            (dispatch [::model/word-long-press id false])))
+      :on-pan-responder-terminate        (fn []
+                                           (utils/clear-timeout @long-press-timeout)
+                                           (when @(subscribe [::model/long-press])
+                                            (dispatch [::model/word-long-press id false])))
       })))
 
 (defn word [{:keys [id]}]
@@ -145,7 +150,8 @@
   (let [transcript         (subscribe [::model/transcript])
         mode               (subscribe [::model/mode])
         select-in-progress (subscribe [::model/select-in-progress])
-        search-text        (subscribe [::model/search-text])]
+        search-text        (subscribe [::model/search-text])
+        select-in-progress (subscribe [::model/select-in-progress])]
     (println "build text-editor")
     (dispatch [::model/text-fragment nlp/test-text3])
     (fn []
@@ -156,6 +162,7 @@
         [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
                        :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                        :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
+                       :scroll-enabled            (not @select-in-progress)
                        :remove-clipped-subviews   true
                        :initial-num-to-render     5
                        :on-viewable-items-changed (fn [data]
