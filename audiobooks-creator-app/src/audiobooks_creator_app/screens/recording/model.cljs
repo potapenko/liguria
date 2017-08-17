@@ -323,6 +323,12 @@
    db))
 
 (reg-event-db
+ ::word-long-press
+ (fn [db [_ id]]
+   (println "word long press")
+   db))
+
+(reg-event-db
  ::word-release
  (fn [db [_ id gesture-state]]
    (if (::select-in-progress db)

@@ -171,6 +171,11 @@
   ([lifetime]
    (-> (js/Date.) (.getTime) (/ lifetime) (js/Math.round))))
 
+(def set-timeout js/setTimeout)
+(def clear-timeout js/clearTimeout)
+(def set-interval js/setInterval)
+(def clear-interval js/clearInterval)
+
 (defn await
   [promise]
   (let [port (chan)]

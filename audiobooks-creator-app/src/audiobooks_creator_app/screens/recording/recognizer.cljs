@@ -32,11 +32,22 @@
 
 
 (defn create-responder [id]
-  (rn/pan-responder-create
-   {:on-start-should-set-pan-responder #(not= @(subscribe [::model/mode]) :search)
-    :on-pan-responder-grant            #(dispatch [::model/word-click id (rn-util/->getsture-state %2)])
-    :on-pan-responder-move             #(dispatch [::model/select-progress id (rn-util/->getsture-state %2)])
-    :on-pan-responder-release          #(dispatch [::model/word-release id (rn-util/->getsture-state %2)])}))
+  (let [long-press-timeout (atom 0)]
+    (rn/pan-responder-create
+     {:on-start-should-set-pan-responder #(not= @(subscribe [::model/mode]) :search)
+      :on-pan-responder-grant            (fn [e g] (reset! long-press-timeout
+                                                        (utils/set-timeout
+                                                         #(dispatch [::model/word-long-press id
+                                                                     (rn-util/->getsture-state g)]) 600))
+                                              (dispatch [::model/word-click id (rn-util/->getsture-state g)]))
+      :on-pan-responder-move             (fn [e g]
+                                            (utils/clear-timeout @long-press-timeout)
+                                            (dispatch [::model/select-progress id (rn-util/->getsture-state g)]))
+      :on-pan-responder-release          (fn [e g]
+                                            (utils/clear-timeout @long-press-timeout)
+                                            (dispatch [::model/word-release id (rn-util/->getsture-state g)]))
+      :on-pan-responder-terminate        #(utils/clear-timeout @long-press-timeout)
+      })))
 
 (defn word [{:keys [id]}]
   (r/create-class
