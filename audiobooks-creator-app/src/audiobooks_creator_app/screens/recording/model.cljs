@@ -29,6 +29,9 @@
   (some->> db ::transcript
            (map :sentences) flatten (map :words) flatten (filter #(= (:id %) id)) first))
 
+(defn filter-words [db f]
+  (some->> db ::transcript (map :sentences) flatten (map :words) flatten (filter f)))
+
 (defn- ->word-state-path [id k]
   [::words-states (keyword (str "word-" id)) k])
 
@@ -104,8 +107,7 @@
     (map-words db #(assoc % :selected (= word-y (-> % :layout :page-y))))))
 
 (defn select-sentence-with-word [db id]
-  (let [s-id (get-word-data db id :s-id)]
-    (println (... id s-id))
+  (let [s-id (get-word-data db id :s-id)] 
     (map-words db #(assoc % :selected (= s-id (:s-id %))))))
 
 (defn select-paragraph-with-word [db id]
@@ -166,7 +168,30 @@
               new-scroll-pos (+ p-y s-y)]
           (-> list-ref (.scrollToOffset (clj->js {:offset new-scroll-pos}))))))))
 
+
+(defn get-selected-words [db]
+ (filter-words db #(:selected %)))
+
+(defn add-text-style-to-selected [db value]
+  (loop [db db
+         [w & t] (get-selected-words db)]
+    (println "add" (:id w))
+    (if w
+      (recur (let [styles (w :text-style)]
+               (set-word-data db (:id w) :text-style (-> styles set (conj value) vec))) t)
+      db)))
+
+(defn remove-text-style-from-selected [db value]
+  (loop [db db
+         [w & t] (get-selected-words db)]
+    (println "remove" (:id w))
+    (if w
+      (recur (let [styles (w :text-style)]
+               (set-word-data db (:id w) :text-style (-> styles set (disj value) vec))) t)
+      db)))
+
 (comment
+  (count (get-selected-words @(subscribe [::db []])))
   @(subscribe [::sentence-data 17 :text])
   @(subscribe [::scroll-pos])
   (get-paragraph-y 3)
@@ -383,7 +408,6 @@
 (reg-event-db
  ::word-one-click
  (fn [db [_ id]]
-   (println "(get-word-data db id :long-press)" (get-word-data db id :long-press) (get-word-data db id :selected))
    (if (get-word-data db id :long-press)
      (set-word-data db id :long-press false)
      (let [prev-selected (get-word-data db id :selected)]
@@ -394,7 +418,6 @@
 (reg-event-db
  ::select-sentence-with-word
  (fn [db [_ id]]
-   (println ::select-sentence-with-word id)
    (select-sentence-with-word db id)))
 
 (reg-event-db
@@ -482,6 +505,36 @@
  ::text-size
  (fn [db [_ value]]
    (assoc db ::text-size value)))
+
+(reg-event-db
+ ::add-text-style
+ (fn [db [_ style]]
+   (add-text-style-to-selected db style)))
+
+(reg-event-db
+ ::remove-text-style
+ (fn [db [_ style]]
+   (remove-text-style-from-selected db style)))
+
+(reg-event-db
+ ::toggle-text-style
+ (fn [db [_ style]]
+   (let [selected        (get-selected-words db)
+         has-not-deleted (some #(some-> % :text-style set style) selected)]
+     (if has-not-deleted
+       (add-text-style-to-selected db style)
+       (remove-text-style-from-selected db style)))))
+
+(reg-event-db
+ ::toggle-deleted
+ (fn [db [_]]
+   (let [selected        (set (get-selected-words db))
+         has-not-deleted (some #(some-> % :deleted) selected)]
+     (map-words db
+                (fn [w]
+                  (if (selected w)
+                    (assoc w :deleted (not has-not-deleted))
+                    w))))))
 
 (comment
   (reg-sub

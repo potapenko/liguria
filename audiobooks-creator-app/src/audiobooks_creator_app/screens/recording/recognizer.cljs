@@ -58,11 +58,13 @@
   (r/create-class
    {:component-will-mount   #(dispatch [::model/word-state id :mounted true])
     :component-will-unmount #(dispatch [::model/word-state id :mounted false])
-    :reagent-render         (fn [{:keys [id text background-gray text-style selected searched]}]
+    :reagent-render         (fn [{:keys [id text background-gray text-style selected searched deleted]}]
                               (let [text-size       @(subscribe [::model/text-size])
                                     responder       (create-responder id)
                                     background-gray (and (not selected) background-gray)
-                                    text-style      (-> text-style (conj (when selected :invert)) map-decorations)]
+                                    text-style      (-> text-style (conj
+                                                                    (when selected :invert)
+                                                                    (when deleted :s)) map-decorations)]
                                 [view (merge
                                        {:ref   #(dispatch [::model/word-state id :ref %])
                                         :style [(st/padding 4 2)
@@ -77,22 +79,23 @@
     (fn [] [view {:style [(st/padding 4 2)]}
             [rn/text {:style [(st/font-size @(subscribe [::model/text-size]))]} text]])))
 
-(defn icon-button [icon-name icon-text focused]
+(defn icon-button [{:keys [icon label focused on-press]}]
   [touchable-opacity {:style [(st/justify-content "center")
                               (st/align-items "center")
-                              (st/padding 22 0 0 0)]}
-   [nm/icon-fa {:color "#ccc" :size 22 :name icon-name}]
-   [text {:style [(st/color "#ccc") (st/font-size 8) (st/text-align "center")]} icon-text]])
+                              (st/padding 22 0 0 0)]
+                      :on-press on-press}
+   [nm/icon-fa {:color "#ccc" :size 22 :name icon}]
+   [text {:style [(st/color "#ccc") (st/font-size 8) (st/text-align "center")]} label]])
 
 (defn editor-toolbar []
   [view {:style [(st/width 60)]}
    [rn/scroll-view {:style [(st/flex)]}
-    [icon-button "question-circle-o" "Help"]
-    [icon-button "eye-slash" "Hide deleted"]
-    [icon-button "strikethrough" "Mark as deleted"]
-    [icon-button "eraser" "Erase recording"]
-    [icon-button "undo" "Undo"]
-    [icon-button "repeat" "Redo"]]])
+    [icon-button {:icon "question-circle-o" :label "Help" :on-press #()}]
+    [icon-button {:icon "eye-slash" :label "Hide deleted" :on-press #()}]
+    [icon-button {:icon "strikethrough" :label "Mark as deleted" :on-press #(dispatch [::model/toggle-deleted])}]
+    [icon-button {:icon "eraser" :label "Erase recording" :on-press #()}]
+    [icon-button {:icon "undo" :label "Undo" :on-press #()}]
+    [icon-button {:icon "repeat" :label "Redo" :on-press #()}]]])
 
 (defn build-search-rx [search-text]
   (re-pattern (string/lower-case search-text)))
