@@ -35,8 +35,10 @@
 (defn cr [c]
   (stylize [st/line-through (st/color c)]))
 
-(defn make-spaces [x]
-  (apply str (repeat x " ")))
+(defn make-spaces
+  ([x] (make-spaces " "))
+  ([x s]
+  (apply str (repeat x s))))
 
 (defn space
   ([] (space 1))

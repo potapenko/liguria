@@ -3,6 +3,7 @@
             [micro-rn.react-native :as rn :refer [alert text text-input view spacer flexer touchable-opacity]]
             [micro-rn.styles :as st]
             [micro-rn.react-navigation :as nav]
+            [micro-rn.text-decorator :as text-decorator]
             [reagent.core :as r :refer [atom]]
             [micro-rn.rn-utils :as rn-util]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
@@ -58,20 +59,29 @@
   (r/create-class
    {:component-will-mount   #(dispatch [::model/word-state id :mounted true])
     :component-will-unmount #(dispatch [::model/word-state id :mounted false])
-    :reagent-render         (fn [{:keys [id text background-gray text-style selected searched deleted]}]
+    :reagent-render         (fn [{:keys [id text background-gray text-style
+                                         selected searched deleted recorded]}]
                               (let [text-size       @(subscribe [::model/text-size])
                                     responder       (create-responder id)
                                     background-gray (and (not selected) background-gray)
                                     text-style      (-> text-style (conj
                                                                     (when selected :invert)
                                                                     (when deleted :s)) map-decorations)]
-                                [view (merge
-                                       {:ref   #(dispatch [::model/word-state id :ref %])
-                                        :style [(st/padding 4 2)
-                                                (when selected (st/gray 9))
-                                                (when background-gray (st/gray 1))]}
-                                       (rn-util/->gesture-props responder))
-                                 [rn/text {:style (conj text-style (st/font-size text-size))} text]]))}))
+                                [view
+                                 (merge
+                                  {:ref   #(dispatch [::model/word-state id :ref %])}
+                                  (rn-util/->gesture-props responder))
+                                 [view {:style [(st/padding 4 2)
+                                                 (when selected (st/gray 9))
+                                                 (when background-gray (st/gray 1))]}
+                                  [rn/text {:style (conj text-style (st/font-size text-size))} text]]
+                                 (when recorded
+                                  [view {:style [st/box (st/padding 2)
+                                                 (st/background-color "transparent")
+                                                 (st/overflow "hidden")]}
+                                   [rn/text {:number-of-lines 1 :style [(st/width "200%")
+                                                                        (st/margin-top 12) (st/font-size 17) (st/color "skyblue")]}
+                                    (text-decorator/make-spaces 33  "~")]])]))}))
 
 (defn word-empty [text id]
   (let []
@@ -93,7 +103,7 @@
     [icon-button {:icon "question-circle-o" :label "Help" :on-press #()}]
     [icon-button {:icon "eye-slash" :label "Hide deleted" :on-press #()}]
     [icon-button {:icon "strikethrough" :label "Mark as deleted" :on-press #(dispatch [::model/toggle-deleted])}]
-    [icon-button {:icon "eraser" :label "Erase recording" :on-press #()}]
+    [icon-button {:icon "eraser" :label "Erase recording" :on-press #(dispatch [::model/toggle-recorded])}]
     [icon-button {:icon "undo" :label "Undo" :on-press #()}]
     [icon-button {:icon "repeat" :label "Redo" :on-press #()}]]])
 

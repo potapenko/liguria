@@ -48,18 +48,17 @@
   (let [db (let [{:keys [s-id p-id]} (get-word db id)]
              (assoc db ::transcript
                     (for [p (::transcript db)]
-                      (do
-                        (if (= p-id (:id p))
-                          (assoc p :sentences
-                                 (for [s (:sentences p)]
-                                   (if (= s-id (:id s))
-                                     (assoc s :words
-                                            (for [w (:words s)]
-                                              (if (= id (:id w))
-                                                (assoc w k v)
-                                                w)))
-                                     s)))
-                          p)))))]
+                      (if (= p-id (:id p))
+                        (assoc p :sentences
+                               (for [s (:sentences p)]
+                                 (if (= s-id (:id s))
+                                   (assoc s :words
+                                          (for [w (:words s)]
+                                            (if (= id (:id w))
+                                              (assoc w k v)
+                                              w)))
+                                   s)))
+                        p))))]
     (if kv
       (let [[k v & kv] kv]
         (recur db id k v kv))
@@ -67,7 +66,10 @@
 
 (defn set-paragraph-data [db id k v]
   (assoc db ::transcript
-         (->> db ::transcript (mapv #(if (= (:id %) id) (assoc % k v) %)))))
+         (for [p (::transcript db)]
+           (if (= id (:id p))
+             (assoc p k v)
+             p))))
 
 (defn get-paragraph [db id]
   (some->> db ::transcript (filter #(= (:id %) id)) first))
@@ -75,8 +77,11 @@
 (defn get-paragraph-data [db id k]
   (get (get-paragraph db id) k))
 
+(defn get-sentences [db]
+  (some->> db ::transcript (map :sentences) flatten))
+
 (defn get-sentence [db id]
-  (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first))
+  (some->> (get-sentences db) (filter #(= (:id %) id)) first))
 
 (defn get-sentence-data [db id k]
   (some->> db ::transcript (map :sentences) flatten (filter #(= (:id %) id)) first k))
@@ -175,22 +180,32 @@
 (defn add-text-style-to-selected [db value]
   (loop [db db
          [w & t] (get-selected-words db)]
-    (println "add" (:id w))
     (if w
-      (recur (let [styles (w :text-style)]
+      (recur (let [styles (or (w :text-style) [])]
                (set-word-data db (:id w) :text-style (-> styles set (conj value) vec))) t)
       db)))
 
 (defn remove-text-style-from-selected [db value]
   (loop [db db
          [w & t] (get-selected-words db)]
-    (println "remove" (:id w))
     (if w
-      (recur (let [styles (w :text-style)]
+      (recur (let [styles (or (w :text-style) [])]
                (set-word-data db (:id w) :text-style (-> styles set (disj value) vec))) t)
       db)))
 
+(defn update-layouts []
+  (let [db @(subscribe [::db []])]
+    (go
+      (doseq [p (::transcript db)]
+        (let [[layout] (<! (utils/await-cb rn-utils/ref->layout (:ref p)))]
+          (dispatch [::paragraph-data (:id p) :layout layout])
+          (doseq [s (:sentences p)]
+            (let [[layout] (<! (utils/await-cb rn-utils/ref->layout (:ref s)))]
+              (dispatch [::sentence-data (:id s) :layout layout]))))))))
+
 (comment
+  (update-layouts)
+
   (count (get-selected-words @(subscribe [::db []])))
   @(subscribe [::sentence-data 17 :text])
   @(subscribe [::scroll-pos])
@@ -535,6 +550,32 @@
                   (if (selected w)
                     (assoc w :deleted (not has-not-deleted))
                     w))))))
+
+(reg-event-db
+ ::toggle-recorded
+ (fn [db [_]]
+   (let [selected        (set (get-selected-words db))
+         has-not-recorded (some #(some-> % :recorded) selected)]
+     (map-words db
+                (fn [w]
+                  (if (selected w)
+                    (assoc w :recorded (not has-not-recorded))
+                    w))))))
+
+(reg-event-db
+ ::update-layouts
+ (fn [db [_ value]]
+   (update-layouts)))
+
+(reg-sub
+ ::hide-deleted
+ (fn [db _]
+   (get db ::hide-deleted false)))
+
+(reg-event-db
+ ::hide-deleted
+ (fn [db [_ value]]
+   (assoc db ::hide-deleted value)))
 
 (comment
   (reg-sub
