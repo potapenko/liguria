@@ -3,14 +3,15 @@
    [reagent.core :as r :refer [atom]]
    [clojure.string :as string]
    [micro-rn.utils :as utils]
-   [cljs.core.async :as async :refer [<! >! put! chan timeout]])
+   [cljs.core.async :as async :refer [<! >! put! chan timeout]]
+   [micro-rn.react-native :as rn])
 
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
   ;; FBSDK
 
-(def login-button (r/adapt-react-class (aget (js/require "react-native-fbsdk") "LoginButton")))
+(def login-button (rn/adapt-react-class (aget (js/require "react-native-fbsdk") "LoginButton") "facebook-login-button"))
 
 (def LoginManager (aget (js/require "react-native-fbsdk") "LoginManager"))
 (def ShareDialog (aget (js/require "react-native-fbsdk") "ShareDialog"))
