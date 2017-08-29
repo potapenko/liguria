@@ -1,0 +1,30 @@
+{
+  "name": "liguria",
+  "interface": "reagent6",
+  "envRoots": {
+    "dev": "env/dev",
+    "prod": "env/prod"
+  },
+  "modules": [
+    "./src/js/modules.js",
+    "react-navigation",
+    "react-native-vector-icons",
+    "react-native-audio",
+    "react-native-device-info",
+    "react-native-speech-to-text-ios",
+    "react-native-search-input"
+  ],
+  "imageDirs": [
+    "images"
+  ],
+  "platforms": {
+    "ios": {
+      "host": "192.168.0.200",
+      "modules": []
+    },
+    "android": {
+      "host": "192.168.0.200",
+      "modules": []
+    }
+  }
+}
