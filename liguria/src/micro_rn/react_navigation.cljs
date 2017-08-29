@@ -1,8 +1,9 @@
 (ns micro-rn.react-navigation
   (:refer-clojure :exclude [pop!])
-  (:require-macros [reagent.ratom :refer [reaction]])
   (:require [reagent.core :as r]
-            [camel-snake-kebab.core :refer [->camelCase]]))
+            [micro-rn.react-native :as rn]
+            [camel-snake-kebab.core :refer [->camelCase]])
+  (:require-macros [reagent.ratom :refer [reaction]]))
 
 (defn check-value [func]
   (fn [[key val]]
@@ -65,5 +66,5 @@
   (. navigator (goBack)))
 
 (defn import-module [name]
-  (-> (js/require "react-navigation") (aget name) r/adapt-react-class))
+  (-> (js/require "react-navigation") (aget name) (rn/adapt-react-class "react-navigation")))
 

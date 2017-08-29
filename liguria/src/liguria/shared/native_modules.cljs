@@ -9,14 +9,14 @@
 
 (def icons (.-icons modules))
 
-(def icon-fa (r/adapt-react-class (.-IconFA icons)))
-(def icon-md (r/adapt-react-class (.-IconMD icons)))
-(def icon-io (r/adapt-react-class (.-IconIO icons)))
+(def icon-fa (rn/adapt-react-class (.-IconFA icons) "icon-fa"))
+(def icon-md (rn/adapt-react-class (.-IconMD icons) "icon-md"))
+(def icon-io (rn/adapt-react-class (.-IconIO icons) "icon-io"))
 
 (def audio-recorder (.-AudioRecorder modules))
 (def audio-path (.-audioPath modules))
 
-(def search-input (-> (js/require "react-native-search-input") .-SearchInput r/adapt-react-class))
+(def search-input (-> (js/require "react-native-search-input") .-SearchInput (rn/adapt-react-class "search-input")))
 
 (comment
   (js/Object.keys modules))

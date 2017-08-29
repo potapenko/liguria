@@ -141,8 +141,6 @@ function importJs(src, success, error) {
 
     var file = fileBasePath + '/' + src;
 
-    console.log("serverHost:", serverHost)
-
     logDebug('(importJs) Importing: ' + file);
     if (isChrome()) {
         syncImportScripts(serverBaseUrl("localhost") + '/' + file, success, error);

@@ -1,6 +1,7 @@
 (ns micro-rn.rn-utils
   (:require [micro-rn.utils :as utils]
-            [re-frame.loggers :as rf-log])
+            [re-frame.loggers :as rf-log]
+            [reagent.core :as r])
   (:require-macros [micro-rn.macros :refer [...]]))
 
 (defn event->layout [e]
@@ -78,3 +79,4 @@
             (cond
               (= "re-frame: overwriting " (first args)) nil
               :else (apply warn args)))}))
+

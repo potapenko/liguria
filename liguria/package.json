@@ -1,29 +1,29 @@
 {
-	"name": "liguria",
-	"version": "0.0.1",
-	"private": true,
-	"scripts": {
-		"start": "node node_modules/react-native/local-cli/cli.js start",
-		"test": "jest"
-	},
-	"dependencies": {
-		"babel-plugin-transform-es2015-block-scoping": "6.15.0",
-		"react": "16.0.0-alpha.12",
+  "name": "liguria",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "babel-plugin-transform-es2015-block-scoping": "6.15.0",
+    "react": "16.0.0-alpha.12",
     "react-native": "0.46.1",
     "react-native-audio": "^3.2.2",
     "react-native-device-info": "^0.10.2",
     "react-native-search-input": "0.0.4",
-    "react-native-speech-to-text-ios": "^1.0.3",
+    "react-native-speech-to-text-ios": "^1.0.4",
     "react-native-vector-icons": "^4.1.1",
     "react-navigation": "^1.0.0-beta.9"
-	},
-	"devDependencies": {
-		"babel-jest": "20.0.3",
-		"babel-preset-react-native": "3.0.1",
-		"jest": "20.0.4",
-		"react-test-renderer": "16.0.0-alpha.12"
-	},
-	"jest": {
-		"preset": "react-native"
-	}
+  },
+  "devDependencies": {
+    "babel-jest": "20.0.3",
+    "babel-preset-react-native": "3.0.1",
+    "jest": "20.0.4",
+    "react-test-renderer": "16.0.0-alpha.12"
+  },
+  "jest": {
+    "preset": "react-native"
+  }
 }

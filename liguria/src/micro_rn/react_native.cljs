@@ -22,6 +22,16 @@
 
 (def ReactNative (js/require "react-native"))
 
+(defn adapt-react-class
+  ([cl] (adapt-react-class cl nil))
+  ([cl message]
+   (try
+     (r/adapt-react-class cl)
+     (catch js/Error e
+       (let [m (str "Error load module(" (or message "unnamed") "): nil?" (nil? cl))]
+         (println ">>> !! >>>" m)
+         (throw (new js/Error m)))))))
+
 (def device (.get ReactNative.Dimensions "window"))
 
 (defmacro create-components [names]
@@ -33,31 +43,31 @@
 
 ; build-in сomponents
 
-(def image (r/adapt-react-class (.-Image ReactNative)))
-(def list-view (r/adapt-react-class (.-ListView ReactNative)))
-(def flat-list (r/adapt-react-class (.-FlatList ReactNative)))
-(def virtualized-list (r/adapt-react-class (.-VirtualizedList ReactNative)))
-(def section-list (r/adapt-react-class (.-SectionList ReactNative)))
-(def refresh-control (r/adapt-react-class (.-RefreshControl ReactNative)))
-(def map-view (r/adapt-react-class (.-MapView ReactNative)))
-(def modal (r/adapt-react-class (.-Modal ReactNative)))
-(def refresh-contol (r/adapt-react-class (.-RefreshControl ReactNative)))
-(def scroll-view (r/adapt-react-class (.-ScrollView ReactNative)))
-(def switch (r/adapt-react-class (.-Switch ReactNative)))
-(def text (r/adapt-react-class (.-Text ReactNative)))
-(def text-input (r/adapt-react-class (.-TextInput ReactNative)))
-(def touchable-without-feedback (r/adapt-react-class (.-TouchableWithoutFeedback ReactNative)))
-(def touchable-highlight (r/adapt-react-class (.-TouchableHighlight ReactNative)))
-(def touchable-native-feedback (r/adapt-react-class (.-TouchableNativeFeedback ReactNative)))
-(def touchable-opacity (r/adapt-react-class (.-TouchableOpacity ReactNative)))
-(def view (r/adapt-react-class (.-View ReactNative)))
-(def animated-view (r/adapt-react-class (.-View (.-Animated ReactNative))))
-(def web-view (r/adapt-react-class (.-WebView ReactNative)))
-(def activity-indicator (r/adapt-react-class (.-ActivityIndicator ReactNative)))
-(def slider (r/adapt-react-class (.-Slider ReactNative)))
-(def picker (r/adapt-react-class (.-Picker ReactNative)))
-(def picker-item (r/adapt-react-class (.-Picker.Item ReactNative)))
-(def status-bar (r/adapt-react-class (.-StatusBar ReactNative)))
+(def image (adapt-react-class (.-Image ReactNative) "image"))
+(def list-view (adapt-react-class (.-ListView ReactNative) "list-view"))
+(def flat-list (adapt-react-class (.-FlatList ReactNative) "flat-list"))
+(def virtualized-list (adapt-react-class (.-VirtualizedList ReactNative) "virtualized-list"))
+(def section-list (adapt-react-class (.-SectionList ReactNative) "section-list"))
+(def refresh-control (adapt-react-class (.-RefreshControl ReactNative) "refresh-control"))
+;; (def map-view (adapt-react-class (.-MapView ReactNative) "map-view"))
+(def modal (adapt-react-class (.-Modal ReactNative) "modal"))
+(def refresh-contol (adapt-react-class (.-RefreshControl ReactNative) "refresh-contol"))
+(def scroll-view (adapt-react-class (.-ScrollView ReactNative) "scroll-view"))
+(def switch (adapt-react-class (.-Switch ReactNative) "switch"))
+(def text (adapt-react-class (.-Text ReactNative) "text"))
+(def text-input (adapt-react-class (.-TextInput ReactNative) "text-input"))
+(def touchable-without-feedback (adapt-react-class (.-TouchableWithoutFeedback ReactNative) "touchable-without-feedback"))
+(def touchable-highlight (adapt-react-class (.-TouchableHighlight ReactNative) "touchable-highlight"))
+(def touchable-native-feedback (adapt-react-class (.-TouchableNativeFeedback ReactNative) "touchable-native-feedback"))
+(def touchable-opacity (adapt-react-class (.-TouchableOpacity ReactNative) "touchable-opacity"))
+(def view (adapt-react-class (.-View ReactNative) "view"))
+(def animated-view (adapt-react-class (.-View (.-Animated ReactNative)) "animated-view"))
+(def web-view (adapt-react-class (.-WebView ReactNative) "web-view"))
+(def activity-indicator (adapt-react-class (.-ActivityIndicator ReactNative) "activity-indicator"))
+(def slider (adapt-react-class (.-Slider ReactNative) "slider"))
+(def picker (adapt-react-class (.-Picker ReactNative) "picker"))
+(def picker-item (adapt-react-class (.-Picker.Item ReactNative) "picker-item"))
+(def status-bar (adapt-react-class (.-StatusBar ReactNative) "status-bar"))
 
 ; apis
 

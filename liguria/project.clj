@@ -10,6 +10,7 @@
                            [com.cognitect/transit-cljs "0.8.239"]
                            [camel-snake-kebab "0.4.0"]
                            [mount "0.1.11"]
+                           [org.clojure/core.async "0.3.443"]
                            [thi.ng/color "1.2.0"]
                            [thi.ng/math "0.2.1"]
                            [natal-shell "0.5.1"]]
