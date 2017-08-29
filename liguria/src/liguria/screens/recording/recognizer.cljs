@@ -13,7 +13,8 @@
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [micro-rn.utils :as utils]
             [clojure.string :as string]
-            [micro-rn.utils :as util])
+            [micro-rn.utils :as util]
+            [liguria.screens.recording.liguria-text :refer [liguria-text]])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
@@ -22,15 +23,17 @@
 (def editor-ref (atom nil))
 
 (defn- map-decorations [values]
-  (->> (map #(case %
+  (->> values
+       flatten
+       (map #(case %
                :invert (st/color "white")
                :s      [st/line-through (st/color "#ccc")]
                :u      st/underline
                :b      st/bold
-               :i      st/italic nil) values)
-
-       (filter #(-> % nil? not)) flatten vec))
-
+               :i      st/italic
+               %))
+       flatten vec
+       (filter (complement nil?))))
 
 (defn create-responder [id]
   (let [long-press-timeout (atom 0)]
@@ -56,38 +59,22 @@
       })))
 
 (defn word [{:keys [id]}]
-  (r/create-class
-   {:component-will-mount   #(dispatch [::model/word-state id :mounted true])
-    :component-will-unmount #(dispatch [::model/word-state id :mounted false])
-    :reagent-render         (fn [{:keys [id text background-gray text-style
-                                         selected searched deleted recorded]}]
-                              (let [text-size       @(subscribe [::model/text-size])
-                                    responder       (create-responder id)
-                                    background-gray (and (not selected) background-gray)
-                                    text-style      (-> text-style (conj
-                                                                    (when selected :invert)
-                                                                    (when deleted :s)) map-decorations)]
-                                [view
-                                 (merge
-                                  {:ref   #(dispatch [::model/word-state id :ref %])}
-                                  (rn-util/->gesture-props responder))
-                                 [view {:style [(st/padding 4 2)
-                                                 (when selected (st/gray 9))
-                                                 (when background-gray (st/gray 1))]}
-                                  [rn/text {:style (conj text-style (st/font-size text-size))} text]]
-                                 (when recorded
-                                  [view {:style [st/box (st/padding 2)
-                                                 (st/background-color "transparent")
-                                                 (st/overflow "hidden")]}
-                                   [rn/text {:number-of-lines 1 :style [(st/width "200%")
-                                                                        (st/margin-top 12) (st/font-size 17) (st/color "skyblue")]}
-                                    (text-decorator/make-spaces 33  "~")]])]))}))
-
-(defn word-empty [text id]
-  (let []
-    (dispatch [::model/word-data id :ref nil])
-    (fn [] [view {:style [(st/padding 4 2)]}
-            [rn/text {:style [(st/font-size @(subscribe [::model/text-size]))]} text]])))
+  (let [responder (create-responder id)]
+    (fn [{:keys [id text background-gray text-style
+                 selected searched deleted recorded]}]
+      (let [text-size  @(subscribe [::model/text-size])
+            text-style (-> text-style (conj
+                                       (when selected [:invert
+                                                       (when recorded (st/color "gold"))])
+                                       (when deleted :s)) map-decorations)]
+        [view
+         (merge
+          {:ref #(dispatch [::model/word-state id :ref %])}
+          (rn-util/->gesture-props responder))
+         [view {:style [(st/padding 4 2)
+                        (when recorded (st/background-color "gold"))
+                        (when selected (st/gray 9))]}
+          [rn/text {:style (conj text-style (st/font-size text-size))} text]]]))))
 
 (defn icon-button [{:keys [icon label focused on-press]}]
   [touchable-opacity {:style [(st/justify-content "center")
@@ -100,14 +87,10 @@
 (defn editor-toolbar []
   [view {:style [(st/width 60)]}
    [rn/scroll-view {:style [(st/flex)]}
-    [icon-button {:icon "question-circle-o" :label "Help" :on-press #()}]
-    [icon-button {:icon "eye-slash" :label "Hide deleted" :on-press #()}]
     [icon-button {:icon "strikethrough" :label "Mark as deleted" :on-press #(dispatch [::model/toggle-deleted])}]
-    [icon-button {:icon "eraser" :label "Erase recording" :on-press #(dispatch [::model/toggle-recorded])}]
-    [icon-button {:icon "undo" :label "Undo" :on-press #()}]
-    [icon-button {:icon "repeat" :label "Redo" :on-press #()}]]])
+    [icon-button {:icon "eraser" :label "Отменить запись" :on-press #(dispatch [::model/toggle-recorded])}]]])
 
-(defn build-search-rx [search-text]
+(defn- build-search-rx [search-text]
   (re-pattern (string/lower-case search-text)))
 
 (defn- filter-paragraphs [paragraphs search-text]
@@ -166,18 +149,16 @@
         search-text        (subscribe [::model/search-text])
         select-in-progress (subscribe [::model/select-in-progress])]
     (println "build text-editor")
-    (dispatch [::model/text-fragment nlp/test-text3])
+    (dispatch [::model/text-fragment liguria-text])
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
-       [view {:style [st/row (st/flex)]}
-        [editor-toolbar]
-        [view {:style [(st/gray 1) (st/width 1)]}]
+       [view {:style [(st/flex)]}
         [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
                        :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                        :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
                        :scroll-enabled            (not @select-in-progress)
                        :remove-clipped-subviews   true
-                       :initial-num-to-render     5
+                       :initial-num-to-render     3
                        :on-viewable-items-changed (fn [data]
                                                     (doseq [[id visible] (->> data .-changed
                                                                               (map (fn [e] [(-> e .-item .-id)
@@ -185,7 +166,8 @@
                                                       (dispatch [::model/paragraph-hidden id (not visible)])))
                        :data                      (map #(select-keys % [:id]) (filter-paragraphs @transcript @search-text))
                        :render-item               #(r/as-element [one-list-line %])
-                       :key-extractor             #(str "paragraph-" (-> % .-id))}]]])))
+                       :key-extractor             #(str "paragraph-" (-> % .-id))}]
+        ]])))
 
 (comment
   (subscribe [::model/word-data 1 :selected])

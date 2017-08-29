@@ -514,7 +514,7 @@
 (reg-sub
  ::text-size
  (fn [db _]
-   (get db ::text-size 16)))
+   (get db ::text-size 18)))
 
 (reg-event-db
  ::text-size

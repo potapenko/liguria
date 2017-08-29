@@ -21,6 +21,6 @@
 
 (def main
   (nav/create-screen
-   {:title "Recording"
+   {:title "Тренировка"
     :tab-bar-icon #(r/as-element [sh/icon-recording (util/prepare-to-clj %)])}
    (screen-content)))
