@@ -80,16 +80,17 @@
       [nm/icon-md {:color (if-not focused "#ccc" #_"#E6532C" "#FB783A") :size 30 :name icon-name}]]]))
 
 (defn one-result [res label]
-  [view {:style [st/align-center (st/flex) st/align-center (st/overflow "hidden")]}
-   [text {:style [(st/font-size 50) (st/margin-top -5) (st/color "cornflowerblue")]} (str res)]
-   [text {:style [(st/color "dimgray") (st/margin-top -5)]} (str label)]])
+  (let [recording @(subscribe [::model/recording])]
+    [view {:style [st/align-center (st/flex) st/align-center (st/overflow "hidden")]}
+     [text {:style [(st/font-size 50) (st/margin-top -5) (st/color (if recording (st/gray-cl 1) "cornflowerblue" ))]} (str res)]
+     [text {:style [(st/color (if recording (st/gray-cl 2) "dimgray" )) (st/margin-top -5)]} (str label)]]))
 
 (defn progress-monitor []
   [view {:style [st/row st/align-center (st/padding 0 0 8 0) (st/background-color "#E9E9EF")]}
    [spacer 8]
    [one-result "20%" "прогресс"]
    [one-result "0.79" "скорость"]
-   [one-result 90 "ошибок"]
+   [one-result 201 "балл"]
    [spacer 8]])
 
 (defn recording-controls []
@@ -117,7 +118,7 @@
             [recording-button "stop" true #(stop-recording)]
             [recording-button "fiber-manual-record" false #(start-recording)])
           [recording-button "play-arrow" (= @mode :playing) toggle-play]
-          [recording-button "search" (= @mode :search) #(dispatch [::model/mode (if (search?) :idle :search)])]])
+          #_[recording-button "search" (= @mode :search) #(dispatch [::model/mode (if (search?) :idle :search)])]])
 
        [progress-monitor]
        [view {:style [(st/gray 1) (st/width 1)]}]
