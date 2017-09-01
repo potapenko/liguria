@@ -5,6 +5,7 @@
 	};
 	objectVersion = 46;
 	objects = {
+
 /* Begin PBXBuildFile section */
 		00C302E51ABCBA2D00DB3ED1 /* libRCTActionSheet.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302AC1ABCB8CE00DB3ED1 /* libRCTActionSheet.a */; };
 		00C302E71ABCBA2D00DB3ED1 /* libRCTGeolocation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 00C302BA1ABCB90400DB3ED1 /* libRCTGeolocation.a */; };
@@ -45,6 +46,9 @@
 		506AEA42F7C74FDCAC34911C /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 9BCB865FB46645ACAF49057C /* SimpleLineIcons.ttf */; };
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		832341BD1AAA6AB300B99B32 /* libRCTText.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 832341B51AAA6A8300B99B32 /* libRCTText.a */; };
+		9DF6B7D81F5939120003B771 /* SFCompactText-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 9DF6B7D71F5939120003B771 /* SFCompactText-Bold.otf */; };
+		9DF6B7DB1F5939CC0003B771 /* SFCompactText-Semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 9DF6B7D91F5939CC0003B771 /* SFCompactText-Semibold.otf */; };
+		9DF6B7DC1F5939CC0003B771 /* SFCompactText-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 9DF6B7DA1F5939CC0003B771 /* SFCompactText-Regular.otf */; };
 		C5E56C1F98704079A8E74CDA /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4243A173DF4E4BA9801C2521 /* Ionicons.ttf */; };
 		E561E0124AF1445B830A98A2 /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 212F4BE76D2B4FDA9A8054AA /* libRNVectorIcons.a */; };
 		FA4E9027C3DC47EA977D0751 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 082F90B8C1E7446BB6F4DC70 /* MaterialCommunityIcons.ttf */; };
@@ -339,6 +343,9 @@
 		832341B01AAA6A8300B99B32 /* RCTText.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTText.xcodeproj; path = "../node_modules/react-native/Libraries/Text/RCTText.xcodeproj"; sourceTree = "<group>"; };
 		96F70A3030034806BE3AF28D /* RNVectorIcons.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNVectorIcons.xcodeproj; path = "../node_modules/react-native-vector-icons/RNVectorIcons.xcodeproj"; sourceTree = "<group>"; };
 		9BCB865FB46645ACAF49057C /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
+		9DF6B7D71F5939120003B771 /* SFCompactText-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFCompactText-Bold.otf"; sourceTree = "<group>"; };
+		9DF6B7D91F5939CC0003B771 /* SFCompactText-Semibold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFCompactText-Semibold.otf"; sourceTree = "<group>"; };
+		9DF6B7DA1F5939CC0003B771 /* SFCompactText-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFCompactText-Regular.otf"; sourceTree = "<group>"; };
 		A06B9410245F4043976584D8 /* RNDeviceInfo.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNDeviceInfo.xcodeproj; path = "../node_modules/react-native-device-info/RNDeviceInfo.xcodeproj"; sourceTree = "<group>"; };
 		A24C59761D6349AF8A255F98 /* libRNSpeechToTextIos.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libRNSpeechToTextIos.a; sourceTree = "<group>"; };
 		F1862115116041B1BC34B5A0 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
@@ -472,6 +479,9 @@
 				40D8E63E7D354FBAAC31EE2E /* Octicons.ttf */,
 				9BCB865FB46645ACAF49057C /* SimpleLineIcons.ttf */,
 				1725D3AF23194AB29256DF83 /* Zocial.ttf */,
+				9DF6B7D71F5939120003B771 /* SFCompactText-Bold.otf */,
+				9DF6B7D91F5939CC0003B771 /* SFCompactText-Semibold.otf */,
+				9DF6B7DA1F5939CC0003B771 /* SFCompactText-Regular.otf */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -1073,12 +1083,15 @@
 				351CD91F09CB455D8F8884DC /* Entypo.ttf in Resources */,
 				3949D24410B847C0AF29A8E8 /* EvilIcons.ttf in Resources */,
 				0DF9FFF87B644BACA935390A /* FontAwesome.ttf in Resources */,
+				9DF6B7DC1F5939CC0003B771 /* SFCompactText-Regular.otf in Resources */,
 				073305D07B8B4DE4827B9E9B /* Foundation.ttf in Resources */,
 				C5E56C1F98704079A8E74CDA /* Ionicons.ttf in Resources */,
 				FA4E9027C3DC47EA977D0751 /* MaterialCommunityIcons.ttf in Resources */,
+				9DF6B7D81F5939120003B771 /* SFCompactText-Bold.otf in Resources */,
 				0D4EA313F3764D638ABC41D9 /* MaterialIcons.ttf in Resources */,
 				19A803B451C2427391434411 /* Octicons.ttf in Resources */,
 				506AEA42F7C74FDCAC34911C /* SimpleLineIcons.ttf in Resources */,
+				9DF6B7DB1F5939CC0003B771 /* SFCompactText-Semibold.otf in Resources */,
 				FAA09229A55F4E6B8F41670B /* Zocial.ttf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1212,9 +1225,7 @@
 				INFOPLIST_FILE = liguriaTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -1239,9 +1250,7 @@
 				INFOPLIST_FILE = liguriaTests/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -1321,9 +1330,7 @@
 				);
 				INFOPLIST_FILE = "liguria-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -1357,9 +1364,7 @@
 				);
 				INFOPLIST_FILE = "liguria-tvOS/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
@@ -1385,9 +1390,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "liguria-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.liguria-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;
@@ -1409,9 +1412,7 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "liguria-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-				);
+				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.liguria-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = appletvos;

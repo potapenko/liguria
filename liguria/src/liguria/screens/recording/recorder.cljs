@@ -79,18 +79,22 @@
      [view {:style {:justify-content "center" :align-items "center"}}
       [nm/icon-md {:color (if-not focused "#ccc" #_"#E6532C" "#FB783A") :size 30 :name icon-name}]]]))
 
-(defn one-result [res label]
-  (let [recording @(subscribe [::model/recording])]
-    [view {:style [st/align-center (st/flex) st/align-center (st/overflow "hidden")]}
-     [text {:style [(st/font-size 50) (st/margin-top -5) (st/color (if recording (st/gray-cl 1) "cornflowerblue" ))]} (str res)]
-     [text {:style [(st/color (if recording (st/gray-cl 2) "dimgray" )) (st/margin-top -5)]} (str label)]]))
+(defn one-result
+  ([res label] (one-result res label "cornflowerblue"))
+  ([res label color]
+   (let [recording @(subscribe [::model/recording])]
+     [view {:style [st/align-center (st/flex) st/align-center (st/overflow "hidden")]}
+      [text {:style [(st/font-size 48) (st/margin-top -5)
+                     (st/color (if recording (st/gray-cl 1) color))]} (str res)]
+      [text {:style [(st/color (if recording (st/gray-cl 2) "dimgray" ))
+                     (st/margin-top -5)]} (str label)]])))
 
 (defn progress-monitor []
   [view {:style [st/row st/align-center (st/padding 0 0 8 0) (st/background-color "#E9E9EF")]}
    [spacer 8]
    [one-result "20%" "прогресс"]
    [one-result "0.79" "скорость"]
-   [one-result 201 "балл"]
+   [one-result 201 "балл" #_"orangered"]
    [spacer 8]])
 
 (defn recording-controls []
