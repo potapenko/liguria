@@ -215,12 +215,11 @@
             (let [id  (:id p)
                   ref (:ref p)]
               (when-let [[paragraph] (<! (utils/await-cb! rn-utils/ref->layout ref))]
-                (let [
-                      top-paragraph    (:page-y paragraph)
+                (let [top-paragraph    (:page-y paragraph)
                       bottom-paragraph (+ top-paragraph (:height paragraph))
                       hidden           (or (> top-paragraph bottom-box)
                                            (< bottom-paragraph top-box))]
-                  (when-not hidden (println "visible:" id))
+                  ;; (when-not hidden (println "visible:" id))
                   (when (not= @(subscribe [::paragraph-data id :hidden]) hidden)
                     (dispatch [::paragraph-data id :hidden hidden]))))))))
       (put! port "end")

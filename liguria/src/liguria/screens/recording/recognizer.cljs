@@ -16,6 +16,7 @@
             [micro-rn.utils :as util]
             [liguria.screens.recording.liguria-text :refer [liguria-text]])
   (:require-macros
+   [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))
 
 ;; react-native-speech-to-text-ios
@@ -60,9 +61,16 @@
                                                 (dispatch [::model/word-long-press id false])))
          })))))
 
+(defn word-text
+  ([text] (word-text text [] []))
+  ([text bg-style text-style]
+   [view {:style (conj bg-style (st/padding 4 2))}
+    [rn/text {:style (conj text-style
+                           (st/font-size @(subscribe [::model/text-size])))}
+     text]]))
+
 (defn word [{:keys [id]}]
-  (let [responder-props (rn-util/->gesture-props (create-responder id))
-        text-size       (subscribe [::model/text-size])]
+  (let [responder-props (rn-util/->gesture-props (create-responder id))]
     (fn [{:keys [id text background-gray text-style
                  selected searched deleted recorded]}]
       (let [text-style (-> text-style (conj
@@ -73,10 +81,11 @@
          (merge
           {:ref #(dispatch [::model/word-state id :ref %])}
           responder-props)
-         [view {:style [(st/padding 4 2)
-                        (when recorded (st/background-color "gold"))
-                        (when selected (st/gray 9))]}
-          [rn/text {:style (conj text-style (st/font-size @text-size))} text]]]))))
+         [word-text
+          text
+          [(when recorded (st/background-color "gold"))
+           (when selected (st/gray 9))]
+          text-style]]))))
 
 (defn icon-button [{:keys [icon label focused on-press]}]
   [touchable-opacity {:style [(st/justify-content "center")
@@ -109,8 +118,14 @@
     (let [rx (re-pattern (build-search-rx search-text))]
       (->> sentences (filter #(->> % :text string/lower-case (re-find rx) nil? not))))))
 
+(defn sentence-hidden [{:keys [words]}]
+  [view {:style [(st/width "100%") (st/margin 6 0) st/row st/wrap]}
+   (doall
+    (for [w words]
+      ^{:key (str "word-empty-" (:id w))} [word-text (:text w)]))])
+
 (defn sentence [{:keys [id p-id]}]
-  (let [mode           (subscribe [::model/mode])]
+  (let [mode (subscribe [::model/mode])]
     (fn [{:keys [words]}]
       [rn/touchable-opacity {:active-opacity 1
                              :on-press       #(dispatch [::model/sentence-click id])
@@ -161,8 +176,6 @@
                               (map #(select-keys % [:id])
                                    (filter-paragraphs transcript search-text))))]
     (go-loop []
-      (<! (utils/await-cb rn/run-after-interactions))
-      (<! (utils/await-cb rn/request-animation-frame))
       (<! (model/update-paragraphs-visible))
       (<! (timeout 1000))
       (recur))
@@ -174,11 +187,32 @@
                        :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
                        :scroll-enabled            (not @select-in-progress)
                        :initial-num-to-render     3
+                       :viewability-config        {
+                                                   ;; :minimum-view-time              1
+                                                   :item-visible-percent-threshold 1
+                                                   :wait-for-interaction           false}
                        :on-viewable-items-changed (fn [data]
-                                                    (doseq [[id visible] (->> data .-changed
-                                                                              (map (fn [e] [(-> e .-item .-id)
-                                                                                            (-> e .-isViewable)])))]
-                                                      (dispatch [::model/paragraph-hidden id (not visible)])))
+                                                    (let [change-log  (->> data .-changed
+                                                                           (map (fn [e] [(-> e .-item .-id)
+                                                                                         (-> e .-isViewable)
+                                                                                         (-> e .-index)])))
+                                                          visible     (filter second change-log)
+                                                          max-visible (apply max-key #(nth % 2) visible)
+                                                          min-visible (apply min-key #(nth % 2) visible)]
+                                                      (doseq [[id visible] change-log]
+                                                        (dispatch [::model/paragraph-hidden id (not visible)]))
+                                                      (println (... max-visible min-visible))
+                                                      (let [index (-> max-visible :index inc)
+                                                            item  (nth @transcript index nil)]
+                                                        (println "inc" (... item))
+                                                        (when-let [item (nth @transcript index nil)]
+                                                          (dispatch [::model/paragraph-hidden (:id item) true])))
+                                                      (let [index (-> min-visible :index dec)
+                                                            item  (nth @transcript index nil)]
+                                                        (println "dec" (... item))
+                                                        (when-let [item (nth @transcript index nil)]
+                                                          (dispatch [::model/paragraph-hidden
+                                                                     (:id (nth @transcript index)) true])))))
                        :data                      (build-data-fn @transcript @search-text)
                        :render-item               #(r/as-element [one-list-line %])
                        :key-extractor             #(str "paragraph-list-" (-> % .-id))}]]])))
