@@ -5,11 +5,11 @@
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
             [reagent.ratom :as ra]
-            [micro-rn.utils :as util]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [liguria.shared.screens-shared-ui :as sh]
             [re-frame.core :refer [subscribe dispatch]]
-            [liguria.screens.recording.model :as model])
+            [liguria.screens.recording.model :as model]
+            [micro-rn.utils :as utils])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
@@ -19,10 +19,10 @@
   ;; -160dB 0dB
   (-> nm/audio-recorder
       (aset "onProgress"
-            #(let [from 38 to 0]
-               (dispatch [::model/monitoring
-                          (-> % .-currentMetering
-                              (+ from) (/ from) (* 100) (max 0))])))))
+            #(let [from 38 to 0
+                   monitoring (-> % .-currentMetering
+                                  (+ from) (/ from) (* 100) (max 0))]
+               (dispatch [::model/monitoring monitoring])))))
 
 (defn stop-recording []
   (dispatch [::model/recording false])
@@ -114,15 +114,14 @@
                                                  (<! (timeout 300))
                                                  (dispatch [::model/mode :idle]))
                             :on-focus         #(dispatch [::model/mode :search])
-                            :on-delete        #(util/lazy-call (fn [] (dispatch [::model/search-text ""])))
-                            :on-change-text   #(util/lazy-call (fn [] (dispatch [::model/search-text %])))}]
+                            :on-delete        #(utils/lazy-call (fn [] (dispatch [::model/search-text ""])))
+                            :on-change-text   #(utils/lazy-call (fn [] (dispatch [::model/search-text %])))}]
           [flexer]]
          [view {:style [(st/height 50) st/row (st/padding 0 4)]}
           (if @in-progress?
             [recording-button "stop" true #(stop-recording)]
             [recording-button "fiber-manual-record" false #(start-recording)])
-          [recording-button "play-arrow" (= @mode :playing) toggle-play]
-          #_[recording-button "search" (= @mode :search) #(dispatch [::model/mode (if (search?) :idle :search)])]])
+          [recording-button "play-arrow" (= @mode :playing) toggle-play]])
 
        [progress-monitor]
        [view {:style [(st/gray 1) (st/width 1)]}]

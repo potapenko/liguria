@@ -4,11 +4,13 @@
 (def test-text "
 ")
 
-
-(def one-dot-mark         "#one#")
-(def one-question-mark    "#question#")
+(def one-dot-mark "#one#")
+(def one-question-mark "#question#")
 (def one-exclamation-mark "#exclamation#")
-(def sentence-separator     "#sentence#")
+(def sentence-separator "#sentence#")
+(def escape_dot "#escape_dot#")
+(def escape_qustion "#escape_question#")
+(def escape_exclamation "#escape_exclamation#")
 
 (defn create-words [s]
   (string/split s #"\s+"))
@@ -24,19 +26,28 @@
 (defn create-sentences [s]
   (-> s
       person-dots
-      (string/replace #"\.\"\s+" (str one-dot-mark "\"" sentence-separator))
-      (string/replace #"!\"\s+" (str one-exclamation-mark "\"" sentence-separator))
-      (string/replace #"\?\"\s+\" " (str one-question-mark "\"" sentence-separator))
-      (string/replace #"\.'\s+" (str one-dot-mark "'" sentence-separator))
-      (string/replace #"!'\s+" (str one-exclamation-mark "'" sentence-separator))
-      (string/replace #"\?'\s+" (str one-question-mark "'" sentence-separator));
-      (string/replace #"\.\s+" (str "." sentence-separator))
-      (string/replace #"!\s+" (str "!" sentence-separator))
-      (string/replace #"\?\s+" (str "?" sentence-separator));
-      (string/replace one-dot-mark ".")
-      (string/replace one-question-mark "?")
-      (string/replace one-exclamation-mark "!")
-      (string/split sentence-separator)))
+      (->
+       (string/replace #"\.\*" escape_dot)
+       (string/replace #"\?\*" escape_qustion)
+       (string/replace #"\!\*" escape_exclamation))
+      (->
+       (string/replace #"\.\"\s+" (str one-dot-mark "\"" sentence-separator))
+       (string/replace #"!\"\s+" (str one-exclamation-mark "\"" sentence-separator))
+       (string/replace #"\?\"\s+\" " (str one-question-mark "\"" sentence-separator))
+       (string/replace #"\.'\s+" (str one-dot-mark "'" sentence-separator))
+       (string/replace #"!'\s+" (str one-exclamation-mark "'" sentence-separator))
+       (string/replace #"\?'\s+" (str one-question-mark "'" sentence-separator));
+       (string/replace #"\.\s+" (str "." sentence-separator))
+       (string/replace #"!\s+" (str "!" sentence-separator))
+       (string/replace #"\?\s+" (str "?" sentence-separator));
+       (string/replace one-dot-mark ".")
+       (string/replace one-question-mark "?")
+       (string/replace one-exclamation-mark "!")
+       (string/split sentence-separator))
+      (->>
+       (map #(string/replace % escape_dot "."))
+       (map #(string/replace % escape_qustion "?"))
+       (map #(string/replace % escape_exclamation "!")))))
 
 (comment
 
