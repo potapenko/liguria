@@ -123,21 +123,26 @@
 
 (defn paragraph [{:keys [id]}]
   (let [sentences   (subscribe [::model/paragraph-data id :sentences])
+        hidden      (subscribe [::model/paragraph-data id :hidden])
+        layout      (subscribe [::model/paragraph-data id :layout])
         search-text (subscribe [::model/search-text])]
     (fn []
-      (println "render p" id)
-      [rn/touchable-opacity {:active-opacity 1
-                             :on-press       #(dispatch [::model/paragraph-click id])
-                             :on-layout      #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
-                             :ref            #(dispatch [::model/paragraph-data id :ref %])}
-       [view {:style [(st/padding 6 12)
-                      (st/border 1 (st/gray-cl 1) "solid")
-                      (st/border-left 0)
-                      (st/border-right 0)
-                      (st/border-top 0)]}
-        (doall
-         (for [s (filter-sentences @sentences @search-text)]
-           ^{:key (str "sentence-" (:id s))} [sentence s]))]])))
+      ;; (println "render p" id)
+      (if (and @hidden @layout)
+        [view {:ref   #(dispatch [::model/paragraph-data id :ref %])
+               :style [(st/width (:width @layout)) (st/height (:height @layout))]}]
+        [rn/touchable-opacity {:active-opacity 1
+                               :on-press       #(dispatch [::model/paragraph-click id])
+                               :on-layout      #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
+                               :ref            #(dispatch [::model/paragraph-data id :ref %])}
+         [view {:style [(st/padding 6 12)
+                        (st/border 1 (st/gray-cl 1) "solid")
+                        (st/border-left 0)
+                        (st/border-right 0)
+                        (st/border-top 0)]}
+          (doall
+           (for [s (filter-sentences @sentences @search-text)]
+             ^{:key (str "sentence-" (:id s))} [sentence s]))]]))))
 
 (defn one-list-line [x]
   (let [id    (-> x .-item .-id)
@@ -155,11 +160,15 @@
                             (fn [transcript search-text]
                               (map #(select-keys % [:id])
                                    (filter-paragraphs transcript search-text))))]
+    (go-loop []
+      (<! (utils/await-cb rn/run-after-interactions))
+      (<! (utils/await-cb rn/request-animation-frame))
+      (<! (model/update-paragraphs-visible))
+      (<! (timeout 1000))
+      (recur))
     (fn []
-      (println "build text-list")
       [view {:style [(st/flex) (st/background "white")]}
        [view {:style [(st/flex)]}
-        ^{:key "recognizer-flat-list"}
         [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
                        :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                        :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
@@ -172,14 +181,13 @@
                                                       (dispatch [::model/paragraph-hidden id (not visible)])))
                        :data                      (build-data-fn @transcript @search-text)
                        :render-item               #(r/as-element [one-list-line %])
-                       :key-extractor             #(str "paragraph-list-" (-> % .-id))}]
-        ]])))
+                       :key-extractor             #(str "paragraph-list-" (-> % .-id))}]]])))
 
 (defn text-editor []
   (let []
     (dispatch [::model/text-fragment liguria-text])
     (fn []
-      ^{:key "text-list"} [text-list])))
+      [text-list])))
 
 (comment
   (subscribe [::model/word-data 1 :selected])

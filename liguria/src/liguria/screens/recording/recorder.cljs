@@ -22,10 +22,7 @@
             #(let [from 38 to 0
                    monitoring (-> % .-currentMetering
                                   (+ from) (/ from) (* 100) (max 0))]
-               (utils/lazy-call
-                (fn []
-                   (println monitoring)
-                   (dispatch [::model/monitoring monitoring])) 100)))))
+               (dispatch [::model/monitoring monitoring])))))
 
 (defn stop-recording []
   (dispatch [::model/recording false])

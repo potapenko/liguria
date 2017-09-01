@@ -203,9 +203,34 @@
             (let [[layout] (<! (utils/await-cb rn-utils/ref->layout (:ref s)))]
               (dispatch [::sentence-data (:id s) :layout layout]))))))))
 
-(comment
-  (update-layouts)
 
+(defn update-paragraphs-visible []
+  (go
+    (let [db   @(subscribe [::db []])
+          port (chan)]
+      (when-let [box (::list-layout db)]
+        (let [top-box    330
+              bottom-box (+ top-box (:height box))]
+          (doseq [p (::transcript db)]
+            (let [id  (:id p)
+                  ref (:ref p)]
+              (when-let [[paragraph] (<! (utils/await-cb! rn-utils/ref->layout ref))]
+                (let [
+                      top-paragraph    (:page-y paragraph)
+                      bottom-paragraph (+ top-paragraph (:height paragraph))
+                      hidden           (or (> top-paragraph bottom-box)
+                                           (< bottom-paragraph top-box))]
+                  (when-not hidden (println "visible:" id))
+                  (when (not= @(subscribe [::paragraph-data id :hidden]) hidden)
+                    (dispatch [::paragraph-data id :hidden hidden]))))))))
+      (put! port "end")
+      port)))
+
+(comment
+
+  (update-paragraphs-visible)
+
+  (update-layouts)
   (count (get-selected-words @(subscribe [::db []])))
   @(subscribe [::sentence-data 17 :text])
   @(subscribe [::scroll-pos])

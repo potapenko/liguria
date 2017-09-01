@@ -190,6 +190,13 @@
     (apply fnc (concat args [(fn [& a] (put! port (or a [])))]))
     port))
 
+(defn await-cb! [fnc & args]
+  (let [port (chan)]
+    (try
+      (apply fnc (concat args [(fn [& a] (put! port (or a [])))]))
+      (catch js/Error e (put! port [])))
+    port))
+
 (defn pmap [f col]
   (let [chans (repeatedly (count col) chan)]
     (doseq [[c e] (map vector chans col)]
