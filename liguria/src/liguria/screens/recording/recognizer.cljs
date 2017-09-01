@@ -35,46 +35,48 @@
        flatten vec
        (filter (complement nil?))))
 
-(defn create-responder [id]
-  (let [long-press-timeout (atom 0)]
-    (rn/pan-responder-create
-     {:on-start-should-set-pan-responder #(not= @(subscribe [::model/mode]) :search)
-      :on-pan-responder-grant            (fn [e g] (reset! long-press-timeout
-                                                           (utils/set-timeout
-                                                            #(dispatch [::model/word-long-press id true]) 600))
-                                           (dispatch [::model/word-click id (rn-util/->getsture-state g)]))
-      :on-pan-responder-move             (fn [e g]
-                                           (utils/clear-timeout @long-press-timeout)
-                                           (when @(subscribe [::model/long-press])
-                                             (dispatch [::model/select-progress id (rn-util/->getsture-state g)])))
-      :on-pan-responder-release          (fn [e g]
-                                           (utils/clear-timeout @long-press-timeout)
-                                           (dispatch [::model/word-release id (rn-util/->getsture-state g)])
-                                           (when @(subscribe [::model/long-press])
-                                            (dispatch [::model/word-long-press id false])))
-      :on-pan-responder-terminate        (fn []
-                                           (utils/clear-timeout @long-press-timeout)
-                                           (when @(subscribe [::model/long-press])
-                                            (dispatch [::model/word-long-press id false])))
-      })))
+(def create-responder
+  (memoize
+   (fn [id]
+     (let [long-press-timeout (atom 0)]
+       (rn/pan-responder-create
+        {:on-start-should-set-pan-responder #(not= @(subscribe [::model/mode]) :search)
+         :on-pan-responder-grant            (fn [e g] (reset! long-press-timeout
+                                                              (utils/set-timeout
+                                                               #(dispatch [::model/word-long-press id true]) 600))
+                                              (dispatch [::model/word-click id (rn-util/->getsture-state g)]))
+         :on-pan-responder-move             (fn [e g]
+                                              (utils/clear-timeout @long-press-timeout)
+                                              (when @(subscribe [::model/long-press])
+                                                (dispatch [::model/select-progress id (rn-util/->getsture-state g)])))
+         :on-pan-responder-release          (fn [e g]
+                                              (utils/clear-timeout @long-press-timeout)
+                                              (dispatch [::model/word-release id (rn-util/->getsture-state g)])
+                                              (when @(subscribe [::model/long-press])
+                                                (dispatch [::model/word-long-press id false])))
+         :on-pan-responder-terminate        (fn []
+                                              (utils/clear-timeout @long-press-timeout)
+                                              (when @(subscribe [::model/long-press])
+                                                (dispatch [::model/word-long-press id false])))
+         })))))
 
 (defn word [{:keys [id]}]
-  (let [responder (create-responder id)]
+  (let [responder-props (rn-util/->gesture-props (create-responder id))
+        text-size       (subscribe [::model/text-size])]
     (fn [{:keys [id text background-gray text-style
                  selected searched deleted recorded]}]
-      (let [text-size  @(subscribe [::model/text-size])
-            text-style (-> text-style (conj
+      (let [text-style (-> text-style (conj
                                        (when selected [:invert
                                                        (when recorded (st/color "gold"))])
                                        (when deleted :s)) map-decorations)]
         [view
          (merge
           {:ref #(dispatch [::model/word-state id :ref %])}
-          (rn-util/->gesture-props responder))
+          responder-props)
          [view {:style [(st/padding 4 2)
                         (when recorded (st/background-color "gold"))
                         (when selected (st/gray 9))]}
-          [rn/text {:style (conj text-style (st/font-size text-size))} text]]]))))
+          [rn/text {:style (conj text-style (st/font-size @text-size))} text]]]))))
 
 (defn icon-button [{:keys [icon label focused on-press]}]
   [touchable-opacity {:style [(st/justify-content "center")
@@ -108,7 +110,7 @@
       (->> sentences (filter #(->> % :text string/lower-case (re-find rx) nil? not))))))
 
 (defn sentence [{:keys [id p-id]}]
-  (let [mode    (subscribe [::model/mode])]
+  (let [mode           (subscribe [::model/mode])]
     (fn [{:keys [words]}]
       [rn/touchable-opacity {:active-opacity 1
                              :on-press       #(dispatch [::model/sentence-click id])
@@ -123,6 +125,7 @@
   (let [sentences   (subscribe [::model/paragraph-data id :sentences])
         search-text (subscribe [::model/search-text])]
     (fn []
+      (println "render p" id)
       [rn/touchable-opacity {:active-opacity 1
                              :on-press       #(dispatch [::model/paragraph-click id])
                              :on-layout      #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
@@ -140,34 +143,43 @@
   (let [id    (-> x .-item .-id)
         index (-> x .-index)]
     (fn []
-      [paragraph {:id id}])))
+      ^{:key (str "paragraph-" id)} [paragraph {:id id}])))
 
-(defn text-editor []
+(defn text-list []
+  (println "build text-list component")
   (let [transcript         (subscribe [::model/transcript])
         mode               (subscribe [::model/mode])
-        select-in-progress (subscribe [::model/select-in-progress])
         search-text        (subscribe [::model/search-text])
-        select-in-progress (subscribe [::model/select-in-progress])]
-    (println "build text-editor")
-    (dispatch [::model/text-fragment liguria-text])
+        select-in-progress (subscribe [::model/select-in-progress])
+        build-data-fn      (memoize
+                            (fn [transcript search-text]
+                              (map #(select-keys % [:id])
+                                   (filter-paragraphs transcript search-text))))]
     (fn []
+      (println "build text-list")
       [view {:style [(st/flex) (st/background "white")]}
        [view {:style [(st/flex)]}
+        ^{:key "recognizer-flat-list"}
         [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
                        :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                        :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
                        :scroll-enabled            (not @select-in-progress)
-                       :remove-clipped-subviews   true
                        :initial-num-to-render     3
                        :on-viewable-items-changed (fn [data]
                                                     (doseq [[id visible] (->> data .-changed
                                                                               (map (fn [e] [(-> e .-item .-id)
                                                                                             (-> e .-isViewable)])))]
                                                       (dispatch [::model/paragraph-hidden id (not visible)])))
-                       :data                      (map #(select-keys % [:id]) (filter-paragraphs @transcript @search-text))
+                       :data                      (build-data-fn @transcript @search-text)
                        :render-item               #(r/as-element [one-list-line %])
-                       :key-extractor             #(str "paragraph-" (-> % .-id))}]
+                       :key-extractor             #(str "paragraph-list-" (-> % .-id))}]
         ]])))
+
+(defn text-editor []
+  (let []
+    (dispatch [::model/text-fragment liguria-text])
+    (fn []
+      ^{:key "text-list"} [text-list])))
 
 (comment
   (subscribe [::model/word-data 1 :selected])

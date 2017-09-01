@@ -22,7 +22,10 @@
             #(let [from 38 to 0
                    monitoring (-> % .-currentMetering
                                   (+ from) (/ from) (* 100) (max 0))]
-               (dispatch [::model/monitoring monitoring])))))
+               (utils/lazy-call
+                (fn []
+                   (println monitoring)
+                   (dispatch [::model/monitoring monitoring])) 100)))))
 
 (defn stop-recording []
   (dispatch [::model/recording false])
@@ -63,8 +66,7 @@
       [view {:style [(st/padding 0 0) (st/background "#aaa")]}
        [monitor-line]
        [spacer 4]
-       [monitor-line]
-       #_[view [text @monitor-value]]])))
+       [monitor-line]])))
 
 (defn recording-button [icon-name focused on-press]
   (let [d (- 60 (* 2 8))]
