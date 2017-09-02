@@ -21,11 +21,12 @@
   ;; -160dB 0dB
   (-> nm/audio-recorder
       (aset "onProgress"
-            #(let [from 38 to 0
+            #(let [from 28 to -5
                    monitoring (-> % .-currentMetering
                                   (+ from) (/ from) (* 100) (max 0))
                    set-width (some-> @monitor-lines-ref .-setWidth)]
-               (set-width monitoring)))))
+               (when set-width
+                 (set-width monitoring))))))
 
 (defn stop-recording []
   (dispatch [::model/recording false])
