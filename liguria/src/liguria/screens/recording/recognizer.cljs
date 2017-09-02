@@ -71,21 +71,19 @@
 
 (defn word [{:keys [id]}]
   (let [responder-props (rn-util/->gesture-props (create-responder id))]
-    (fn [{:keys [id text background-gray text-style
-                 selected searched deleted recorded]}]
-      (let [text-style (-> text-style (conj
-                                       (when selected [:invert
-                                                       (when recorded (st/color "gold"))])
-                                       (when deleted :s)) map-decorations)]
+    (fn word-render [{:keys [id text background-gray text-style
+                             selected searched deleted recorded]}]
+      (let [text-style    (-> text-style (conj
+                                          (when selected [:invert
+                                                          (when recorded (st/color "gold"))])
+                                          (when deleted :s)) map-decorations)
+            text-bg-style [(when recorded (st/background-color "gold"))
+                           (when selected (st/gray 9))]]
         [view
          (merge
           {:ref #(dispatch [::model/word-state id :ref %])}
           responder-props)
-         [word-text
-          text
-          [(when recorded (st/background-color "gold"))
-           (when selected (st/gray 9))]
-          text-style]]))))
+         [word-text text text-bg-style text-style]]))))
 
 (defn icon-button [{:keys [icon label focused on-press]}]
   [touchable-opacity {:style [(st/justify-content "center")
@@ -118,15 +116,9 @@
     (let [rx (re-pattern (build-search-rx search-text))]
       (->> sentences (filter #(->> % :text string/lower-case (re-find rx) nil? not))))))
 
-(defn sentence-hidden [{:keys [words]}]
-  [view {:style [(st/width "100%") (st/margin 6 0) st/row st/wrap]}
-   (doall
-    (for [w words]
-      ^{:key (str "word-empty-" (:id w))} [word-text (:text w)]))])
-
 (defn sentence [{:keys [id p-id]}]
   (let [mode (subscribe [::model/mode])]
-    (fn [{:keys [words]}]
+    (fn sentence-render [{:keys [words]}]
       [rn/touchable-opacity {:active-opacity 1
                              :on-press       #(dispatch [::model/sentence-click id])
                              :ref            #(dispatch [::model/sentence-data id :ref %])
@@ -141,9 +133,9 @@
         hidden      (subscribe [::model/paragraph-data id :hidden])
         layout      (subscribe [::model/paragraph-data id :layout])
         search-text (subscribe [::model/search-text])]
-    (fn []
+    (fn paragraph-render []
       ;; (println "render p" id)
-      (if (and @hidden @layout)
+      (if (and false @hidden @layout)
         [view {:ref   #(dispatch [::model/paragraph-data id :ref %])
                :style [(st/width (:width @layout)) (st/height (:height @layout))]}]
         [rn/touchable-opacity {:active-opacity 1
@@ -179,7 +171,7 @@
       (<! (model/update-paragraphs-visible))
       (<! (timeout 1000))
       (recur))
-    (fn []
+    (fn text-list-render []
       [view {:style [(st/flex) (st/background "white")]}
        [view {:style [(st/flex)]}
         [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])

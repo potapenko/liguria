@@ -43,7 +43,7 @@
                          [view {:style [(st/width "85%") (st/background "green")]}]
                          [view {:style [(st/width "10%") (st/background "yellow")]}]
                          [view {:style [(st/width "5%") (st/background "red")]}]])]
-    (fn []
+    (fn monitor-line-render []
       [view {:on-layout (fn [e] (let [w (-> e .-nativeEvent .-layout .-width)]
                                   (reset! top-w w)))
              :style     [(st/gray 1)]}
@@ -59,7 +59,7 @@
 (defn monitor []
   (let [monitor-value (subscribe [::model/monitoring])
         in-progress?  (subscribe [::model/recording])]
-    (fn []
+    (fn monitor-render []
       [view {:style [(st/padding 0 0) (st/background "#aaa")]}
        [monitor-line]
        [spacer 4]
@@ -101,7 +101,7 @@
         mode         (subscribe [::model/mode])
         search?      #(= @mode :search)
         input-ref    (atom nil)]
-    (fn []
+    (fn recording-controls-render []
       [view
 
        (if (search?)
