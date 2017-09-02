@@ -15,4 +15,4 @@
 (defn init []
   ;; (rn-utils/disable-overwriting-warnings)
   (dispatch-sync [:initialize-db])
-  (.registerComponent c/AppRegistry "Liguria" #(r/reactify-component app-root)))
+  (.registerComponent c/AppRegistry "liguria" #(r/reactify-component app-root)))

@@ -18,6 +18,8 @@
 
 (def search-input (-> (js/require "react-native-search-input") .-SearchInput (rn/adapt-react-class "search-input")))
 
+(def monitor-line (rn/adapt-react-class (.-Monitor modules) "Monitor"))
+
 (comment
   (js/Object.keys modules))
 

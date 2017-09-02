@@ -18,3 +18,7 @@ export const TabIcon = (name) => (
 
 import AudioRecorderLinks from './recording.js';
 export const { AudioRecorder, audioPath } = AudioRecorderLinks;
+
+import MonitorLink from './MonitorLine.js'
+export const Monitor = MonitorLink;
+

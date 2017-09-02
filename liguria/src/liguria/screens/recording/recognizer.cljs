@@ -71,14 +71,14 @@
 
 (defn word [{:keys [id]}]
   (let [responder-props (rn-util/->gesture-props (create-responder id))]
-    (fn word-render [{:keys [id text background-gray text-style
-                             selected searched deleted recorded]}]
-      (let [text-style    (-> text-style (conj
-                                          (when selected [:invert
-                                                          (when recorded (st/color "gold"))])
-                                          (when deleted :s)) map-decorations)
+    (fn [{:keys [id text background-gray text-style
+                 selected searched deleted recorded]}]
+      (let [text-style (-> text-style (conj
+                                       (when selected [:invert
+                                                       (when recorded (st/color "gold"))])
+                                       (when deleted :s)) map-decorations)
             text-bg-style [(when recorded (st/background-color "gold"))
-                           (when selected (st/gray 9))]]
+                      (when selected (st/gray 9))]]
         [view
          (merge
           {:ref #(dispatch [::model/word-state id :ref %])}
@@ -118,7 +118,7 @@
 
 (defn sentence [{:keys [id p-id]}]
   (let [mode (subscribe [::model/mode])]
-    (fn sentence-render [{:keys [words]}]
+    (fn [{:keys [words]}]
       [rn/touchable-opacity {:active-opacity 1
                              :on-press       #(dispatch [::model/sentence-click id])
                              :ref            #(dispatch [::model/sentence-data id :ref %])
@@ -133,7 +133,7 @@
         hidden      (subscribe [::model/paragraph-data id :hidden])
         layout      (subscribe [::model/paragraph-data id :layout])
         search-text (subscribe [::model/search-text])]
-    (fn paragraph-render []
+    (fn []
       ;; (println "render p" id)
       (if (and false @hidden @layout)
         [view {:ref   #(dispatch [::model/paragraph-data id :ref %])
@@ -171,12 +171,14 @@
       (<! (model/update-paragraphs-visible))
       (<! (timeout 1000))
       (recur))
-    (fn text-list-render []
+    (fn []
       [view {:style [(st/flex) (st/background "white")]}
        [view {:style [(st/flex)]}
-        [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
-                       :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
-                       :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
+        [nm/monitor-line]
+        #_[rn/flat-list {
+                       ;; :ref                       #(dispatch [::model/list-ref %])
+                       ;; :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
+                       ;; :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
                        :scroll-enabled            (not @select-in-progress)
                        :initial-num-to-render     3
                        :viewability-config        {
@@ -189,22 +191,11 @@
                                                                                          (-> e .-isViewable)
                                                                                          (-> e .-index)])))
                                                           visible     (filter second change-log)
+                                                          not-visible (filter (complement second) change-log)
                                                           max-visible (apply max-key #(nth % 2) visible)
                                                           min-visible (apply min-key #(nth % 2) visible)]
                                                       (doseq [[id visible] change-log]
-                                                        (dispatch [::model/paragraph-hidden id (not visible)]))
-                                                      (println (... max-visible min-visible))
-                                                      (let [index (-> max-visible :index inc)
-                                                            item  (nth @transcript index nil)]
-                                                        (println "inc" (... item))
-                                                        (when-let [item (nth @transcript index nil)]
-                                                          (dispatch [::model/paragraph-hidden (:id item) true])))
-                                                      (let [index (-> min-visible :index dec)
-                                                            item  (nth @transcript index nil)]
-                                                        (println "dec" (... item))
-                                                        (when-let [item (nth @transcript index nil)]
-                                                          (dispatch [::model/paragraph-hidden
-                                                                     (:id (nth @transcript index)) true])))))
+                                                        (dispatch [::model/paragraph-hidden id (not visible)]))))
                        :data                      (build-data-fn @transcript @search-text)
                        :render-item               #(r/as-element [one-list-line %])
                        :key-extractor             #(str "paragraph-list-" (-> % .-id))}]]])))
