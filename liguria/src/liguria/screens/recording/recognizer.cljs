@@ -174,7 +174,7 @@
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
        [view {:style [(st/flex)]}
-        #_[rn/flat-list {
+        [rn/flat-list {
                        ;; :ref                       #(dispatch [::model/list-ref %])
                        ;; :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                        ;; :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])

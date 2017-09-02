@@ -24,7 +24,7 @@ import {StyleSheet, Text, TextInput, View, Image, Alert} from 'react-native';
  *           [line-bg 1]]
  *          [view {:style [(st/height 14)]}])])))*/
 
-const linestyle = {height:6, marginTop: 6, marginBottom: 6, overflow: 'hidden'}
+const linestyle = {height:6, marginTop: 4, marginBottom: 4, overflow: 'hidden'}
 
 const Background = ({width, opacity}) => {return (
   <View style={{flexDirection:'row', width: width, opacity: opacity, top: 0,
