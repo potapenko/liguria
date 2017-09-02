@@ -13,7 +13,7 @@
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
-(def monitor-lines-refs (atom {}))
+(def monitor-lines-ref (atom {}))
 
 (defn start-recording []
   (dispatch [::model/recording true])
@@ -23,50 +23,23 @@
       (aset "onProgress"
             #(let [from 38 to 0
                    monitoring (-> % .-currentMetering
-                                  (+ from) (/ from) (* 100) (max 0))]
-               (dispatch [::model/monitoring monitoring])))))
+                                  (+ from) (/ from) (* 100) (max 0))
+                   set-width (some-> @monitor-lines-ref .-setWidth)]
+               (set-width monitoring)))))
 
 (defn stop-recording []
   (dispatch [::model/recording false])
   (-> nm/audio-recorder .stopRecording))
-
 
 (defn toggle-play []
   (if (= @(subscribe [::model/mode]) :playing)
     (dispatch [::model/mode :idle])
     (dispatch [::model/mode :playing])))
 
-(defn monitor-line [id]
-  (let [monitor-value (subscribe [::model/monitoring])
-        in-progress? (subscribe [::model/recording])
-        top-w        (atom 0)
-        line-bg      (fn [o]
-                       [view {:style [st/box st/row (st/opacity o) (st/width @top-w)]}
-                        [view {:style [(st/width "85%") (st/background "green")]}]
-                        [view {:style [(st/width "10%") (st/background "yellow")]}]
-                        [view {:style [(st/width "5%") (st/background "red")]}]])]
-    (fn []
-      [view {:on-layout (fn [e] (let [w (-> e .-nativeEvent .-layout .-width)]
-                                  (reset! top-w w)))
-             :style     [(st/gray 1)]}
-       [line-bg 0.1]
-       (if @in-progress?
-         [view {:ref   #(swap! monitor-lines-refs assoc id %)
-                :style [(st/height 6)
-                        (st/margin 4 0)
-                        (st/width @monitor-value)
-                        (st/overflow "hidden")]}
-          [line-bg 1]]
-         [view {:style [(st/height 14)]}])])))
-
 (defn monitor []
-  (let [monitor-value (subscribe [::model/monitoring])
-        in-progress?  (subscribe [::model/recording])]
+  (let [in-progress?  (subscribe [::model/recording])]
     (fn []
-      [view {:style [(st/padding 0 0) (st/background "#aaa")]}
-       [monitor-line 1]
-       [spacer 4]
-       [monitor-line 2]])))
+      [nm/monitor-line {:in-progress @in-progress? :ref #(reset! monitor-lines-ref %) }])))
 
 (defn recording-button [icon-name focused on-press]
   (let [d (- 60 (* 2 8))]

@@ -174,7 +174,6 @@
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
        [view {:style [(st/flex)]}
-        [nm/monitor-line]
         #_[rn/flat-list {
                        ;; :ref                       #(dispatch [::model/list-ref %])
                        ;; :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
