@@ -173,35 +173,34 @@
       (recur))
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
-       [view {:style [(st/flex)]}
-        [rn/flat-list {
-                       ;; :ref                       #(dispatch [::model/list-ref %])
-                       ;; :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
-                       ;; :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
-                       :scroll-enabled            (not @select-in-progress)
-                       :initial-num-to-render     3
-                       :viewability-config        {
-                                                   ;; :minimum-view-time              1
-                                                   :item-visible-percent-threshold 1
-                                                   :wait-for-interaction           false}
-                       :on-viewable-items-changed (fn [data]
-                                                    (let [change-log  (->> data .-changed
-                                                                           (map (fn [e] [(-> e .-item .-id)
-                                                                                         (-> e .-isViewable)
-                                                                                         (-> e .-index)])))
-                                                          visible     (filter second change-log)
-                                                          not-visible (filter (complement second) change-log)
-                                                          max-visible (apply max-key #(nth % 2) visible)
-                                                          min-visible (apply min-key #(nth % 2) visible)]
-                                                      (doseq [[id visible] change-log]
-                                                        (dispatch [::model/paragraph-hidden id (not visible)]))))
-                       :data                      (build-data-fn @transcript @search-text)
-                       :render-item               #(r/as-element [one-list-line %])
-                       :key-extractor             #(str "paragraph-list-" (-> % .-id))}]]])))
+       [rn/flat-list {
+                      :ref                       #(dispatch [::model/list-ref %])
+                      :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
+                      :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
+                      :scroll-enabled            (not @select-in-progress)
+                      :initial-num-to-render     3
+                      :viewability-config        {
+                                                  ;; :minimum-view-time              1
+                                                  :item-visible-percent-threshold 1
+                                                  :wait-for-interaction           false}
+                      :on-viewable-items-changed (fn [data]
+                                                   (let [change-log  (->> data .-changed
+                                                                          (map (fn [e] [(-> e .-item .-id)
+                                                                                        (-> e .-isViewable)
+                                                                                        (-> e .-index)])))
+                                                         visible     (filter second change-log)
+                                                         not-visible (filter (complement second) change-log)
+                                                         max-visible (apply max-key #(nth % 2) visible)
+                                                         min-visible (apply min-key #(nth % 2) visible)]
+                                                     (doseq [[id visible] change-log]
+                                                       (dispatch [::model/paragraph-hidden id (not visible)]))))
+                      :data                      (build-data-fn @transcript @search-text)
+                      :render-item               #(r/as-element [one-list-line %])
+                      :key-extractor             #(str "paragraph-list-" (-> % .-id))}]])))
 
 (defn text-editor []
   (let []
-    (dispatch [::model/text-fragment liguria-text])
+    ;; (dispatch [::model/text-fragment liguria-text])
     (fn []
       [text-list])))
 

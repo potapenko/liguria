@@ -4,14 +4,13 @@
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
             [micro-rn.utils :as util]
-            [liguria.shared.screens-shared-ui :as sh]))
+            [liguria.shared.screens-shared-ui :as sh]
+            [liguria.screens.results.resulsts-list :refer [results-list]]))
 
 (defn- screen-content []
   (fn []
-    [view {:style {:flex            1
-                   :justify-content "center"
-                   :align-items     "center"}}
-     [text "Content"]]))
+    [view {:style {:flex 1}}
+     [results-list]]))
 
 (def main
   (nav/create-screen
