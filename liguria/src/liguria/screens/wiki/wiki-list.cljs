@@ -1,8 +1,9 @@
-(ns liguria.screens.results.resulsts-list
+(ns liguria.screens.wiki.resulsts-list
   (:require [liguria.shared.native-modules :as nm]
             [micro-rn.react-native :as rn :refer [alert text text-input view spacer flexer touchable-opacity]]
             [micro-rn.styles :as st]
             [micro-rn.react-navigation :as nav]
+            [micro-rn.text-decorator :as text-decorator]
             [reagent.core :as r :refer [atom]]
             [micro-rn.rn-utils :as rn-util]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
@@ -15,17 +16,17 @@
    [cljs.core.async.macros :refer [go go-loop]]))
 
 (defn result [{:keys [id]}]
-  [view [text "one result"]])
+  [view [text "one element"]])
 
 (defn one-list-line [x]
   (let [id    (-> x .-item .-id)
         index (-> x .-index)]
     (fn []
-      ^{:key (str "results-" id)} [result {:id id}])))
+      ^{:key (str "wiki-" id)} [result {:id id}])))
 
-(defn results-list []
+(defn wiki-list []
   [view {:style [(st/flex) (st/background "white")]}
    [rn/flat-list {
                   :data          []
                   :render-item   #(r/as-element [one-list-line %])
-                  :key-extractor #(str "results-list-" (-> % .-id))}]])
+                  :key-extractor #(str "wiki-list-" (-> % .-id))}]])

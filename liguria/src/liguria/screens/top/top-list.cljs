@@ -1,4 +1,4 @@
-(ns liguria.screens.results.resulsts-list
+(ns liguria.screens.top.resulsts-list
   (:require [liguria.shared.native-modules :as nm]
             [micro-rn.react-native :as rn :refer [alert text text-input view spacer flexer touchable-opacity]]
             [micro-rn.styles :as st]
@@ -15,17 +15,16 @@
    [cljs.core.async.macros :refer [go go-loop]]))
 
 (defn result [{:keys [id]}]
-  [view [text "one result"]])
+  [view [text "one element"]])
 
 (defn one-list-line [x]
   (let [id    (-> x .-item .-id)
         index (-> x .-index)]
     (fn []
-      ^{:key (str "results-" id)} [result {:id id}])))
+      ^{:key (str "top-" id)} [result {:id id}])))
 
-(defn results-list []
+(defn top-list []
   [view {:style [(st/flex) (st/background "white")]}
-   [rn/flat-list {
-                  :data          []
+   [rn/flat-list {:data          []
                   :render-item   #(r/as-element [one-list-line %])
-                  :key-extractor #(str "results-list-" (-> % .-id))}]])
+                  :key-extractor #(str "top-list-" (-> % .-id))}]])

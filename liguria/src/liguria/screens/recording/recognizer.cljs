@@ -200,7 +200,7 @@
 
 (defn text-editor []
   (let []
-    ;; (dispatch [::model/text-fragment liguria-text])
+    (dispatch [::model/text-fragment liguria-text])
     (fn []
       [text-list])))
 
