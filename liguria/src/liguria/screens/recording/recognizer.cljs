@@ -13,13 +13,10 @@
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [micro-rn.utils :as utils]
             [clojure.string :as string]
-            [micro-rn.utils :as util]
-            [liguria.screens.recording.liguria-text :refer [liguria-text]])
+            [micro-rn.utils :as util])
   (:require-macros
    [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))
-
-;; react-native-speech-to-text-ios
 
 (def editor-ref (atom nil))
 
@@ -200,7 +197,6 @@
 
 (defn text-editor []
   (let []
-    (dispatch [::model/text-fragment liguria-text])
     (fn []
       [text-list])))
 

@@ -8,3 +8,24 @@
             [cljs.core.async :as async :refer [<! >! put! chan timeout]])
   (:require-macros [micro-rn.macros :refer [...]]
                    [cljs.core.async.macros :refer [go go-loop]]))
+
+(reg-sub
+ ::results-list
+ (fn [db _]
+   (get db ::results-list [])))
+
+(reg-event-db
+ ::results-list
+ (fn [db [_ value]]
+   (assoc db ::results-list value)))
+
+(comment
+  (reg-sub
+   ::data
+   (fn [db _]
+     (get db ::data 0)))
+
+  (reg-event-db
+   ::data
+   (fn [db [_ value]]
+     (assoc db ::data value))))

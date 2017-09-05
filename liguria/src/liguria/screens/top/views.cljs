@@ -4,9 +4,15 @@
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
             [micro-rn.utils :as util]
-            [liguria.shared.screens-shared-ui :as sh]))
+            [liguria.shared.screens-shared-ui :as sh]
+            [re-frame.core :refer [dispatch subscribe]]
+            [liguria.screens.top.model :as model]))
+
+(defn build-test-data []
+  [])
 
 (defn- screen-content []
+  (dispatch [::model/top-list (build-test-data)])
   (fn []
     [view {:style {:flex            1
                    :justify-content "center"
