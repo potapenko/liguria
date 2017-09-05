@@ -5,19 +5,20 @@
             [reagent.core :as r :refer [atom]]
             [micro-rn.utils :as util]
             [liguria.shared.screens-shared-ui :as sh]
+            [liguria.screens.top.top-list :refer [top-list]]
             [re-frame.core :refer [dispatch subscribe]]
             [liguria.screens.top.model :as model]))
 
 (defn build-test-data []
-  [])
+  (->> (range 1 10)
+       (map #(do {:id   %
+                  :date (str "10-12-2017 10:" %)
+                  :text "hello"}))))
 
 (defn- screen-content []
   (dispatch [::model/top-list (build-test-data)])
   (fn []
-    [view {:style {:flex            1
-                   :justify-content "center"
-                   :align-items     "center"}}
-     [text "Content"]]))
+    [top-list]))
 
 (def main
   (nav/create-screen

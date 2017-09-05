@@ -12,8 +12,7 @@
             [liguria.screens.recording.nlp :as nlp]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [micro-rn.utils :as utils]
-            [clojure.string :as string]
-            [micro-rn.utils :as util])
+            [clojure.string :as string])
   (:require-macros
    [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))

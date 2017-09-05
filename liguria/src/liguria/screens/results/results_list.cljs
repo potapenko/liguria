@@ -1,32 +1,38 @@
-(ns liguria.screens.wiki.resulsts-list
+(ns liguria.screens.results.results-list
   (:require [liguria.shared.native-modules :as nm]
             [micro-rn.react-native :as rn :refer [alert text text-input view spacer flexer touchable-opacity]]
             [micro-rn.styles :as st]
             [micro-rn.react-navigation :as nav]
-            [micro-rn.text-decorator :as text-decorator]
             [reagent.core :as r :refer [atom]]
             [micro-rn.rn-utils :as rn-util]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [micro-rn.utils :as utils]
             [clojure.string :as string]
-            [micro-rn.utils :as util])
+            [micro-rn.utils :as util]
+            [liguria.screens.results.model :as model])
   (:require-macros
    [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))
 
-(defn result [{:keys [id]}]
-  [view [text "one element"]])
+(defn result [{:keys [id date statistic]}]
+  [view {:style [st/row
+                 (st/padding 8)
+                 (st/background "#ccc")
+
+
+                 ]} [text "one result"]])
 
 (defn one-list-line [x]
-  (let [id    (-> x .-item .-id)
-        index (-> x .-index)]
+  (let [id      (-> x .-item .-id)
+        index   (-> x .-index)
+        results (subscribe [::model/results-list])]
     (fn []
-      ^{:key (str "wiki-" id)} [result {:id id}])))
+      ^{:key (str "results-" id)} [result (nth @results index)])))
 
-(defn wiki-list []
+(defn results-list []
   [view {:style [(st/flex) (st/background "white")]}
    [rn/flat-list {
-                  :data          []
+                  :data          @(subscribe [::model/results-list])
                   :render-item   #(r/as-element [one-list-line %])
-                  :key-extractor #(str "wiki-list-" (-> % .-id))}]])
+                  :key-extractor #(str "results-list-" (-> % .-id))}]])
