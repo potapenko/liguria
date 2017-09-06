@@ -12,7 +12,8 @@
             [liguria.screens.recording.nlp :as nlp]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [micro-rn.utils :as utils]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            [liguria.screens.recording.liguria-text :refer [liguria-text]])
   (:require-macros
    [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))
@@ -54,8 +55,7 @@
          :on-pan-responder-terminate        (fn []
                                               (utils/clear-timeout @long-press-timeout)
                                               (when @(subscribe [::model/long-press])
-                                                (dispatch [::model/word-long-press id false])))
-         })))))
+                                                (dispatch [::model/word-long-press id false])))})))))
 
 (defn word-text
   ([text] (word-text text [] []))
@@ -74,7 +74,7 @@
                                                        (when recorded (st/color "gold"))])
                                        (when deleted :s)) map-decorations)
             text-bg-style [(when recorded (st/background-color "gold"))
-                      (when selected (st/gray 9))]]
+                           (when selected (st/gray 9))]]
         [view
          (merge
           {:ref #(dispatch [::model/word-state id :ref %])}
@@ -155,6 +155,7 @@
 
 (defn text-list []
   (println "build text-list component")
+  ;; (dispatch [::model/text-fragment liguria-text])
   (let [transcript         (subscribe [::model/transcript])
         mode               (subscribe [::model/mode])
         search-text        (subscribe [::model/search-text])
@@ -169,14 +170,12 @@
       (recur))
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
-       [rn/flat-list {
-                      :ref                       #(dispatch [::model/list-ref %])
+       [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
                       :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                       :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
                       :scroll-enabled            (not @select-in-progress)
                       :initial-num-to-render     3
-                      :viewability-config        {
-                                                  ;; :minimum-view-time              1
+                      :viewability-config        {;; :minimum-view-time              1
                                                   :item-visible-percent-threshold 1
                                                   :wait-for-interaction           false}
                       :on-viewable-items-changed (fn [data]

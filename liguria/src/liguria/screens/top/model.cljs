@@ -11,9 +11,13 @@
 
 (defn build-test-data []
   (->> (range 1 10)
-       (map #(do {:id   %
-                  :date (str "10-12-2017 10:" %)
-                  :text "hello"}))))
+       (map #(do {:name   (rand-nth ["Евгений Потапенко" "Василий Бовкин" "Елена Новицкая"])
+                  :result (+ 1000 (rand-int 100))
+                  :date   (str "10-12-2017 10:" %)
+                  :info   "hello"}))
+       (sort-by :result)
+       reverse
+       (map-indexed (fn [index item] (assoc item :id (inc index))))))
 
 (reg-sub
  ::top-list

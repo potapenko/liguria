@@ -9,8 +9,7 @@
             [liguria.screens.recording.model :as model]
             [liguria.screens.recording.recognizer :as rz]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
-            [re-frame.core :refer [subscribe dispatch dispatch-sync]]
-            [liguria.screens.recording.liguria-text :refer [liguria-text]])
+            [re-frame.core :refer [subscribe dispatch dispatch-sync]])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
@@ -18,7 +17,6 @@
   [sh/tab-icon tint-color focused "ios-mic-outline"])
 
 (defn- screen-content []
-  (dispatch [::model/text-fragment liguria-text])
   (fn []
     [view {:style {:flex 1}}
      [recorder/monitor]

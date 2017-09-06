@@ -7,6 +7,7 @@
             [micro-rn.rn-utils :as rn-util]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
+            [liguria.shared.screens-shared-ui :as sh]
             [micro-rn.utils :as utils]
             [clojure.string :as string]
             [micro-rn.utils :as util]
@@ -16,11 +17,13 @@
    [cljs.core.async.macros :refer [go go-loop]]))
 
 (defn result [{:keys [id date statistic]}]
-  [view {:style [st/row
+  [rn/touchable-opacity {:style [st/row
                  (st/padding 16)
                  (st/border-bottom 1 (st/gray-cl 1))]}
    [text {:style [(st/font-size 22)
-                  (st/color "cornflowerblue")]} (str date)]])
+                  (st/color "cornflowerblue")]} (str date)]
+   [flexer]
+   [sh/play-icon]])
 
 (defn one-list-line [x]
   (let [id      (-> x .-item .-id)

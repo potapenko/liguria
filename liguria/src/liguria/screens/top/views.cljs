@@ -21,4 +21,3 @@
     :tab-bar-icon #(r/as-element [icon-top (util/prepare-to-clj %)])}
    (screen-content)))
 
-

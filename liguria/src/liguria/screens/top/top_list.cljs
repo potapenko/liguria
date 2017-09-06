@@ -9,19 +9,32 @@
             [micro-rn.utils :as utils]
             [clojure.string :as string]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
-            [liguria.screens.top.model :as model])
+            [liguria.screens.top.model :as model]
+            [liguria.shared.screens-shared-ui :as sh])
   (:require-macros
    [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))
 
-(defn top-element [{:keys [id]}]
-  [view [text "one element"]])
+(defn top-element [{:keys [id date name result info]}]
+  (let [color "cornflowerblue"]
+    [rn/touchable-opacity {:style [st/row
+                                   st/align-center
+                                   (st/padding 16)
+                                   (st/border-bottom 1 (st/gray-cl 1))]}
+     [text {:style [(st/font-size 22) (st/color color)]} (str id)]
+     [spacer 16]
+     [text {:style [(st/font-size 22) (st/color color)]} (str name)]
+     [flexer]
+     [text {:style [(st/color color)]} (str result)]
+     [spacer 16]
+     [sh/play-icon]]))
 
 (defn one-list-line [x]
   (let [id    (-> x .-item .-id)
-        index (-> x .-index)]
+        index (-> x .-index)
+        top   (subscribe [::model/top-list])]
     (fn []
-      ^{:key (str "top-" id)} [top-element {:id id}])))
+      ^{:key (str "top-" id)} [top-element (nth @top index)])))
 
 (defn top-list []
   (let []
