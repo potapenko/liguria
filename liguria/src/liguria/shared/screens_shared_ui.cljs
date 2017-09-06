@@ -15,10 +15,9 @@
 
 (defn play-icon-style [color]
   [st/align-center st/justify-center
-   (st/padding-left 3)
+   (st/overflow "hidden")
    (st/width 32)
    (st/height 32)
-   (st/overflow "hidden")
    (st/rounded 20)
    (st/border 1 color)])
 
@@ -27,7 +26,7 @@
     [view {:style (play-icon-style color)}
      [tab-icon color false "ios-play"]]))
 
-(defn pause-icon []
+(defn stop-icon []
   (let [color "cornflowerblue"]
     [view {:style (play-icon-style color)}
-     [tab-icon color false "ios-play"]]))
+     [tab-icon color false "ios-stop"]]))

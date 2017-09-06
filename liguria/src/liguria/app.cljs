@@ -25,12 +25,10 @@
 
 (def main-tabs
   (nav/create-tab-navigator
-   {
-    :wiki-tab {:screen wiki-stack}
-    :recording-tab {:screen recording-stack}
-    :top-tab {:screen top-stack}
+   {:recording-tab {:screen recording-stack}
     :results-tab {:screen results-stack}
-    }
+    :top-tab {:screen top-stack}
+    :wiki-tab {:screen wiki-stack}}
    {:tab-bar-options {}}))
 
 (defn app-root-component []

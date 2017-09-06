@@ -15,14 +15,17 @@
    [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))
 
-(defn one-wiki-element [{:keys [id]}]
-  [view [text "one element"]])
+(defn wiki-element [{:keys [id title]}]
+  (let [color "cornflowerblue"]
+    [rn/touchable-opacity {:style [st/row (st/padding 16) (st/border-bottom 1 (st/gray-cl 1))]}
+     [text {:style [(st/font-size 22) (st/color "cornflowerblue")]} (str title)]]))
 
 (defn one-list-line [x]
   (let [id    (-> x .-item .-id)
-        index (-> x .-index)]
+        index (-> x .-index)
+        wiki   (subscribe [::model/wiki-list])]
     (fn []
-      ^{:key (str "wiki-" id)} [one-wiki-element {:id id}])))
+      ^{:key (str "wiki-" id)} [wiki-element (nth @wiki index)])))
 
 (defn wiki-list []
   (let []
