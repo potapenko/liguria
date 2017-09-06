@@ -31,8 +31,18 @@
       ^{:key (str "results-" id)} [result (nth @results index)])))
 
 (defn results-list []
-  [view {:style [(st/flex) (st/background "white")]}
-   [rn/flat-list {
-                  :data          @(subscribe [::model/results-list])
-                  :render-item   #(r/as-element [one-list-line %])
-                  :key-extractor #(str "results-list-" (-> % .-id))}]])
+  (let []
+    (dispatch [::model/results-list (model/build-test-data)])
+    (fn []
+      [view {:style [(st/flex) (st/background "white")]}
+       [rn/flat-list {
+                      :data          @(subscribe [::model/results-list])
+                      :render-item   #(r/as-element [one-list-line %])
+                      :key-extractor #(str "results-list-" (-> % .-id))}]])))
+
+
+(comment
+
+  @(subscribe [::model/results-list])
+
+  )

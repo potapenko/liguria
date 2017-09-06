@@ -6,17 +6,9 @@
             [micro-rn.utils :as util]
             [liguria.shared.screens-shared-ui :as sh]
             [liguria.screens.wiki.wiki-list :refer [wiki-list]]
-            [re-frame.core :refer [dispatch subscribe]]
-            [liguria.screens.wiki.model :as model]))
-
-(defn build-test-data []
-  (->> (range 1 10)
-       (map #(do {:id   %
-                  :date (str "10-12-2017 10:" %)
-                  :text "hello"}))))
+            [re-frame.core :refer [dispatch subscribe]]))
 
 (defn- screen-content []
-  (dispatch [::model/wiki-list (build-test-data)])
   (fn []
     [wiki-list]))
 

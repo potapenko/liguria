@@ -9,6 +9,12 @@
   (:require-macros [micro-rn.macros :refer [...]]
                    [cljs.core.async.macros :refer [go go-loop]]))
 
+(defn build-test-data []
+  (->> (range 1 10)
+       (map #(do {:id   %
+                  :date (str "10-12-2017 10:" %)
+                  :text "hello"}))))
+
 (reg-sub
  ::top-list
  (fn [db _]

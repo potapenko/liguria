@@ -25,8 +25,11 @@
       ^{:key (str "wiki-" id)} [one-wiki-element {:id id}])))
 
 (defn wiki-list []
-  [view {:style [(st/flex) (st/background "white")]}
-   [rn/flat-list {
-                  :data          @(subscribe [::model/wiki-list])
-                  :render-item   #(r/as-element [one-list-line %])
-                  :key-extractor #(str "wiki-list-" (-> % .-id))}]])
+  (let []
+    (dispatch [::model/wiki-list (model/build-test-data)])
+    (fn []
+      [view {:style [(st/flex) (st/background "white")]}
+       [rn/flat-list {
+                      :data          @(subscribe [::model/wiki-list])
+                      :render-item   #(r/as-element [one-list-line %])
+                      :key-extractor #(str "wiki-list-" (-> % .-id))}]])))

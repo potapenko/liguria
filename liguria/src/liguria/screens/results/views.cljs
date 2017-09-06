@@ -6,20 +6,9 @@
             [reagent.core :as r :refer [atom]]
             [micro-rn.utils :as util]
             [liguria.shared.screens-shared-ui :as sh]
-            [liguria.screens.results.results-list :refer [results-list]]
-            [liguria.screens.results.model :as model]))
-
-(defn build-test-data []
-  (println ">>> build model")
-  (->> (range 1 10)
-       (map #(do {:id        %
-                  :date      (str "10-12-2017 10:" %)
-                  :statistic {:result (rand-int 200)
-                              :time   (rand-int 180)
-                              :errors (rand-int 200)}}))))
+            [liguria.screens.results.results-list :refer [results-list]]))
 
 (defn- screen-content []
-  (dispatch [::model/results-list (build-test-data)])
   (fn []
     [view {:style {:flex 1}}
      [results-list]]))

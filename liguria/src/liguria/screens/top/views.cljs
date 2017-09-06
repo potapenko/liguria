@@ -6,17 +6,9 @@
             [micro-rn.utils :as util]
             [liguria.shared.screens-shared-ui :as sh]
             [liguria.screens.top.top-list :refer [top-list]]
-            [re-frame.core :refer [dispatch subscribe]]
-            [liguria.screens.top.model :as model]))
-
-(defn build-test-data []
-  (->> (range 1 10)
-       (map #(do {:id   %
-                  :date (str "10-12-2017 10:" %)
-                  :text "hello"}))))
+            [re-frame.core :refer [dispatch subscribe]]))
 
 (defn- screen-content []
-  (dispatch [::model/top-list (build-test-data)])
   (fn []
     [top-list]))
 

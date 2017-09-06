@@ -24,7 +24,10 @@
       ^{:key (str "top-" id)} [top-element {:id id}])))
 
 (defn top-list []
-  [view {:style [(st/flex) (st/background "white")]}
-   [rn/flat-list {:data          @(subscribe [::model/top-list])
-                  :render-item   #(r/as-element [one-list-line %])
-                  :key-extractor #(str "top-list-" (-> % .-id))}]])
+  (let []
+    (dispatch [::model/top-list (model/build-test-data)])
+    (fn []
+      [view {:style [(st/flex) (st/background "white")]}
+       [rn/flat-list {:data          @(subscribe [::model/top-list])
+                      :render-item   #(r/as-element [one-list-line %])
+                      :key-extractor #(str "top-list-" (-> % .-id))}]])))
