@@ -172,7 +172,7 @@
                               (empty? @transcript) false
                               :else                (reset! first-update true))]
     (fn []
-      [nm/update-scope {:style [(st/flex) (st/background "white")] :equals = :value [update-fn @select-in-progress]}
+      [nm/update-scope {:style [(st/flex) (st/background "white")] :equals = :value [(update-fn) @select-in-progress]}
        [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
                       :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                       :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
