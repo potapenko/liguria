@@ -8,6 +8,9 @@
             [liguria.screens.wiki.wiki-list :refer [wiki-list]]
             [re-frame.core :refer [dispatch subscribe]]))
 
+(defn icon-wiki [{:keys [tint-color focused]}]
+  [sh/tab-icon tint-color focused "ios-book-outline"])
+
 (defn- screen-content []
   (fn []
     [wiki-list]))
@@ -15,7 +18,7 @@
 (def main
   (nav/create-screen
    {:title "Вики"
-    :tab-bar-icon #(r/as-element [sh/icon-wiki (util/prepare-to-clj %)])}
+    :tab-bar-icon #(r/as-element [icon-wiki (util/prepare-to-clj %)])}
    (screen-content)))
 
 

@@ -8,6 +8,9 @@
             [liguria.shared.screens-shared-ui :as sh]
             [liguria.screens.results.results-list :refer [results-list]]))
 
+(defn icon-results [{:keys [tint-color focused] :as props}]
+  [sh/tab-icon tint-color focused "ios-albums-outline"])
+
 (defn- screen-content []
   (fn []
     [view {:style {:flex 1}}
@@ -16,7 +19,7 @@
 (def main
   (nav/create-screen
    {:title "Результаты"
-    :tab-bar-icon #(r/as-element [sh/icon-results (util/prepare-to-clj %)])}
+    :tab-bar-icon #(r/as-element [icon-results (util/prepare-to-clj %)])}
    (screen-content)))
 
 

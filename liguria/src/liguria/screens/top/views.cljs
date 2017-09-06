@@ -8,6 +8,9 @@
             [liguria.screens.top.top-list :refer [top-list]]
             [re-frame.core :refer [dispatch subscribe]]))
 
+(defn icon-top [{:keys [tint-color focused] :as props}]
+  [sh/tab-icon tint-color focused "ios-star-outline"])
+
 (defn- screen-content []
   (fn []
     [top-list]))
@@ -15,7 +18,7 @@
 (def main
   (nav/create-screen
    {:title "Топ"
-    :tab-bar-icon #(r/as-element [sh/icon-top (util/prepare-to-clj %)])}
+    :tab-bar-icon #(r/as-element [icon-top (util/prepare-to-clj %)])}
    (screen-content)))
 
 

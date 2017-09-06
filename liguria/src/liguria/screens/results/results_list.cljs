@@ -17,11 +17,10 @@
 
 (defn result [{:keys [id date statistic]}]
   [view {:style [st/row
-                 (st/padding 8)
-                 (st/background "#ccc")
-
-
-                 ]} [text "one result"]])
+                 (st/padding 16)
+                 (st/border-bottom 1 (st/gray-cl 1))]}
+   [text {:style [(st/font-size 22)
+                  (st/color "cornflowerblue")]} (str date)]])
 
 (defn one-list-line [x]
   (let [id      (-> x .-item .-id)

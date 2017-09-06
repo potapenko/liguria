@@ -14,6 +14,9 @@
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
+(defn icon-recording [{:keys [tint-color focused] :as props}]
+  [sh/tab-icon tint-color focused "ios-mic-outline"])
+
 (defn- screen-content []
   (dispatch [::model/text-fragment liguria-text])
   (fn []
@@ -25,5 +28,5 @@
 (def main
   (nav/create-screen
    {:title "Тренировка"
-    :tab-bar-icon #(r/as-element [sh/icon-recording (util/prepare-to-clj %)])}
+    :tab-bar-icon #(r/as-element [icon-recording (util/prepare-to-clj %)])}
    (screen-content)))
