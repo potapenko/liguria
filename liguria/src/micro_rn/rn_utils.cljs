@@ -80,3 +80,11 @@
               (= "re-frame: overwriting " (first args)) nil
               :else (apply warn args)))}))
 
+(defn on-viewable-items-changed [item-fn]
+  (fn [data]
+    (let [change-log (->> data .-changed
+                          (map (fn [e] [(-> e .-item .-id)
+                                        (-> e .-isViewable)
+                                        (-> e .-index)])))]
+      (doseq [[id visible index] change-log]
+        (item-fn id visible index)))))

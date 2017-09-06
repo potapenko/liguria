@@ -6,8 +6,8 @@ export default class UpdateScope extends Component {
     if(this.props.update){
       return this.props.update();
     }
-    if(!this.props.equals) throw new Error("You should define 'equals' prop (function).");
-    if(!this.props.value) throw new Error("You should define 'value' prop (object).");
+    if(!('equals' in this.props)) throw new Error("You should define 'equals' prop (function).");
+    if(!('value' in this.props)) throw new Error("You should define 'value' prop (object).");
     let result = !this.props.equals(this.props.value, nextProps.value);
     return result;
   }

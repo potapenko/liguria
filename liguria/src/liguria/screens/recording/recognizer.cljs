@@ -75,7 +75,7 @@
                                           (when deleted :s)) map-decorations)
             text-bg-style [(when recorded (st/background-color "gold"))
                            (when selected (st/gray 9))]]
-        [nm/update-scope
+        [view
          (merge
           {:ref    #(dispatch [::model/word-state id :ref %])
            :equals = :value data}
@@ -171,24 +171,16 @@
                               (nil? @transcript)   false
                               (empty? @transcript) false
                               :else                (reset! first-update true))]
-    #_(go-loop []
-      (<! (model/update-paragraphs-visible))
-      (<! (timeout 1000))
-      (recur))
     (fn []
-      [nm/update-scope {:style [(st/flex) (st/background "white")] :update update-fn}
+      [nm/update-scope {:style [(st/flex) (st/background "white")] :equals = :value [update-fn @select-in-progress]}
        [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
                       :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                       :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
                       :scroll-enabled            (not @select-in-progress)
                       :initial-num-to-render     3
-                      ;; :on-viewable-items-changed (fn [data]
-                      ;;                              (let [change-log (->> data .-changed
-                      ;;                                                    (map (fn [e] [(-> e .-item .-id)
-                      ;;                                                                  (-> e .-isViewable)
-                      ;;                                                                  (-> e .-index)])))]
-                      ;;                                (doseq [[id visible] change-log]
-                      ;;                                  (dispatch [::model/paragraph-hidden id (not visible)]))))
+                      :on-viewable-items-changed (rn-util/on-viewable-items-changed
+                                                  (fn [id visible index]
+                                                    (dispatch [::model/paragraph-hidden id (not visible)])))
                       :data                      (build-data-fn @transcript @search-text)
                       :render-item               #(r/as-element [one-list-line %])
                       :key-extractor             #(str "paragraph-list-" (-> % .-id))}]])))
