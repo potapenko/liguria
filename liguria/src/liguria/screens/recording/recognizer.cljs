@@ -67,17 +67,18 @@
 
 (defn word [{:keys [id]}]
   (let [responder-props (rn-util/->gesture-props (create-responder id))]
-    (fn [{:keys [id text background-gray text-style
-                 selected searched deleted recorded]}]
-      (let [text-style (-> text-style (conj
-                                       (when selected [:invert
-                                                       (when recorded (st/color "gold"))])
-                                       (when deleted :s)) map-decorations)
+    (fn [{:keys                                      [id text background-gray text-style
+                                                      selected searched deleted recorded] :as data}]
+      (let [text-style    (-> text-style (conj
+                                          (when selected [:invert
+                                                          (when recorded (st/color "gold"))])
+                                          (when deleted :s)) map-decorations)
             text-bg-style [(when recorded (st/background-color "gold"))
                            (when selected (st/gray 9))]]
-        [view
+        [nm/update-scope
          (merge
-          {:ref #(dispatch [::model/word-state id :ref %])}
+          {:ref    #(dispatch [::model/word-state id :ref %])
+           :equals = :value data}
           responder-props)
          [word-text text text-bg-style text-style]]))))
 
@@ -115,14 +116,16 @@
 (defn sentence [{:keys [id p-id]}]
   (let [mode (subscribe [::model/mode])]
     (fn [{:keys [words]}]
-      [rn/touchable-opacity {:active-opacity 1
-                             :on-press       #(dispatch [::model/sentence-click id])
-                             :ref            #(dispatch [::model/sentence-data id :ref %])
-                             :on-layout      #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])}
-       [view {:style [(st/width "100%") (st/margin 6 0) st/row st/wrap]}
-        (doall
-         (for [w words]
-           ^{:key (str "word-" (:id w))} [word w]))]])))
+      [nm/update-scope {:ref       #(dispatch [::model/sentence-data id :ref %])
+                        :on-layout #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])
+                        :equals    =
+                        :value     words}
+       [rn/touchable-opacity {:active-opacity 1
+                              :on-press       #(dispatch [::model/sentence-click id])}
+        [view {:style [(st/width "100%") (st/margin 6 0) st/row st/wrap]}
+         (doall
+          (for [w words]
+            ^{:key (str "word-" (:id w))} [word w]))]]])))
 
 (defn paragraph [{:keys [id]}]
   (let [sentences   (subscribe [::model/paragraph-data id :sentences])
@@ -130,22 +133,20 @@
         layout      (subscribe [::model/paragraph-data id :layout])
         search-text (subscribe [::model/search-text])]
     (fn []
-      ;; (println "render p" id)
-      (if (and false @hidden @layout)
-        [view {:ref   #(dispatch [::model/paragraph-data id :ref %])
-               :style [(st/width (:width @layout)) (st/height (:height @layout))]}]
-        [rn/touchable-opacity {:active-opacity 1
-                               :on-press       #(dispatch [::model/paragraph-click id])
-                               :on-layout      #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
-                               :ref            #(dispatch [::model/paragraph-data id :ref %])}
-         [view {:style [(st/padding 6 12)
-                        (st/border 1 (st/gray-cl 1) "solid")
-                        (st/border-left 0)
-                        (st/border-right 0)
-                        (st/border-top 0)]}
-          (doall
-           (for [s (filter-sentences @sentences @search-text)]
-             ^{:key (str "sentence-" (:id s))} [sentence s]))]]))))
+      [nm/update-scope {:on-layout #(dispatch [::model/paragraph-data id :layout (rn-util/event->layout %)])
+                        :ref       #(dispatch [::model/paragraph-data id :ref %])
+                        :equals    =
+                        :value     @sentences}
+       [rn/touchable-opacity {:active-opacity 1
+                              :on-press       #(dispatch [::model/paragraph-click id])}
+        [view {:style [(st/padding 6 12)
+                       (st/border 1 (st/gray-cl 1) "solid")
+                       (st/border-left 0)
+                       (st/border-right 0)
+                       (st/border-top 0)]}
+         (doall
+          (for [s (filter-sentences @sentences @search-text)]
+            ^{:key (str "sentence-" (:id s))} [sentence s]))]]])))
 
 (defn one-list-line [x]
   (let [id    (-> x .-item .-id)
@@ -155,7 +156,7 @@
 
 (defn text-list []
   (println "build text-list component")
-  ;; (dispatch [::model/text-fragment liguria-text])
+  (dispatch [::model/text-fragment liguria-text])
   (let [transcript         (subscribe [::model/transcript])
         mode               (subscribe [::model/mode])
         search-text        (subscribe [::model/search-text])
@@ -163,32 +164,31 @@
         build-data-fn      (memoize
                             (fn [transcript search-text]
                               (map #(select-keys % [:id])
-                                   (filter-paragraphs transcript search-text))))]
-    (go-loop []
+                                   (filter-paragraphs transcript search-text))))
+        first-update       (atom false)
+        update-fn          #(cond
+                              @first-update        false
+                              (nil? @transcript)   false
+                              (empty? @transcript) false
+                              :else                (reset! first-update true))]
+    #_(go-loop []
       (<! (model/update-paragraphs-visible))
       (<! (timeout 1000))
       (recur))
     (fn []
-      [view {:style [(st/flex) (st/background "white")]}
+      [nm/update-scope {:style [(st/flex) (st/background "white")] :update update-fn}
        [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
                       :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                       :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
                       :scroll-enabled            (not @select-in-progress)
                       :initial-num-to-render     3
-                      :viewability-config        {;; :minimum-view-time              1
-                                                  :item-visible-percent-threshold 1
-                                                  :wait-for-interaction           false}
-                      :on-viewable-items-changed (fn [data]
-                                                   (let [change-log  (->> data .-changed
-                                                                          (map (fn [e] [(-> e .-item .-id)
-                                                                                        (-> e .-isViewable)
-                                                                                        (-> e .-index)])))
-                                                         visible     (filter second change-log)
-                                                         not-visible (filter (complement second) change-log)
-                                                         max-visible (apply max-key #(nth % 2) visible)
-                                                         min-visible (apply min-key #(nth % 2) visible)]
-                                                     (doseq [[id visible] change-log]
-                                                       (dispatch [::model/paragraph-hidden id (not visible)]))))
+                      ;; :on-viewable-items-changed (fn [data]
+                      ;;                              (let [change-log (->> data .-changed
+                      ;;                                                    (map (fn [e] [(-> e .-item .-id)
+                      ;;                                                                  (-> e .-isViewable)
+                      ;;                                                                  (-> e .-index)])))]
+                      ;;                                (doseq [[id visible] change-log]
+                      ;;                                  (dispatch [::model/paragraph-hidden id (not visible)]))))
                       :data                      (build-data-fn @transcript @search-text)
                       :render-item               #(r/as-element [one-list-line %])
                       :key-extractor             #(str "paragraph-list-" (-> % .-id))}]])))

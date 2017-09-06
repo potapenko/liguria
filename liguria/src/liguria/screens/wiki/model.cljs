@@ -10,7 +10,7 @@
                    [cljs.core.async.macros :refer [go go-loop]]))
 
 (defn build-test-data []
-  (->> (range 1 10)
+  (->> (range 1 20)
        (map #(do {:title (rand-nth ["Сценическая речь"
                                     "Подготовка к выступлению"
                                     "Обзор книг по публичным выступлениям"

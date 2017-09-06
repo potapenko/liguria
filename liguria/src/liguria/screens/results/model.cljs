@@ -10,7 +10,7 @@
                    [cljs.core.async.macros :refer [go go-loop]]))
 
 (defn build-test-data []
-  (->> (range 1 10)
+  (->> (range 1 20)
        (map #(do {:id        %
                   :date      (str "10-12-2017 10:" %)
                   :statistic {:result (rand-int 200)

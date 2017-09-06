@@ -20,6 +20,10 @@
 
 (def monitor-line (rn/adapt-react-class (.-Monitor modules) "Monitor"))
 
+(def update-scope (rn/adapt-react-class (.-UpdateScope modules) "UpdateScope"))
+
+
+
 (comment
   (js/Object.keys modules))
 

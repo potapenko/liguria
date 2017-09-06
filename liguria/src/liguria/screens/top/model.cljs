@@ -10,7 +10,7 @@
                    [cljs.core.async.macros :refer [go go-loop]]))
 
 (defn build-test-data []
-  (->> (range 1 10)
+  (->> (range 1 20)
        (map #(do {:name   (rand-nth ["Евгений Потапенко" "Василий Бовкин" "Елена Новицкая"])
                   :result (+ 1000 (rand-int 100))
                   :date   (str "10-12-2017 10:" %)

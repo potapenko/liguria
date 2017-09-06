@@ -22,3 +22,5 @@ export const { AudioRecorder, audioPath } = AudioRecorderLinks;
 import MonitorLink from './MonitorLine.js'
 export const Monitor = MonitorLink;
 
+import UpdateScopeLink from './UpdateScope.js'
+export const UpdateScope = UpdateScopeLink;
