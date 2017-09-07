@@ -6,16 +6,24 @@
    [liguria.screens.top.model :as top-model]
    [liguria.screens.wiki.model :as wiki-model]
    [liguria.screens.results.model :as results-model]
-   [liguria.screens.recording.liguria-text :refer [liguria-text]])
+   [liguria.screens.recording.liguria-text :refer [liguria-text]]
+   [liguria.screens.recording.nlp :as nlp])
   (:require-macros [micro-rn.macros :refer [...]]
                    [cljs.core.async.macros :refer [go go-loop]]))
 
 (reg-event-db
  :initialize-db
  (fn [_ _]
-   (dispatch [::recording-model/text-fragment liguria-text])
-   (dispatch [::results-model/results-list (results-model/build-test-data)])
-   (dispatch [::top-model/top-list (top-model/build-test-data)])
-   (dispatch [::wiki-model/wiki-list (wiki-model/build-test-data)])
+   (go
+     (loop [[v & t] (nlp/create-text-parts liguria-text)
+            current []]
+       (when v
+        (<! (timeout 100))
+        (dispatch-sync [::recording-model/transcript (conj current v)])
+        (recur t (vec (conj current v)))))
+
+     (dispatch-sync [::results-model/results-list (results-model/build-test-data)])
+     (dispatch-sync [::top-model/top-list (top-model/build-test-data)])
+     (dispatch-sync [::wiki-model/wiki-list (wiki-model/build-test-data)]))
    {}))
 
