@@ -17,7 +17,7 @@
 
 (def main
   (nav/create-screen
-   {:title "Вики"
+   {:title "Статьи"
     :tab-bar-icon #(r/as-element [icon-wiki (util/prepare-to-clj %)])}
    (screen-content)))
 

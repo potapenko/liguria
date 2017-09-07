@@ -23,7 +23,7 @@
 
 (defn play-icon []
   (let [color "cornflowerblue"]
-    [view {:style (play-icon-style color)}
+    [view {:style (conj (play-icon-style color) (st/padding-left 3))}
      [tab-icon color false "ios-play"]]))
 
 (defn stop-icon []

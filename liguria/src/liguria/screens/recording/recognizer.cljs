@@ -57,18 +57,11 @@
                                               (when @(subscribe [::model/long-press])
                                                 (dispatch [::model/word-long-press id false])))})))))
 
-(defn word-text
-  ([text] (word-text text [] []))
-  ([text bg-style text-style]
-   [view {:style (conj bg-style (st/padding 4 2))}
-    [rn/text {:style (conj text-style
-                           (st/font-size @(subscribe [::model/text-size])))}
-     text]]))
-
 (defn word [{:keys [id]}]
   (let [responder-props (rn-util/->gesture-props (create-responder id))]
-    (fn [{:keys                                      [id text background-gray text-style
-                                                      selected searched deleted recorded] :as data}]
+    (fn [{:keys
+          [id text background-gray text-style
+           selected searched deleted recorded] :as data}]
       (let [text-style    (-> text-style (conj
                                           (when selected [:invert
                                                           (when recorded (st/color "gold"))])
@@ -77,10 +70,12 @@
                            (when selected (st/gray 9))]]
         [view
          (merge
-          {:ref    #(dispatch [::model/word-state id :ref %])
-           :equals = :value data}
+          {:ref #(dispatch [::model/word-state id :ref %])}
           responder-props)
-         [word-text text text-bg-style text-style]]))))
+         [view {:style (conj text-bg-style (st/padding 4 2))}
+          [rn/text {:style (conj text-style
+                                 (st/font-size @(subscribe [::model/text-size])))}
+           text]]]))))
 
 (defn icon-button [{:keys [icon label focused on-press]}]
   [touchable-opacity {:style [(st/justify-content "center")
@@ -156,7 +151,7 @@
 
 (defn text-list []
   (println "build text-list component")
-  (dispatch [::model/text-fragment liguria-text])
+  (dispatch-sync [::model/text-fragment liguria-text])
   (let [transcript         (subscribe [::model/transcript])
         mode               (subscribe [::model/mode])
         search-text        (subscribe [::model/search-text])
@@ -164,15 +159,9 @@
         build-data-fn      (memoize
                             (fn [transcript search-text]
                               (map #(select-keys % [:id])
-                                   (filter-paragraphs transcript search-text))))
-        first-update       (atom false)
-        update-fn          #(cond
-                              @first-update        false
-                              (nil? @transcript)   false
-                              (empty? @transcript) false
-                              :else                (reset! first-update true))]
+                                   (filter-paragraphs transcript search-text))))]
     (fn []
-      [nm/update-scope {:style [(st/flex) (st/background "white")] :equals = :value [(update-fn) @select-in-progress]}
+      [nm/update-scope {:style [(st/flex) (st/background "white")] :equals = :value [@select-in-progress]}
        [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
                       :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                       :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
@@ -186,9 +175,7 @@
                       :key-extractor             #(str "paragraph-list-" (-> % .-id))}]])))
 
 (defn text-editor []
-  (let []
-    (fn []
-      [text-list])))
+  [text-list])
 
 (comment
   (subscribe [::model/word-data 1 :selected])
