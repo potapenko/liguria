@@ -478,7 +478,7 @@
  (fn [db [_ word-id gesture-state]]
    (let [in-progress (::select-in-progress db)
          distance    (rn-utils/gesture-state-distance (::prev-gesture-state db) gesture-state)]
-     (if (and (::long-press db) (or (not in-progress) (> distance 10)))
+     (if (and (::long-press db) (or (not in-progress) (> distance 22)))
        (do
          (calculate-collision-and-select word-id gesture-state)
          (-> db
