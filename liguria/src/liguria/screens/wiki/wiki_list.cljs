@@ -29,7 +29,6 @@
 
 (defn wiki-list []
   (let []
-    (dispatch [::model/wiki-list (model/build-test-data)])
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
        [rn/flat-list {

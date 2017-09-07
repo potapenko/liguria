@@ -9,8 +9,7 @@
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [micro-rn.utils :as utils])
   (:require-macros [micro-rn.macros :refer [...]]
-                   [cljs.core.async.macros :refer [go go-loop]]
-                   [natal-shell.interaction-manager :as interaction-manager]))
+                   [cljs.core.async.macros :refer [go go-loop]]))
 
 ;; -------------------------------------------------------------------------------
 
@@ -304,14 +303,14 @@
 (reg-event-db
  ::paragraph-click
  (fn [db [_ id value]]
-   (println "paragraph click:" id)
+   ;; (println "paragraph click:" id)
    (dispatch [::deselect])
    db))
 
 (reg-event-db
  ::sentence-click
  (fn [db [_ id value]]
-   (println "sentence click:" id)
+   ;; (println "sentence click:" id)
    (if (= (::mode db) :search)
      (do
        (if true #_(and
@@ -392,7 +391,7 @@
 (reg-event-db
  ::word-long-press
  (fn [db [_ id value]]
-   (println ::word-long-press id value)
+   ;; (println ::word-long-press id value)
    (if value
      (-> db
          deselect-all

@@ -1,8 +1,7 @@
 (ns liguria.ios.core
   (:require [liguria.app :refer [app-root-component]]
             [micro-rn.react-native :as c]
-            [liguria.events]
-            [liguria.subs]
+            [liguria.model]
             [re-frame.core :refer [dispatch dispatch-sync subscribe]]
             [reagent.core :as r :refer [atom]]
             [micro-rn.rn-utils :as rn-utils]))

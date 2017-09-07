@@ -4,16 +4,15 @@
             [micro-rn.styles :as st]
             [micro-rn.react-navigation :as nav]
             [micro-rn.text-decorator :as text-decorator]
+            [liguria.screens.recording.model :as model]
             [reagent.core :as r :refer [atom]]
             [micro-rn.rn-utils :as rn-util]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
-            [liguria.screens.recording.model :as model]
             [liguria.screens.recording.rte-css :refer [css]]
             [liguria.screens.recording.nlp :as nlp]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [micro-rn.utils :as utils]
-            [clojure.string :as string]
-            [liguria.screens.recording.liguria-text :refer [liguria-text]])
+            [clojure.string :as string])
   (:require-macros
    [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))
@@ -151,7 +150,6 @@
 
 (defn text-list []
   (println "build text-list component")
-  (dispatch-sync [::model/text-fragment liguria-text])
   (let [transcript         (subscribe [::model/transcript])
         mode               (subscribe [::model/mode])
         search-text        (subscribe [::model/search-text])
@@ -161,7 +159,7 @@
                               (map #(select-keys % [:id])
                                    (filter-paragraphs transcript search-text))))]
     (fn []
-      [nm/update-scope {:style [(st/flex) (st/background "white")] :equals = :value [@select-in-progress]}
+      [nm/update-scope {:style [(st/flex) (st/background "white")] :equals = :value [(count @transcript) @select-in-progress]}
        [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
                       :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                       :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])

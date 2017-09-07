@@ -34,7 +34,6 @@
 
 (defn results-list []
   (let []
-    (dispatch [::model/results-list (model/build-test-data)])
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
        [rn/flat-list {

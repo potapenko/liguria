@@ -38,7 +38,6 @@
 
 (defn top-list []
   (let []
-    (dispatch [::model/top-list (model/build-test-data)])
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
        [rn/flat-list {:data          @(subscribe [::model/top-list])
