@@ -8,7 +8,6 @@
             [reagent.core :as r :refer [atom]]
             [micro-rn.rn-utils :as rn-util]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
-            [liguria.screens.recording.rte-css :refer [css]]
             [liguria.shared.nlp :as nlp]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [micro-rn.utils :as utils]

@@ -1,4 +1,4 @@
-(ns liguria.screens.recording.recorder
+(ns liguria.screens.recording.controls
   (:require [liguria.shared.native-modules :as nm]
             [micro-rn.react-native :as rn :refer [alert text view spacer flexer]]
             [micro-rn.styles :as st]
