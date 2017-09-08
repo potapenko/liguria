@@ -1,4 +1,4 @@
-(ns liguria.screens.recording.nlp
+(ns liguria.shared.nlp
   (:require [clojure.string :as string]))
 
 (def test-text "

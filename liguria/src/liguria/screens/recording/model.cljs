@@ -3,7 +3,7 @@
             [clojure.core.reducers :as red]
             [micro-rn.rn-utils :as rn-utils]
             [clojure.string :as string]
-            [liguria.screens.recording.nlp :as nlp]
+            [liguria.shared.nlp :as nlp]
             [micro-rn.react-native :as rn]
             [clojure.walk :as walk]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]

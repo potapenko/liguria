@@ -6,8 +6,8 @@
    [liguria.screens.top.model :as top-model]
    [liguria.screens.wiki.model :as wiki-model]
    [liguria.screens.results.model :as results-model]
-   [liguria.screens.recording.liguria-text :refer [liguria-text]]
-   [liguria.screens.recording.nlp :as nlp])
+   [liguria.shared.liguria-text :refer [liguria-text]]
+   [liguria.shared.nlp :as nlp])
   (:require-macros [micro-rn.macros :refer [...]]
                    [cljs.core.async.macros :refer [go go-loop]]))
 
