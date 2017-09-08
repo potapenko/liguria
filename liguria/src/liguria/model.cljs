@@ -14,16 +14,8 @@
 (reg-event-db
  :initialize-db
  (fn [_ _]
-   (go
-     (loop [[v & t] (nlp/create-text-parts liguria-text)
-            current []]
-       (when v
-        (<! (timeout 100))
-        (dispatch-sync [::recording-model/transcript (conj current v)])
-        (recur t (vec (conj current v)))))
-
-     (dispatch-sync [::results-model/results-list (results-model/build-test-data)])
-     (dispatch-sync [::top-model/top-list (top-model/build-test-data)])
-     (dispatch-sync [::wiki-model/wiki-list (wiki-model/build-test-data)]))
+   (dispatch [::results-model/results-list (results-model/build-test-data)])
+   (dispatch [::top-model/top-list (top-model/build-test-data)])
+   (dispatch [::wiki-model/wiki-list (wiki-model/build-test-data)])
    {}))
 

@@ -8,6 +8,8 @@
             [liguria.screens.recording.recorder :as recorder]
             [liguria.screens.recording.model :as model]
             [liguria.screens.recording.recognizer :as rz]
+            [liguria.recognizer.recognizer :as recognizer]
+            [liguria.shared.liguria-text :refer [liguria-text]]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]])
   (:require-macros
@@ -21,7 +23,7 @@
     [view {:style {:flex 1}}
      [recorder/monitor]
      [recorder/recording-controls]
-     [rz/text-editor]]))
+     [recognizer/text-editor liguria-text]]))
 
 (def main
   (nav/create-screen

@@ -37,7 +37,7 @@
    (fn [id]
      (let [long-press-timeout (atom 0)]
        (rn/pan-responder-create
-        {:on-start-should-set-pan-responder #(not= @(subscribe [::model/mode]) :search)
+        {:on-start-should-set-pan-responder #(do true)
          :on-pan-responder-grant            (fn [e g] (reset! long-press-timeout
                                                               (utils/set-timeout
                                                                #(dispatch [::model/word-long-press id true]) 600))
@@ -108,7 +108,7 @@
       (->> sentences (filter #(->> % :text string/lower-case (re-find rx) nil? not))))))
 
 (defn sentence [{:keys [id p-id]}]
-  (let [mode (subscribe [::model/mode])]
+  (let []
     (fn [{:keys [words]}]
       [nm/update-scope {:ref       #(dispatch [::model/sentence-data id :ref %])
                         :on-layout #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])
@@ -151,7 +151,6 @@
 (defn text-list []
   (println "build text-list component")
   (let [transcript         (subscribe [::model/transcript])
-        mode               (subscribe [::model/mode])
         search-text        (subscribe [::model/search-text])
         select-in-progress (subscribe [::model/select-in-progress])
         build-data-fn      (memoize

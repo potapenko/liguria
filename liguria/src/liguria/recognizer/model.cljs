@@ -468,19 +468,6 @@
  (fn [db [_ from to]]
    (select-words-range db from to)))
 
-(reg-sub
- ::mode
- (fn [db _]
-   #{:edit :search :record :idle}
-   (get db ::mode :idle)))
-
-(reg-event-db
- ::mode
- (fn [db [_ value]]
-   (merge db
-          {::mode value}
-          (when (= value :idle) {::search-text ""}))))
-
 (reg-event-db
  ::list-ref
  (fn [db [_ value]]
