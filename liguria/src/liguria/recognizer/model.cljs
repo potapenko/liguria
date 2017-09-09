@@ -172,7 +172,6 @@
               new-scroll-pos (+ p-y s-y)]
           (-> list-ref (.scrollToOffset (clj->js {:offset new-scroll-pos}))))))))
 
-
 (defn get-selected-words [db]
  (filter-words db #(:selected %)))
 

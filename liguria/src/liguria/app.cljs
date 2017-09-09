@@ -5,7 +5,8 @@
             [liguria.screens.recording.views :as recording]
             [liguria.screens.top.views :as top]
             [liguria.screens.wiki.views :as wiki]
-            [liguria.screens.results.views :as results]))
+            [liguria.screens.results.views :as results]
+            [liguria.screens.lessons.views :as lessons]))
 
 (def wiki-stack
   (nav/create-stack-navigator
@@ -21,7 +22,8 @@
 
 (def recording-stack
   (nav/create-stack-navigator
-   {:books {:screen recording/main}}))
+   {:lessons   {:screen lessons/main}
+    :recording {:screen recording/main}}))
 
 (def main-tabs
   (nav/create-tab-navigator
