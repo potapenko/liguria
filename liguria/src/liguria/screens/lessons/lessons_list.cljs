@@ -16,14 +16,30 @@
    [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))
 
+(defn go-icon
+  ([] (go-icon "ios-mic" false))
+  ([icon disabled])
+  (let [color (st/gray-cl 2)
+        w     24]
+    [view {:style
+           [st/align-center st/justify-center
+            (st/overflow "hidden")
+            (st/width w)
+            (st/height w)
+            (st/rounded (/ w 2))
+            (st/border 1 color)]}
+     [nm/icon-io {:color color :size 18 :name "ios-mic"}]]))
+
 (defn lesson [{:keys [id date title statistic]}]
   [rn/touchable-opacity {:style [st/row
-                 (st/padding 16)
+                                 st/align-center
                  (st/border-bottom 1 (st/gray-cl 1))]}
-   [text {:style [(st/font-size 18)
-                  (st/color "cornflowerblue")]} (str (inc id) ".   " title)]
+   [text {:style [(st/font-size 16)
+                  (st/padding 16)
+                  #_(st/color "cornflowerblue")]} (str (inc id) ".   " title)]
    [flexer]
-   #_[sh/play-icon]])
+   [go-icon]
+   [spacer 16]])
 
 (defn one-list-line [x]
   (let [id      (-> x .-item .-id)

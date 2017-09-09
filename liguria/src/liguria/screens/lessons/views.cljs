@@ -9,7 +9,7 @@
             [liguria.screens.lessons.lessons-list :refer [lessons-list]]))
 
 (defn icon-lessons [{:keys [tint-color focused] :as props}]
-  [sh/tab-icon tint-color focused "ios-albums-outline"])
+  [sh/tab-icon tint-color focused "ios-mic-outline"])
 
 (defn- screen-content []
   (fn []
@@ -18,7 +18,7 @@
 
 (def main
   (nav/create-screen
-   {:title "Тренировка"
+   {:title "Уроки"
     :tab-bar-icon #(r/as-element [icon-lessons (util/prepare-to-clj %)])}
    (screen-content)))
 

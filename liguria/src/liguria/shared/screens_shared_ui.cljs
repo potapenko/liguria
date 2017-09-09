@@ -6,8 +6,7 @@
             [micro-rn.styles :as st]))
 
 (defn tab-icon [tint-color focused icon-name]
-  [view {:style {:justify-content "center"
-                 :align-items     "center"}}
+  [view {:style [st/justify-center st/align-center]}
    [nm/icon-io {:color tint-color :size 22 :name icon-name}]])
 
 (defn icon-settings [{:keys [tint-color focused] :as props}]
