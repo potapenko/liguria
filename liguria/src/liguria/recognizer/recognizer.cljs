@@ -172,10 +172,11 @@
 
 (defn text-editor [text]
   (let []
+    (dispatch-sync [::model/transcript []])
     (go
       (<! (utils/await-cb rn/run-after-interactions))
       (loop [parts   (time (nlp/create-text-parts text))
-             current []]
+             current '()]
         (let [v     (first parts)
               parts (time (rest parts))]
           (when v

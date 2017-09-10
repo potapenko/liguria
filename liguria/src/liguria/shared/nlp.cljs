@@ -76,23 +76,26 @@
                      (string? source) (time (create-paragraphs source))
                      (seq? source)    source)]
     (println "create paragraphs done")
-    (for [p paragraphs]
-      (do
-        (println "id:" @p-counter)
-        {:type      :paragraph
-         :id        (swap! p-counter inc)
-         :text      p
-         :sentences (for [s (time (create-sentences p))]
-                      {:type  :sentence
-                       :id    (swap! s-counter inc)
-                       :p-id  @p-counter
-                       :text  s
-                       :words (for [w (create-words s)]
-                                {:type :word
-                                 :id   (swap! w-counter inc)
-                                 :p-id @p-counter
-                                 :s-id @s-counter
-                                 :text w})})}))))
+    (doall
+     (for [p paragraphs]
+       (do
+         (println "id:" @p-counter)
+         {:type      :paragraph
+          :id        (swap! p-counter inc)
+          :text      p
+          :sentences (doall
+                      (for [s (time (create-sentences p))]
+                        {:type  :sentence
+                         :id    (swap! s-counter inc)
+                         :p-id  @p-counter
+                         :text  s
+                         :words (doall
+                                 (for [w (create-words s)]
+                                   {:type :word
+                                    :id   (swap! w-counter inc)
+                                    :p-id @p-counter
+                                    :s-id @s-counter
+                                    :text w}))}))})))))
 
 (comment
   (-> test-text create-text-parts count)
