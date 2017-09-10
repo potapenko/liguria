@@ -261,6 +261,11 @@
    (dispatch [::transcript (nlp/create-text-parts value)])
    (assoc db ::text-fragment value)))
 
+(reg-sub
+ ::text-fragment
+ (fn [db _]
+   (get db ::text-fragment)))
+
 (reg-event-db
  ::paragraph-hidden
  (fn [db [_ id value]]

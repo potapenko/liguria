@@ -50,13 +50,9 @@
      (set! (.-navigationOptions screen) (clj->js (transform-params params)))
      screen)))
 
-(defn screen-cb [cb]
-  (fn [props]
-    (-> (cb (js->clj props :keywordize-keys true))
-        (transform-params)
-        (clj->js))))
 
-(defn navigate! [navigator screen props]
+(defn navigate!
+  [navigator screen props]
   (. navigator
      (navigate
       (-> screen (->camelCase) (name))

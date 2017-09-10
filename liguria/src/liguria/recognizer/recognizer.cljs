@@ -173,12 +173,16 @@
 (defn text-editor [text]
   (let []
     (go
-      (loop [[v & t] (nlp/create-text-parts text)
+      (<! (utils/await-cb rn/run-after-interactions))
+      (loop [parts   (time (nlp/create-text-parts text))
              current []]
-        (when v
-          (<! (timeout 100))
-          (dispatch-sync [::model/transcript (conj current v)])
-          (recur t (vec (conj current v))))))
+        (let [v     (first parts)
+              parts (time (rest parts))]
+          (when v
+            (let [new-list (concat current [v])]
+              (<! (timeout 100))
+              (dispatch-sync [::model/transcript new-list])
+              (recur parts new-list))))))
     (fn []
       [text-list])))
 

@@ -23,31 +23,35 @@
         (recur t (string/replace s (str v ".") (str v one-dot-mark)))
         s))))
 
-(defn create-sentences [s]
-  (-> s
-      person-dots
-      (->
-       (string/replace #"\.\*" escape_dot)
-       (string/replace #"\?\*" escape_qustion)
-       (string/replace #"\!\*" escape_exclamation))
-      (->
-       (string/replace #"\.\"\s+" (str one-dot-mark "\"" sentence-separator))
-       (string/replace #"!\"\s+" (str one-exclamation-mark "\"" sentence-separator))
-       (string/replace #"\?\"\s+\" " (str one-question-mark "\"" sentence-separator))
-       (string/replace #"\.'\s+" (str one-dot-mark "'" sentence-separator))
-       (string/replace #"!'\s+" (str one-exclamation-mark "'" sentence-separator))
-       (string/replace #"\?'\s+" (str one-question-mark "'" sentence-separator));
-       (string/replace #"\.\s+" (str "." sentence-separator))
-       (string/replace #"!\s+" (str "!" sentence-separator))
-       (string/replace #"\?\s+" (str "?" sentence-separator));
-       (string/replace one-dot-mark ".")
-       (string/replace one-question-mark "?")
-       (string/replace one-exclamation-mark "!")
-       (string/split sentence-separator))
-      (->>
-       (map #(string/replace % escape_dot "."))
-       (map #(string/replace % escape_qustion "?"))
-       (map #(string/replace % escape_exclamation "!")))))
+(def create-sentences
+  (memoize
+   (fn [s]
+     (-> s
+         person-dots
+         (->
+          (string/replace #"\.\*" escape_dot)
+          (string/replace #"\?\*" escape_qustion)
+          (string/replace #"\!\*" escape_exclamation))
+         (->
+          (string/replace #"\.\"\s+" (str one-dot-mark "\"" sentence-separator))
+          (string/replace #"!\"\s+" (str one-exclamation-mark "\"" sentence-separator))
+          (string/replace #"\?\"\s+\" " (str one-question-mark "\"" sentence-separator))
+          (string/replace #"\.'\s+" (str one-dot-mark "'" sentence-separator))
+          (string/replace #"!'\s+" (str one-exclamation-mark "'" sentence-separator))
+          (string/replace #"\?'\s+" (str one-question-mark "'" sentence-separator)) ;
+          (string/replace #"\.\s+" (str "." sentence-separator))
+          (string/replace #"!\s+" (str "!" sentence-separator))
+          (string/replace #"\?\s+" (str "?" sentence-separator)) ;
+          (string/replace one-dot-mark ".")
+          (string/replace one-question-mark "?")
+          (string/replace one-exclamation-mark "!")
+          (string/split sentence-separator))
+         (->>
+          (map #(string/replace % escape_dot "."))
+          (map #(string/replace % escape_qustion "?"))
+          (map #(string/replace % escape_exclamation "!")))))))
+
+(create-sentences "")
 
 (comment
 
@@ -56,37 +60,39 @@
   (-> test-text create-paragraphs first
       create-sentences count))
 
-(defn create-paragraphs [s]
-  (->> s
-       (#(string/split % #"(\r|\n)+"))
-       (map string/trim)
-       (filter #(-> % empty? not))))
+(def create-paragraphs
+  (memoize
+   (fn [s]
+     (->> s
+          (#(string/split % #"(\r|\n)+"))
+          (map string/trim)
+          (filter (complement empty?))))))
 
 (defn create-text-parts [source]
   (let [p-counter  (atom 0)
         w-counter  (atom 0)
         s-counter  (atom 0)
         paragraphs (cond
-                     (string? source) (create-paragraphs source)
+                     (string? source) (time (create-paragraphs source))
                      (seq? source)    source)]
-    (doall
-     (for [p paragraphs]
-       {:type      :paragraph
-        :id        (swap! p-counter inc)
-        :text      p
-        :sentences (doall
-                    (for [s (create-sentences p)]
+    (println "create paragraphs done")
+    (for [p paragraphs]
+      (do
+        (println "id:" @p-counter)
+        {:type      :paragraph
+         :id        (swap! p-counter inc)
+         :text      p
+         :sentences (for [s (time (create-sentences p))]
                       {:type  :sentence
                        :id    (swap! s-counter inc)
                        :p-id  @p-counter
                        :text  s
-                       :words (doall
-                               (for [w (create-words s)]
-                                 {:type :word
-                                  :id   (swap! w-counter inc)
-                                  :p-id @p-counter
-                                  :s-id @s-counter
-                                  :text w}))}))}))))
+                       :words (for [w (create-words s)]
+                                {:type :word
+                                 :id   (swap! w-counter inc)
+                                 :p-id @p-counter
+                                 :s-id @s-counter
+                                 :text w})})}))))
 
 (comment
   (-> test-text create-text-parts count)

@@ -17,13 +17,12 @@
    [cljs.core.async.macros :refer [go go-loop]]))
 
 (defn result [{:keys [id date statistic]}]
-  [rn/touchable-opacity {:style [st/row
-                 (st/padding 16)
-                 (st/border-bottom 1 (st/gray-cl 1))]}
-   [text {:style [(st/font-size 22)
-                  (st/color "cornflowerblue")]} (str date)]
-   [flexer]
-   [sh/play-icon]])
+  [view {:style [(st/border-bottom 1 (st/gray-cl 1))]}
+   [rn/touchable-opacity {:style [st/row st/align-center (st/padding 16)]}
+    [text {:style [(st/font-size 22)
+                   (st/color "cornflowerblue")]} (str date)]
+    [flexer]
+    [sh/play-icon]]])
 
 (defn one-list-line [x]
   (let [id      (-> x .-item .-id)

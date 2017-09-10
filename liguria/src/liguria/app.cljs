@@ -10,15 +10,15 @@
 
 (def wiki-stack
   (nav/create-stack-navigator
-   {:books {:screen wiki/main}}))
+   {:wiki {:screen wiki/main}}))
 
 (def results-stack
   (nav/create-stack-navigator
-   {:books {:screen results/main}}))
+   {:results {:screen results/main}}))
 
 (def top-stack
   (nav/create-stack-navigator
-   {:books {:screen top/main}}))
+   {:top {:screen top/main}}))
 
 (def recording-stack
   (nav/create-stack-navigator

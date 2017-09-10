@@ -17,9 +17,7 @@
 
 (defn top-element [{:keys [id date name result info]}]
   (let [color "cornflowerblue"]
-    [rn/touchable-opacity {:style [st/row
-                                   st/align-center
-                                   (st/padding 16)
+    [rn/touchable-opacity {:style [st/row st/align-center (st/padding 16)
                                    (st/border-bottom 1 (st/gray-cl 1))]}
      [text {:style [(st/font-size 22) (st/color color)]} (str id)]
      [spacer 16]

@@ -12,9 +12,9 @@
   [sh/tab-icon tint-color focused "ios-mic-outline"])
 
 (defn- screen-content []
-  (fn []
+  (fn [props]
     [view {:style {:flex 1}}
-     [lessons-list]]))
+     [lessons-list (:navigation props)]]))
 
 (def main
   (nav/create-screen

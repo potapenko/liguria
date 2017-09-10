@@ -42,6 +42,16 @@
  (fn [db [_ value]]
    (assoc db ::lessons-list value)))
 
+(reg-sub
+ ::navigator
+ (fn [db _]
+   (get db ::navigator 0)))
+
+(reg-event-db
+ ::navigator
+ (fn [db [_ value]]
+   (assoc db ::navigator value)))
+
 (comment
   (reg-sub
    ::data
@@ -51,4 +61,5 @@
   (reg-event-db
    ::data
    (fn [db [_ value]]
-     (assoc db ::data value))))
+     (assoc db ::data value)))
+  )
