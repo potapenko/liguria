@@ -11,7 +11,8 @@
             [liguria.shared.liguria-text :refer [liguria-text]]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
-            [liguria.shared.nlp :as nlp])
+            [liguria.shared.nlp :as nlp]
+            [micro-rn.utils :as utils])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
@@ -19,11 +20,12 @@
   [sh/tab-icon tint-color focused "ios-mic-outline"])
 
 (defn- screen-content []
-  (fn []
-    [view {:style {:flex 1}}
-     [controls/monitor]
-     [controls/recording-controls]
-     [recognizer/text-editor liguria-text]]))
+  (fn [{:keys [state navigation] :as props}]
+    (let [params (nav/props->params props)]
+      [view {:style {:flex 1}}
+       [controls/monitor]
+       [controls/recording-controls]
+       [recognizer/text-editor (merge {:text liguria-text} params)]])))
 
 (def main
   (nav/create-screen

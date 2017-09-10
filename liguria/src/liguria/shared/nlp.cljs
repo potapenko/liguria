@@ -73,7 +73,7 @@
         w-counter  (atom 0)
         s-counter  (atom 0)
         paragraphs (cond
-                     (string? source) (time (create-paragraphs source))
+                     (string? source) (create-paragraphs source)
                      (seq? source)    source)]
     (println "create paragraphs done")
     (doall
@@ -84,7 +84,7 @@
           :id        (swap! p-counter inc)
           :text      p
           :sentences (doall
-                      (for [s (time (create-sentences p))]
+                      (for [s (create-sentences p)]
                         {:type  :sentence
                          :id    (swap! s-counter inc)
                          :p-id  @p-counter

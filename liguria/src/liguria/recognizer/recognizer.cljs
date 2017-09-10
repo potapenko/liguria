@@ -170,12 +170,12 @@
                       :render-item               #(r/as-element [one-list-line %])
                       :key-extractor             #(str "paragraph-list-" (-> % .-id))}]])))
 
-(defn text-editor [text]
+(defn text-editor [{:keys [text lesson]}]
   (let []
     (dispatch-sync [::model/transcript []])
     (go
       (<! (utils/await-cb rn/run-after-interactions))
-      (loop [parts   (time (nlp/create-text-parts text))
+      (loop [parts   (nlp/create-text-parts text)
              current '()]
         (let [v     (first parts)
               parts (time (rest parts))]

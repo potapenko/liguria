@@ -2,7 +2,8 @@
   (:refer-clojure :exclude [pop!])
   (:require [reagent.core :as r]
             [micro-rn.react-native :as rn]
-            [camel-snake-kebab.core :refer [->camelCase]])
+            [camel-snake-kebab.core :refer [->camelCase]]
+            [micro-rn.utils :as utils])
   (:require-macros [reagent.ratom :refer [reaction]]))
 
 (defn check-value [func]
@@ -37,6 +38,9 @@
 (defn get-screen-wrapper [child]
   (fn screen-wrapper [props]
     [child props]))
+
+(defn props->params [props]
+  (-> props :navigation utils/prepare-to-clj :state :params))
 
 (defn create-screen
   ([content]
