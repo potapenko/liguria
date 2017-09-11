@@ -23,33 +23,46 @@
 (defn go-back! []
   (nav/go-back! @(subscribe [::model/navigator])))
 
-(defn result [{:keys [id date statistic]}]
-  [view {:style [(st/border-bottom 1 (st/gray-cl 1))]}
-   [rn/touchable-opacity {:style [st/row st/align-center (st/padding 16)]}
-    [text {:style [(st/font-size 22)
-                   (st/color "cornflowerblue")]} (str date)]
+(defn go-icon
+  ([] (go-icon "ios-play" false))
+  ([icon higlited]
+   (let [color (if higlited "cornflowerblue" (st/gray-cl 2))
+         w     32]
+     [view {:style
+            [st/align-center st/justify-center
+             (st/overflow "hidden")
+             (st/width w)
+             (st/height w)
+             (st/rounded (/ w 2))]}
+      [nm/icon-io {:color color :size (- w 8) :name icon}]])))
+
+(defn results-list-element [{:keys [id date statistic]}]
+  [view {:style []}
+   [rn/touchable-opacity {:style    [st/row st/align-center]
+                          :on-press #(navigate! :result {:result id})}
+    [rn/text {:number-of-lines 1 :elipsis-mode "tail"
+              :style [(st/font-size 16) (st/padding 16)]} (str date)]
     [flexer]
-    [sh/play-icon]]])
+    [go-icon]
+    [spacer 16]]])
 
 (defn one-list-line [x]
   (let [id      (-> x .-item .-id)
         index   (-> x .-index)
         results (subscribe [::model/results-list])]
     (fn []
-      ^{:key (str "results-" id)} [result (nth @results index)])))
+      ^{:key (str "results-" id)} [results-list-element (nth @results index)])))
 
-(defn results-list []
+(defn results-list [navigator]
   (let []
+    (dispatch [::model/navigator navigator])
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
-       [rn/flat-list {
-                      :data          @(subscribe [::model/results-list])
-                      :render-item   #(r/as-element [one-list-line %])
-                      :key-extractor #(str "results-list-" (-> % .-id))}]])))
-
+       [rn/flat-list {:data                   @(subscribe [::model/results-list])
+                      :ItemSeparatorComponent #(r/as-element [view {:style [(st/height 1) (st/gray 10)]}])
+                      :render-item            #(r/as-element [one-list-line %])
+                      :key-extractor          #(str "results-list-" (-> % .-id))}]])))
 
 (comment
-
   @(subscribe [::model/results-list])
-
-  )
+  @(subscribe [::model/navigator]))

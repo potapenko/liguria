@@ -16,8 +16,6 @@
    [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))
 
-
-
 (defn navigate!
   [screen props]
   (nav/navigate! @(subscribe [::model/navigator]) screen props))
@@ -36,13 +34,14 @@
              (st/width w)
              (st/height w)
              (st/rounded (/ w 2))]}
-      [nm/icon-io {:color color :size (- w 8) :name "ios-mic"}]])))
+      [nm/icon-io {:color color :size (- w 8) :name icon}]])))
 
-(defn lesson [{:keys [id date title text statistic navigation]}]
+(defn lessons-list-element [{:keys [id date title text statistic navigation]}]
   [view {:style []}
    [rn/touchable-opacity {:style    [st/row st/align-center]
                           :on-press #(navigate! :recording {:lesson id :text text})}
-    [rn/text {:style [(st/font-size 16) (st/padding 16)]} (str (inc id) ".   " title)]
+    [rn/text {:number-of-lines 1 :elipsis-mode "tail"
+              :style [(st/font-size 16) (st/padding 16)]} (str (inc id) ".   " title)]
     [flexer]
     [go-icon]
     [spacer 16]]])
@@ -52,7 +51,7 @@
         index   (-> x .-index)
         lessons (subscribe [::model/lessons-list])]
     (fn []
-      ^{:key (str "lessons-" id)} [lesson (nth @lessons index)])))
+      ^{:key (str "lessons-" id)} [lessons-list-element (nth @lessons index)])))
 
 (defn lessons-list [navigator]
   (let []
@@ -64,8 +63,6 @@
                       :render-item            #(r/as-element [one-list-line %])
                       :key-extractor          #(str "lessons-list-" (-> % .-id))}]])))
 
-
 (comment
   @(subscribe [::model/lessons-list])
-  @(subscribe [::model/navigator])
-  )
+  @(subscribe [::model/navigator]))

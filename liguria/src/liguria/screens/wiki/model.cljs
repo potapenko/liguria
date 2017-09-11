@@ -27,6 +27,16 @@
  (fn [db [_ value]]
    (assoc db ::wiki-list value)))
 
+(reg-sub
+ ::navigator
+ (fn [db _]
+   (get db ::navigator 0)))
+
+(reg-event-db
+ ::navigator
+ (fn [db [_ value]]
+   (assoc db ::navigator value)))
+
 (comment
   (reg-sub
    ::data
