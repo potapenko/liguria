@@ -147,7 +147,7 @@
     (fn []
       ^{:key (str "paragraph-" id)} [paragraph {:id id}])))
 
-(defn text-list []
+(defn text-list [{:keys [lesson]}]
   (println "build text-list component")
   (let [transcript         (subscribe [::model/transcript])
         search-text        (subscribe [::model/search-text])
@@ -161,7 +161,7 @@
        (if (empty? @transcript)
          [rn/view {:style [(st/flex) st/align-center st/justify-center]}
           [rn/activity-indicator {:size "large"}]]
-         [nm/animatable-view {:animation "fadeInUp" :duration 400}
+         [nm/animatable-view {:animation (when-not (= 11 lesson) "fadeInUp") :duration 200}
           [rn/flat-list {:ref                         #(dispatch [::model/list-ref %])
                          :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                          :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
@@ -174,7 +174,7 @@
                          :render-item               #(r/as-element [one-list-line %])
                          :key-extractor             #(str "paragraph-list-" (-> % .-id))}]])])))
 
-(defn text-editor [{:keys [text lesson]}]
+(defn text-editor [{:keys [text lesson] :as props}]
   (let []
     (dispatch-sync [::model/transcript []])
     (go
@@ -189,7 +189,7 @@
               (dispatch-sync [::model/transcript new-list])
               (recur parts new-list))))))
     (fn []
-      [text-list])))
+      [text-list props])))
 
 (comment
   (subscribe [::model/word-data 1 :selected])
