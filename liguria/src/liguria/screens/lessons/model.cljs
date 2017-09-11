@@ -5,32 +5,34 @@
             [micro-rn.utils :as utils]
             [clojure.string :as string]
             [micro-rn.react-native :as rn]
-            [cljs.core.async :as async :refer [<! >! put! chan timeout]])
+            [liguria.shared.liguria-text :refer [liguria-text]]
+            [cljs.core.async :as async :refer [<! >! put! chan timeout]]
+            [liguria.shared.nlp :as nlp])
   (:require-macros [micro-rn.macros :refer [...]]
                    [cljs.core.async.macros :refer [go go-loop]]))
 
 (defn build-test-data []
-  (->> ["Лигурийский регулировщик"
-        "Хохлатые хохотушки"
-        "Сонька и Сашка"
-        "Вавилонка Варвара"
-        "Саша на шоссе"
-        "Колокол переколоколовать"
-        "Сеня с донесеньем"
-        "У гусыни усов не ищи"
-        "Не тот, товарищи, товарищу товарищ"
-        "На улице дёготник"
-        "Дело было в Вавилоне"
-        "Конституционалист Константин"
-        "Щёголь Щегол"
-        "Лигурия"]
-       (map-indexed (fn [index title]
-                      (do {:id        index
-                           :enabled   (< index 5)
-                           :title     title
-                           :statistic {:lesson (rand-int 200)
-                                       :time   (rand-int 180)
-                                       :errors (rand-int 200)}})))))
+  (let [paragraphs (nlp/create-paragraphs liguria-text)]
+    (->> ["Лигурийский регулировщик"
+          "Хохлатые хохотушки"
+          "Сонька и Сашка"
+          "Вавилонка Варвара"
+          "Саша на шоссе"
+          "Колокол переколоколовать"
+          "Сеня с донесеньем"
+          "У гусыни усов не ищи"
+          "Береги честь с молоду"
+          "Конституционалист Константин"
+          "Щёголь Щегол"
+          "Лигурия"]
+         (map-indexed (fn [index title]
+                        (do {:id        index
+                             :enabled   (< index 5)
+                             :title     title
+                             :text      (or (nth paragraphs index nil) liguria-text)
+                             :statistic {:lesson (rand-int 200)
+                                         :time   (rand-int 180)
+                                         :errors (rand-int 200)}}))))))
 
 (reg-sub
  ::lessons-list

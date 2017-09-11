@@ -6,7 +6,8 @@
             [reagent.core :as r :refer [atom]]
             [micro-rn.utils :as util]
             [liguria.shared.screens-shared-ui :as sh]
-            [liguria.screens.lessons.lessons-list :refer [lessons-list]]))
+            [liguria.screens.lessons.lessons-list :refer [lessons-list]]
+            [micro-rn.utils :as utils]))
 
 (defn icon-lessons [{:keys [tint-color focused] :as props}]
   [sh/tab-icon tint-color focused "ios-mic-outline"])
@@ -21,6 +22,4 @@
    {:title "Уроки"
     :tab-bar-icon #(r/as-element [icon-lessons (util/prepare-to-clj %)])}
    (screen-content)))
-
-
 

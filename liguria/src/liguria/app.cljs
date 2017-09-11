@@ -6,7 +6,8 @@
             [liguria.screens.top.views :as top]
             [liguria.screens.wiki.views :as wiki]
             [liguria.screens.results.views :as results]
-            [liguria.screens.lessons.views :as lessons]))
+            [liguria.screens.lessons.views :as lessons]
+            [micro-rn.utils :as utils]))
 
 (def wiki-stack
   (nav/create-stack-navigator
@@ -23,7 +24,11 @@
 (def recording-stack
   (nav/create-stack-navigator
    {:lessons   {:screen lessons/main}
-    :recording {:screen recording/main}}))
+    :recording {:screen recording/main}}
+   {:navigation-options (fn [props]
+                          (utils/prepare-to-js
+                           {:header-right
+                            (r/as-element [rn/view [rn/text "hello"]])}))}))
 
 (def main-tabs
   (nav/create-tab-navigator

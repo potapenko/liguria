@@ -39,12 +39,11 @@
              #_(st/border 1 color)]}
       [nm/icon-io {:color color :size (- w 8) :name "ios-mic"}]])))
 
-(defn lesson [{:keys [id date title statistic navigation]}]
+(defn lesson [{:keys [id date title text statistic navigation]}]
   [view {:style [(st/border-bottom 1 (st/gray-cl 1))]}
-   [rn/touchable-opacity {:style [st/row st/align-center]
-                          :on-press #(navigate! :recording {:lesson id})}
-    [text {:style [(st/font-size 16)
-                   (st/padding 16)]} (str (inc id) ".   " title)]
+   [rn/touchable-opacity {:style    [st/row st/align-center]
+                          :on-press #(navigate! :recording {:lesson id :text text})}
+    [rn/text {:style [(st/font-size 16) (st/padding 16)]} (str (inc id) ".   " title)]
     [flexer]
     [go-icon]
     [spacer 16]]])

@@ -25,7 +25,7 @@
     (walk/postwalk (fn [x] (if (map? x) (into {} (map f x)) x)) m)))
 
 (defn cemelify-keys [x]
-  (some-> x (transform-keys ->camelCase)))
+  (some-> x (transform-keys ->camelCase) (transform-keys name)))
 
 (defn keywordize [x]
   (some-> x (transform-keys keyword)))

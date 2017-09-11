@@ -25,7 +25,7 @@
       [view {:style {:flex 1}}
        [controls/monitor]
        [controls/recording-controls]
-       [recognizer/text-editor (merge {:text liguria-text} params)]])))
+       [recognizer/text-editor params]])))
 
 (def main
   (nav/create-screen

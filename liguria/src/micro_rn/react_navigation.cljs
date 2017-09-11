@@ -42,6 +42,9 @@
 (defn props->params [props]
   (-> props :navigation utils/prepare-to-clj :state :params))
 
+(defn props->navigator [props]
+  (-> props .-navigation))
+
 (defn create-screen
   ([content]
    (create-screen {} content))
