@@ -7,7 +7,10 @@
             [liguria.screens.wiki.views :as wiki]
             [liguria.screens.results.views :as results]
             [liguria.screens.lessons.views :as lessons]
-            [micro-rn.utils :as utils]))
+            [micro-rn.utils :as utils]
+            [liguria.shared.screens-shared-ui :as sh]
+            [micro-rn.styles :as st]
+            [micro-rn.rn-utils :as rn-utils]))
 
 (def wiki-stack
   (nav/create-stack-navigator
@@ -28,7 +31,8 @@
    {:navigation-options (fn [props]
                           (utils/prepare-to-js
                            {:header-right
-                            (r/as-element [rn/view [rn/text "hello"]])}))}))
+                            (r/as-element [lessons/leasons-right-header
+                                           (nav/props->navigator props)])}))}))
 
 (def main-tabs
   (nav/create-tab-navigator

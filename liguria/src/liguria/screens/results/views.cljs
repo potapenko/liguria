@@ -9,7 +9,7 @@
             [liguria.screens.results.results-list :refer [results-list]]))
 
 (defn icon-results [{:keys [tint-color focused] :as props}]
-  [sh/tab-icon tint-color focused "ios-albums-outline"])
+  [sh/tab-icon tint-color focused "ios-stats-outline"])
 
 (defn- screen-content []
   (fn []

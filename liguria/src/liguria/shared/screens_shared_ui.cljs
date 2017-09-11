@@ -12,6 +12,18 @@
 (defn icon-settings [{:keys [tint-color focused] :as props}]
   [tab-icon tint-color focused "ios-more-outline"])
 
+(defn icon-bookmark [{:keys [tint-color focused] :as props}]
+  [tab-icon tint-color focused "ios-bookmark-outline"])
+
+(defn icon-info [{:keys [tint-color focused] :as props}]
+  [tab-icon tint-color focused "ios-information-circle-outline"])
+
+(defn icon-alarm [{:keys [tint-color focused] :as props}]
+  [tab-icon tint-color focused "ios-alarm-outline"])
+
+(defn icon-ios [icon]
+  [tab-icon nil false (str "ios-" icon "-outline")])
+
 (defn play-icon-style [color]
   [st/align-center st/justify-center
    (st/overflow "hidden")

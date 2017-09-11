@@ -7,7 +7,20 @@
             [micro-rn.utils :as util]
             [liguria.shared.screens-shared-ui :as sh]
             [liguria.screens.lessons.lessons-list :refer [lessons-list]]
-            [micro-rn.utils :as utils]))
+            [micro-rn.utils :as utils]
+            [micro-rn.styles :as st]))
+
+(defn leasons-right-header [navigator]
+  [rn/view {:style [st/row]}
+   [rn/touchable-opacity
+    {:style [(st/padding 8)]}
+    [view {:style [st/row st/align-center st/justify-center]}
+     [sh/icon-bookmark]]]
+   [rn/touchable-opacity
+    {:style [(st/padding 8)]}
+    [view {:style [st/row st/align-center st/justify-center]}
+     [sh/icon-info]]]
+   [rn/spacer 20]])
 
 (defn icon-lessons [{:keys [tint-color focused] :as props}]
   [sh/tab-icon tint-color focused "ios-mic-outline"])

@@ -21,7 +21,7 @@
   ;; -160dB 0dB
   (-> nm/audio-recorder
       (aset "onProgress"
-            #(let [from 28 to -5
+            #(let [from 38 to -5
                    monitoring (-> % .-currentMetering
                                   (+ from) (/ from) (* 100) (max 0))
                    set-width (some-> @monitor-lines-ref .-setWidth)]
@@ -68,9 +68,9 @@
 (defn progress-monitor []
   [view {:style [st/row st/align-center (st/padding 0 0 8 0) (st/background-color "#E9E9EF")]}
    [spacer 8]
-   [one-result "20%" "прогресс"]
-   [one-result "0.79" "скорость"]
-   [one-result 201 "балл" #_"orangered"]
+   [one-result (str (rand-int 20) "%") "прогресс"]
+   [one-result (-> 100 rand-int (/ 100) str) "скорость"]
+   [one-result (rand-int 200) "балл"]
    [spacer 8]])
 
 (defn recording-controls []
