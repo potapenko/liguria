@@ -132,11 +132,7 @@
                         :value     @sentences}
        [rn/touchable-opacity {:active-opacity 1
                               :on-press       #(dispatch [::model/paragraph-click id])}
-        [view {:style [(st/padding 6 12)
-                       (st/border 1 (st/gray-cl 1) "solid")
-                       (st/border-left 0)
-                       (st/border-right 0)
-                       (st/border-top 0)]}
+        [view {:style [(st/padding 6 12)]}
          (doall
           (for [s (filter-sentences @sentences @search-text)]
             ^{:key (str "sentence-" (:id s))} [sentence s]))]]])))
@@ -162,7 +158,7 @@
          [rn/view {:style [(st/flex) st/align-center st/justify-center]}
           [rn/activity-indicator {:size "large"}]]
          [nm/animatable-view {:animation (when-not (= 11 lesson) "fadeInUp") :duration 200}
-          [rn/flat-list {:ref                         #(dispatch [::model/list-ref %])
+          [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
                          :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                          :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
                          :scroll-enabled            (not @select-in-progress)
@@ -172,6 +168,7 @@
                                                        (dispatch [::model/paragraph-hidden id (not visible)])))
                          :data                      (build-data-fn @transcript @search-text)
                          :render-item               #(r/as-element [one-list-line %])
+                         :ItemSeparatorComponent    #(r/as-element [view {:style [(st/height 1) (st/gray 10)]}])
                          :key-extractor             #(str "paragraph-list-" (-> % .-id))}]])])))
 
 (defn text-editor [{:keys [text lesson] :as props}]

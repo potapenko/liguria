@@ -35,12 +35,11 @@
              (st/overflow "hidden")
              (st/width w)
              (st/height w)
-             (st/rounded (/ w 2))
-             #_(st/border 1 color)]}
+             (st/rounded (/ w 2))]}
       [nm/icon-io {:color color :size (- w 8) :name "ios-mic"}]])))
 
 (defn lesson [{:keys [id date title text statistic navigation]}]
-  [view {:style [(st/border-bottom 1 (st/gray-cl 1))]}
+  [view {:style []}
    [rn/touchable-opacity {:style    [st/row st/align-center]
                           :on-press #(navigate! :recording {:lesson id :text text})}
     [rn/text {:style [(st/font-size 16) (st/padding 16)]} (str (inc id) ".   " title)]
@@ -60,9 +59,10 @@
     (dispatch [::model/navigator navigator])
     (fn []
       [view {:style [(st/flex) (st/background "white")]}
-       [rn/flat-list {:data          @(subscribe [::model/lessons-list])
-                      :render-item   #(r/as-element [one-list-line %])
-                      :key-extractor #(str "lessons-list-" (-> % .-id))}]])))
+       [rn/flat-list {:data                   @(subscribe [::model/lessons-list])
+                      :ItemSeparatorComponent #(r/as-element [view {:style [(st/height 1) (st/gray 10)]}])
+                      :render-item            #(r/as-element [one-list-line %])
+                      :key-extractor          #(str "lessons-list-" (-> % .-id))}]])))
 
 
 (comment
