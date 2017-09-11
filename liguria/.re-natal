@@ -12,7 +12,8 @@
     "react-native-audio",
     "react-native-device-info",
     "react-native-speech-to-text-ios",
-    "react-native-search-input"
+    "react-native-search-input",
+    "react-native-animatable"
   ],
   "imageDirs": [
     "images"

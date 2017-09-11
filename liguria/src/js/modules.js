@@ -24,3 +24,10 @@ export const Monitor = MonitorLink;
 
 import UpdateScopeLink from './UpdateScope.js'
 export const UpdateScope = UpdateScopeLink;
+
+import * as AnimatableLink from 'react-native-animatable';
+
+export const Animatable = AnimatableLink;
+export const AnimatableView = AnimatableLink.View;
+export const AnimatableText = AnimatableLink.Text;
+

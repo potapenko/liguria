@@ -22,7 +22,8 @@
 
 (def update-scope (rn/adapt-react-class (.-UpdateScope modules) "UpdateScope"))
 
-
+(def animatable-view (rn/adapt-react-class (.-AnimatableView modules) "AnimatableView"))
+(def animatable-text (rn/adapt-react-class (.-AnimatableText modules) "AnimatableText"))
 
 (comment
   (js/Object.keys modules))

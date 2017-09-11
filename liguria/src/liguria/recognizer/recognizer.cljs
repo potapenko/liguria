@@ -158,17 +158,21 @@
                                    (filter-paragraphs transcript search-text))))]
     (fn []
       [nm/update-scope {:style [(st/flex) (st/background "white")] :equals = :value [(count @transcript) @select-in-progress]}
-       [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
-                      :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
-                      :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
-                      :scroll-enabled            (not @select-in-progress)
-                      :initial-num-to-render     3
-                      :on-viewable-items-changed (rn-util/on-viewable-items-changed
-                                                  (fn [id visible index]
-                                                    (dispatch [::model/paragraph-hidden id (not visible)])))
-                      :data                      (build-data-fn @transcript @search-text)
-                      :render-item               #(r/as-element [one-list-line %])
-                      :key-extractor             #(str "paragraph-list-" (-> % .-id))}]])))
+       (if (empty? @transcript)
+         [rn/view {:style [(st/flex) st/align-center st/justify-center]}
+          [rn/activity-indicator {:size "large"}]]
+         [nm/animatable-view {:animation "fadeInUp" :duration 400}
+          [rn/flat-list {:ref                         #(dispatch [::model/list-ref %])
+                         :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
+                         :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
+                         :scroll-enabled            (not @select-in-progress)
+                         :initial-num-to-render     3
+                         :on-viewable-items-changed (rn-util/on-viewable-items-changed
+                                                     (fn [id visible index]
+                                                       (dispatch [::model/paragraph-hidden id (not visible)])))
+                         :data                      (build-data-fn @transcript @search-text)
+                         :render-item               #(r/as-element [one-list-line %])
+                         :key-extractor             #(str "paragraph-list-" (-> % .-id))}]])])))
 
 (defn text-editor [{:keys [text lesson]}]
   (let []
