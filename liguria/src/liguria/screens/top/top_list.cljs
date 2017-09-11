@@ -15,6 +15,13 @@
    [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))
 
+(defn navigate!
+  [screen props]
+  (nav/navigate! @(subscribe [::model/navigator]) screen props))
+
+(defn go-back! []
+  (nav/go-back! @(subscribe [::model/navigator])))
+
 (defn top-element [{:keys [id date name result info]}]
   (let [color "cornflowerblue"]
     [rn/touchable-opacity {:style [st/row st/align-center (st/padding 16)

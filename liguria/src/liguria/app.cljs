@@ -24,15 +24,17 @@
   (nav/create-stack-navigator
    {:top {:screen top/main}}))
 
+(defn build-header-right [component]
+  (fn [props]
+    (utils/prepare-to-js
+     {:header-right
+      (r/as-element [component (nav/props->navigator props)])})))
+
 (def recording-stack
   (nav/create-stack-navigator
    {:lessons   {:screen lessons/main}
     :recording {:screen recording/main}}
-   {:navigation-options (fn [props]
-                          (utils/prepare-to-js
-                           {:header-right
-                            (r/as-element [lessons/leasons-right-header
-                                           (nav/props->navigator props)])}))}))
+   {:navigation-options (build-header-right lessons/leasons-right-header)}))
 
 (def main-tabs
   (nav/create-tab-navigator

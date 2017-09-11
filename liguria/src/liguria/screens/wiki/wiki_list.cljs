@@ -15,6 +15,13 @@
    [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))
 
+(defn navigate!
+  [screen props]
+  (nav/navigate! @(subscribe [::model/navigator]) screen props))
+
+(defn go-back! []
+  (nav/go-back! @(subscribe [::model/navigator])))
+
 (defn wiki-element [{:keys [id title]}]
   (let [color "cornflowerblue"]
     [rn/touchable-opacity {:style [st/row (st/padding 16) (st/border-bottom 1 (st/gray-cl 1))]}
