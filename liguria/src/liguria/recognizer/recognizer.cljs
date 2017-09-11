@@ -157,7 +157,7 @@
        (if (empty? @transcript)
          [rn/view {:style [(st/flex) st/align-center st/justify-center]}
           [rn/activity-indicator {:size "large"}]]
-         [nm/animatable-view {:animation (when-not (= 11 lesson) "fadeInUp") :duration 200}
+         [nm/animatable-view {:style [(st/flex)] :animation (when-not (= 11 lesson) "fadeInUp") :duration 200}
           [rn/flat-list {:ref                       #(dispatch [::model/list-ref %])
                          :on-layout                 #(dispatch [::model/list-layout (rn-util/event->layout %)])
                          :on-scroll                 #(dispatch [::model/scroll-pos (rn-util/scroll-y %)])
