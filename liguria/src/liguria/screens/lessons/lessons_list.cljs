@@ -27,11 +27,18 @@
   [rn/view {:style [st/align-center st/justify-center]}
    [nm/icon-io {:color (st/gray-cl 2) :size 24 :name "ios-mic"}]])
 
+(defn lock-icon []
+  [rn/view {:style [st/align-center st/justify-center]}
+   [nm/icon-io {:color (st/gray-cl 2) :size 24 :name "ios-lock-outline"}]])
+
 (defn star-icon
   ([] (star-icon false))
   ([higlited]
    [rn/view {:style [st/align-center st/justify-center (st/padding 1)]}
-    [nm/icon-io {:color (st/gray-cl 2) :size 18 :name "ios-star-outline"}]]))
+    [rn/view {:style []}
+     (if-not higlited
+      [nm/icon-io {:color (st/gray-cl 2) :size 18 :name "ios-star-outline"}]
+      [nm/icon-io {:color "gold" :size 18 :name "ios-star"}])]]))
 
 (defn lessons-list-element [{:keys [id date title text statistic navigation]}]
   [view {:style []}
@@ -41,9 +48,10 @@
               :style [(st/font-size 16) (st/flex 3) (st/padding 16)]} (str (inc id) ".   " title)]
     [view {:style [(st/flex) st/row]}
      [flexer]
-     [star-icon]
-     [star-icon]
-     [star-icon]
+     [view {:style [st/row]}
+      [star-icon]
+      [star-icon]
+      [star-icon]]
      [spacer 16]
      [go-icon]
      [spacer 16]
