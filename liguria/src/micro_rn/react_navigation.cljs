@@ -2,7 +2,7 @@
   (:refer-clojure :exclude [pop!])
   (:require [reagent.core :as r]
             [micro-rn.react-native :as rn]
-            [camel-snake-kebab.core :refer [->camelCase]]
+            [camel-snake-kebab.core :refer [->camelCase ->kebab-case]]
             [micro-rn.utils :as utils])
   (:require-macros [reagent.ratom :refer [reaction]]))
 
@@ -45,6 +45,9 @@
 (defn props->navigator [props]
   (-> props .-navigation))
 
+(defn navigator->screen [navigator]
+  (-> navigator .-state utils/prepare-to-clj :route-name ->kebab-case keyword))
+
 (defn create-screen
   ([content]
    (create-screen {} content))
@@ -59,14 +62,17 @@
 
 
 (defn navigate!
-  [navigator screen props]
-  (. navigator
-     (navigate
-      (-> screen (->camelCase) (name))
-      (clj->js props))))
+  ([navigator screen] (navigate! navigator screen {}))
+  ([navigator screen props]
+   (let [current-screen (navigator->screen navigator)]
+     (when-not (= current-screen screen)
+         (. navigator
+            (navigate
+             (-> screen (->camelCase) name)
+             (clj->js props)))))))
 
 (defn go-back! [navigator]
-  (. navigator (goBack)))
+  (. navigator goBack))
 
 (defn import-module [name]
   (-> (js/require "react-navigation") (aget name) (rn/adapt-react-class "react-navigation")))

@@ -39,7 +39,7 @@
 (defn wiki-list-element [{:keys [id title]}]
   [view {:style []}
    [rn/touchable-opacity {:style    [st/row st/align-center]
-                          :on-press #(navigate! :wiki {:wiki id})}
+                          :on-press #() #_(navigate! :wiki {:wiki id})}
     [rn/text {:number-of-lines 1 :elipsis-mode "tail"
               :style [(st/width "85%") (st/font-size 16) (st/padding 16) #_(st/font-weight "bold")]} (str title)]
     [flexer]

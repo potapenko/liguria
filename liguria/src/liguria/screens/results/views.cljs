@@ -4,7 +4,7 @@
             [micro-rn.react-native :as rn :refer [alert text view]]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
-            [micro-rn.utils :as util]
+            [micro-rn.utils :as utils]
             [liguria.shared.screens-shared-ui :as sh]
             [liguria.screens.results.results-list :refer [results-list]]))
 
@@ -19,7 +19,7 @@
 (def main
   (nav/create-screen
    {:title "Результаты"
-    :tab-bar-icon #(r/as-element [icon-results (util/prepare-to-clj %)])}
+    :tab-bar-icon #(r/as-element [icon-results (utils/prepare-to-clj %)])}
    (screen-content)))
 
 

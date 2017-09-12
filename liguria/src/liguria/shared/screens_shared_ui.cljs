@@ -24,6 +24,9 @@
 (defn icon-ios [icon]
   [tab-icon nil false (str "ios-" icon "-outline")])
 
+(defn icon-lessons [{:keys [tint-color focused] :as props}]
+  [tab-icon tint-color focused "ios-mic-outline"])
+
 (defn play-icon-style [color]
   [st/align-center st/justify-center
    (st/overflow "hidden")

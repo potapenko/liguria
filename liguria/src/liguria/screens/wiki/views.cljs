@@ -3,7 +3,7 @@
             [micro-rn.react-native :as rn :refer [alert text view]]
             [micro-rn.react-navigation :as nav]
             [reagent.core :as r :refer [atom]]
-            [micro-rn.utils :as util]
+            [micro-rn.utils :as utils]
             [liguria.shared.screens-shared-ui :as sh]
             [liguria.screens.wiki.wiki-list :refer [wiki-list]]
             [re-frame.core :refer [dispatch subscribe]]))
@@ -18,7 +18,7 @@
 (def main
   (nav/create-screen
    {:title "Статьи"
-    :tab-bar-icon #(r/as-element [icon-wiki (util/prepare-to-clj %)])}
+    :tab-bar-icon #(r/as-element [icon-wiki (utils/prepare-to-clj %)])}
    (screen-content)))
 
 

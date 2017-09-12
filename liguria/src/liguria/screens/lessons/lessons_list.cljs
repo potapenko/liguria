@@ -23,28 +23,32 @@
 (defn go-back! []
   (nav/go-back! @(subscribe [::model/navigator])))
 
-(defn go-icon
-  ([] (go-icon "ios-mic" false))
-  ([icon higlited]
-   (let [color (if higlited "cornflowerblue" (st/gray-cl 2))
-         w     32]
-     [view {:style
-            [st/align-center st/justify-center
-             (st/overflow "hidden")
-             (st/width w)
-             (st/height w)
-             (st/rounded (/ w 2))]}
-      [nm/icon-io {:color color :size (- w 8) :name icon}]])))
+(defn go-icon []
+  [rn/view {:style [st/align-center st/justify-center]}
+   [nm/icon-io {:color (st/gray-cl 2) :size 24 :name "ios-mic"}]])
+
+(defn star-icon
+  ([] (star-icon false))
+  ([higlited]
+   [rn/view {:style [st/align-center st/justify-center (st/padding 1)]}
+    [nm/icon-io {:color (st/gray-cl 2) :size 18 :name "ios-star-outline"}]]))
 
 (defn lessons-list-element [{:keys [id date title text statistic navigation]}]
   [view {:style []}
    [rn/touchable-opacity {:style    [st/row st/align-center]
                           :on-press #(navigate! :recording {:lesson id :text text})}
     [rn/text {:number-of-lines 1 :elipsis-mode "tail"
-              :style [(st/font-size 16) (st/padding 16)]} (str (inc id) ".   " title)]
-    [flexer]
-    [go-icon]
-    [spacer 16]]])
+              :style [(st/font-size 16) (st/flex 3) (st/padding 16)]} (str (inc id) ".   " title)]
+    [view {:style [(st/flex) st/row]}
+     [flexer]
+     [star-icon]
+     [star-icon]
+     [star-icon]
+     [spacer 16]
+     [go-icon]
+     [spacer 16]
+     ]
+    ]])
 
 (defn one-list-line [x]
   (let [id      (-> x .-item .-id)

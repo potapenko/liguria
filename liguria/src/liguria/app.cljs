@@ -7,6 +7,8 @@
             [liguria.screens.wiki.views :as wiki]
             [liguria.screens.results.views :as results]
             [liguria.screens.lessons.views :as lessons]
+            [liguria.screens.lessons.info :as info]
+            [liguria.screens.bookmarks.views :as bookmarks]
             [micro-rn.utils :as utils]
             [liguria.shared.screens-shared-ui :as sh]
             [micro-rn.styles :as st]
@@ -32,8 +34,10 @@
 
 (def recording-stack
   (nav/create-stack-navigator
-   {:lessons   {:screen lessons/main}
-    :recording {:screen recording/main}}
+   {:lessons      {:screen lessons/main}
+    :bookmarks    {:screen bookmarks/main}
+    :lessons-info {:screen info/main}
+    :recording    {:screen recording/main}}
    {:navigation-options (build-header-right lessons/leasons-right-header)}))
 
 (def main-tabs

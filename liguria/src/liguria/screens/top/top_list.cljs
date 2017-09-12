@@ -39,7 +39,7 @@
 (defn top-list-element [{:keys [id name result]}]
   [view {:style []}
    [rn/touchable-opacity {:style    [st/row st/align-center]
-                          :on-press #(navigate! :top {:top id})}
+                          :on-press #() #_(navigate! :top {:top id})}
     [rn/text {:number-of-lines 1 :elipsis-mode "tail"
               :style [(st/font-size 16) (st/padding 16)]} (str id ".  " name)]
     [flexer]

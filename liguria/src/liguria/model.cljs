@@ -7,6 +7,7 @@
    [liguria.screens.wiki.model :as wiki-model]
    [liguria.screens.lessons.model :as lessons-model]
    [liguria.screens.results.model :as results-model]
+   [liguria.screens.bookmarks.model :as bookmarks-model]
    [liguria.shared.liguria-text :refer [liguria-text]]
    [liguria.shared.nlp :as nlp])
   (:require-macros [micro-rn.macros :refer [...]]
@@ -19,5 +20,6 @@
    (dispatch [::top-model/top-list (top-model/build-test-data)])
    (dispatch [::wiki-model/wiki-list (wiki-model/build-test-data)])
    (dispatch [::lessons-model/lessons-list (lessons-model/build-test-data)])
+   (dispatch [::bookmarks-model/bookmarks-list (bookmarks-model/build-test-data)])
    {}))
 
