@@ -35,17 +35,16 @@
   ([] (star-icon false))
   ([higlited]
    [rn/view {:style [st/align-center st/justify-center (st/padding 1)]}
-    [rn/view {:style []}
-     (if-not higlited
+    (if-not higlited
       [nm/icon-io {:color (st/gray-cl 2) :size 18 :name "ios-star-outline"}]
-      [nm/icon-io {:color "gold" :size 18 :name "ios-star"}])]]))
+      [nm/icon-io {:color "gold" :size 18 :name "ios-star"}])]))
 
 (defn lessons-list-element [{:keys [id date title text statistic navigation]}]
   [view {:style []}
-   [rn/touchable-opacity {:style    [st/row st/align-center]
+   [rn/touchable-opacity {:style    [st/row st/align-center (st/padding 16)]
                           :on-press #(navigate! :recording {:lesson id :text text})}
     [rn/text {:number-of-lines 1 :elipsis-mode "tail"
-              :style [(st/font-size 16) (st/flex 3) (st/padding 16)]} (str (inc id) ".   " title)]
+              :style [(st/font-size 16) (st/flex 3) ]} (str (inc id) ".   " title)]
     [view {:style [(st/flex) st/row]}
      [flexer]
      [view {:style [st/row]}
@@ -54,9 +53,7 @@
       [star-icon]]
      [spacer 16]
      [go-icon]
-     [spacer 16]
-     ]
-    ]])
+     [spacer 16]]]])
 
 (defn one-list-line [x]
   (let [id      (-> x .-item .-id)

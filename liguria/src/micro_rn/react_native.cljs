@@ -83,12 +83,13 @@
 (def CameraRoll (.-CameraRoll ReactNative))
 (def dimensions (.-Dimensions ReactNative))
 (def InteractionManager (.-InteractionManager ReactNative))
-(def Platform (.-Platform ReactNative))
 (def NativeModules (.-NativeModules ReactNative))
 (def NativeAppEventEmitter (.-NativeAppEventEmitter ReactNative))
 (def DeviceEventEmitter (.-DeviceEventEmitter ReactNative))
-(def android? (= "android" (.-OS Platform)))
-(def ios? (= "ios" (.-OS Platform)))
+
+(def Platform (utils/prepare-to-clj (.-Platform ReactNative)))
+(def android? (= "android" (:os Platform)))
+(def ios? (= "ios" (:os Platform)))
 
 (def layout-animation (.-LayoutAnimation ReactNative))
 (def layout-animation-configure-next (.-configureNext layout-animation))

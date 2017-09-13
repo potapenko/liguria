@@ -1,7 +1,8 @@
 (ns micro-rn.rn-utils
   (:require [micro-rn.utils :as utils]
             [re-frame.loggers :as rf-log]
-            [reagent.core :as r])
+            [reagent.core :as r]
+            [micro-rn.react-native :as rn])
   (:require-macros [micro-rn.macros :refer [...]]))
 
 (defn event->layout [e]
@@ -88,3 +89,14 @@
                                         (-> e .-index)])))]
       (doseq [[id visible index] change-log]
         (item-fn id visible index)))))
+
+
+(defn iphone-x? []
+  (-> rn/Platform ))
+
+(comment
+
+  (iphone-x?)
+
+
+  )

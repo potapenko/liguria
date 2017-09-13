@@ -633,6 +633,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				7D68B8F05D314B568DAB28A3 /* Frameworks */,
 				0316BF9550E447039FF728E1 /* Resources */,
+				9D72AF1B1F697A2E00BA1F06 /* Recovered References */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -647,6 +648,19 @@
 				2D02E4901E0B4A5D006451C7 /* liguria-tvOSTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		9D72AF1B1F697A2E00BA1F06 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				75E36AA0FF27466EB24EBF07 /* libRNAudio.a */,
+				462161F2B54A4EB69DC3E286 /* libRNDeviceInfo.a */,
+				A24C59761D6349AF8A255F98 /* libRNSpeechToTextIos.a */,
+				212F4BE76D2B4FDA9A8054AA /* libRNVectorIcons.a */,
+				BCC6EB46B97C4418A994FAAF /* libOGReactNativeWaveform.a */,
+				141954CBCE34461C9B3082BF /* libRNSVG.a */,
+			);
+			name = "Recovered References";
 			sourceTree = "<group>";
 		};
 		9D762DC01F55A4E500F66441 /* Products */ = {

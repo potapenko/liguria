@@ -49,5 +49,8 @@
    {:tab-bar-options {}}))
 
 (defn app-root-component []
-  [(r/adapt-react-class main-tabs)])
+  [rn/view {:style [(st/flex) (st/background-color "#F4F4F4" #_"")]}
+   [rn/view {:style [(st/height 18) (st/background-color "#EFEFF2")]}]
+   [(r/adapt-react-class main-tabs)]
+   [rn/view {:style [(st/height 32) (st/background-color "#F4F4F4")]}]])
 

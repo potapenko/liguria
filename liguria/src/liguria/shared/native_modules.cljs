@@ -2,7 +2,8 @@
   (:require [clojure.string :as string]
             [micro-rn.react-native :as rn]
             [reagent.core :as r :refer [atom]]
-            [reagent.impl.component :as ru]))
+            [reagent.impl.component :as ru]
+            [micro-rn.utils :as utils]))
 
 (def modules (js/require "./src/js/modules.js"))
 (def TabIcon (.-TabIcon modules))
@@ -25,6 +26,14 @@
 (def animatable-view (rn/adapt-react-class (.-AnimatableView modules) "AnimatableView"))
 (def animatable-text (rn/adapt-react-class (.-AnimatableText modules) "AnimatableText"))
 
+
+(def device-info (->> (js/require "react-native-device-info")
+                     utils/prepare-to-clj
+                     (map (fn [[k v]] {(-> k name (string/replace "get-" "") keyword) (v)}))
+                     (apply merge)))
+
 (comment
+  (println (-> device-info))
+
   (js/Object.keys modules))
 
