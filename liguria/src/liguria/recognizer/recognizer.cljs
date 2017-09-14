@@ -65,12 +65,17 @@
     (fn [{:keys
           [id text background-gray text-style
            selected searched deleted recorded] :as data}]
+
       (go
-        (when (->> @diff-state (some (fn [[k v]] (and (k data) (not= (k data) (k v))))))
-          (<! (timeout 100))
-          (some-> @animation-ref (.word 400)))
-        (reset! diff-state (... selected recorded)))
-      (let [text-style    (-> text-style (conj
+        (let [diffs (->> @diff-state
+                         (filter (fn [[k v]] (and (k data) (not= (k data) (k v)))))
+                         (map (fn [[k v] k])))]
+          (when-not (empty? diffs)
+            (<! (timeout 100))
+            (some-> @animation-ref (.word 800)))
+          (reset! diff-state (... selected recorded))))
+      (let [;;recorded      selected selected false
+            text-style    (-> text-style (conj
                                           (when selected [:invert
                                                           (when recorded (st/color "gold"))])
                                           (when deleted :s)) map-decorations)
