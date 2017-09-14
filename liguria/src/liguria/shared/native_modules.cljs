@@ -26,6 +26,9 @@
 (def animatable-view (rn/adapt-react-class (.-AnimatableView modules) "AnimatableView"))
 (def animatable-text (rn/adapt-react-class (.-AnimatableText modules) "AnimatableText"))
 
+(defn animatable-new-animation [anims]
+  (-> (.-Animatable modules)
+      (.initializeRegistryWithDefinitions (utils/prepare-to-js anims))))
 
 (def device-info (->> (js/require "react-native-device-info")
                      utils/prepare-to-clj

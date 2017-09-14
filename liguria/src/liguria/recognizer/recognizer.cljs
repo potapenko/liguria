@@ -11,7 +11,9 @@
             [liguria.shared.nlp :as nlp]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [micro-rn.utils :as utils]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            [liguria.screens.recording.controls :as recording-controls]
+            [liguria.shared.liguria-text :refer [liguria-text]])
   (:require-macros
    [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))
@@ -56,24 +58,32 @@
                                                 (dispatch [::model/word-long-press id false])))})))))
 
 (defn word [{:keys [id]}]
-  (let [responder-props (rn-util/->gesture-props (create-responder id))]
+  (let [responder-props (rn-util/->gesture-props (create-responder id))
+        animation-ref   (atom nil)
+        diff-state      (atom {})]
+    (nm/animatable-new-animation {:word {:from {:scale 1.2 :z-index 10} :to {:scale 1 :z-index 1}}})
     (fn [{:keys
           [id text background-gray text-style
            selected searched deleted recorded] :as data}]
+      (go
+        (when (->> @diff-state (some (fn [[k v]] (and (k data) (not= (k data) (k v))))))
+          (<! (timeout 100))
+          (some-> @animation-ref (.word 400)))
+        (reset! diff-state (... selected recorded)))
       (let [text-style    (-> text-style (conj
                                           (when selected [:invert
                                                           (when recorded (st/color "gold"))])
                                           (when deleted :s)) map-decorations)
-            text-bg-style [(when recorded (st/background-color "gold"))
-                           (when selected (st/gray 9))]]
-        [view
-         (merge
-          {:ref #(dispatch [::model/word-state id :ref %])}
-          responder-props)
-         [view {:style (conj text-bg-style (st/padding 4 2))}
-          [rn/text {:style (conj text-style
-                                 (st/font-size @(subscribe [::model/text-size])))}
-           text]]]))))
+            text-bg-style [(cond
+                             recorded (st/background-color "gold")
+                             selected (st/gray 9)
+                             :else    (st/background-color "transparent"))]]
+        [nm/animatable-view {:ref #(reset! animation-ref %)}
+         [view (merge {:ref #(dispatch [::model/word-state id :ref %])} responder-props)
+          [view {:style (conj text-bg-style (st/padding 4 2))}
+           [rn/text {:style (conj text-style
+                                  (st/font-size @(subscribe [::model/text-size])))}
+            text]]]]))))
 
 (defn icon-button [{:keys [icon label focused on-press]}]
   [touchable-opacity {:style [(st/justify-content "center")
@@ -174,6 +184,7 @@
 (defn text-editor [{:keys [text lesson] :as props}]
   (let [lesson (if-not (nil? lesson) lesson 0)
         text   (if-not (nil? text) text (-> liguria-text nlp/create-paragraphs first))]
+    (recording-controls/stop-recording)
     (dispatch-sync [::model/transcript []])
     (go
       (<! (utils/await-cb rn/run-after-interactions))
@@ -185,7 +196,10 @@
             (let [new-list (concat current [v])]
               (<! (timeout 100))
               (dispatch-sync [::model/transcript new-list])
-              (recur parts new-list))))))
+              (recur parts new-list)))))
+      (<! (timeout 500))
+      (<! (utils/await-cb rn/run-after-interactions))
+      (recording-controls/start-recording))
     (fn []
       [text-list props])))
 
