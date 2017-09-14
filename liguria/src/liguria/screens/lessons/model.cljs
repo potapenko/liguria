@@ -13,26 +13,28 @@
 
 (defn build-test-data []
   (let [paragraphs (nlp/create-paragraphs liguria-text)]
-    (->> ["Лигурийский регулировщик"
-          "Хохлатые хохотушки"
-          "Сонька и Сашка"
-          "Вавилонка Варвара"
-          "Саша на шоссе"
-          "Колокол переколоколовать"
-          "Сеня с донесеньем"
-          "У гусыни усов не ищи"
-          "Береги честь с молоду"
-          "Конституционалист Константин"
-          "Щёголь Щегол"
-          "Лигурия"]
-         (map-indexed (fn [index title]
+    (->> [["Лигурийский регулировщик" "orangered"]
+          ["Хохлатые хохотушки" "orange"]
+          ["Сонька и Сашка" "gold"]
+          ["Вавилонка Варвара" "greenyellow"]
+          ["Саша на шоссе" "deepskyblue"]
+          ["Колокол переколоколовать" "#A16BD3" #_"blueviolet"]
+          ["Сеня с донесеньем" "dodgerblue"]
+          ["У гусыни усов не ищи" "#FF65B8" #_"deeppink"]
+          ["Береги честь с молоду" "orange"]
+          ["Конституционалист Константин" "orangered"]
+          ["Щёголь Щегол" "gold"]
+          ["Лигурия" "gray"]]
+         (map-indexed (fn [index [title color]]
                         (do {:id        index
                              :enabled   (< index 5)
                              :title     title
+                             :color     color
                              :text      (or (nth paragraphs index nil) liguria-text)
-                             :statistic {:lesson (rand-int 200)
-                                         :time   (rand-int 180)
-                                         :errors (rand-int 200)}}))))))
+                             :statistic {:lesson   (rand-int 200)
+                                         :accuracy (-> 50 rand-int (+ 10))
+                                         :time     (rand-int 180)
+                                         :errors   (rand-int 200)}}))))))
 
 (reg-sub
  ::lessons-list

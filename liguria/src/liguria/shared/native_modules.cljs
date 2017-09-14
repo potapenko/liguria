@@ -34,6 +34,5 @@
 
 (comment
   (println (-> device-info))
-
   (js/Object.keys modules))
 
