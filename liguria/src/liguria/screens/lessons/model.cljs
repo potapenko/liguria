@@ -18,16 +18,16 @@
           ["Сонька и Сашка" "gold"]
           ["Вавилонка Варвара" "greenyellow"]
           ["Саша на шоссе" "deepskyblue"]
-          ["Колокол переколоколовать" "#A16BD3" #_"blueviolet"]
+          ["Колокол переколоколовать" "#A16BD3"]
           ["Сеня с донесеньем" "dodgerblue"]
-          ["У гусыни усов не ищи" "#FF65B8" #_"deeppink"]
+          ["У гусыни усов не ищи" "#FF65B8"]
           ["Береги честь с молоду" "orange"]
-          ["Конституционалист Константин" "orangered"]
+          ["Конституционалист" "orangered"]
           ["Щёголь Щегол" "gold"]
           ["Лигурия" "gray"]]
          (map-indexed (fn [index [title color]]
                         (do {:id        index
-                             :enabled   (< index 5)
+                             :enabled   (< index 3)
                              :title     title
                              :color     color
                              :text      (or (nth paragraphs index nil) liguria-text)

@@ -50,7 +50,7 @@
 
 (defn app-root-component []
   [rn/view {:style [(st/flex) (st/background-color "#F4F4F4" #_"")]}
-   #_[rn/view {:style [(st/height 18) (st/background-color "#EFEFF2")]}]
+   [rn/view {:style [(st/height 18) (st/background-color "#EFEFF2")]}]
    [(r/adapt-react-class main-tabs)]
-   #_[rn/view {:style [(st/height 32) (st/background-color "#F4F4F4")]}]])
+   [rn/view {:style [(st/height 32) (st/background-color "#F4F4F4")]}]])
 

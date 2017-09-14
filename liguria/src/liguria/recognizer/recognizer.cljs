@@ -172,7 +172,8 @@
                          :key-extractor             #(str "paragraph-list-" (-> % .-id))}]])])))
 
 (defn text-editor [{:keys [text lesson] :as props}]
-  (let []
+  (let [lesson (if-not (nil? lesson) lesson 0)
+        text   (if-not (nil? text) text (-> liguria-text nlp/create-paragraphs first))]
     (dispatch-sync [::model/transcript []])
     (go
       (<! (utils/await-cb rn/run-after-interactions))

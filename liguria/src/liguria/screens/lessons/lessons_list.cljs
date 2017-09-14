@@ -23,9 +23,13 @@
 (defn go-back! []
   (nav/go-back! @(subscribe [::model/navigator])))
 
-(defn go-icon []
-  [rn/view {:style [st/align-center st/justify-center]}
-   [nm/icon-io {:color (st/gray-cl 2) :size 24 :name "ios-mic"}]])
+(defn go-icon
+  ([] (go-icon false))
+  ([locked]
+   [rn/view {:style [st/align-center st/justify-center]}
+    (if-not locked
+      [nm/icon-io {:color (st/gray-cl 2) :size 24 :name "ios-mic"}]
+      [nm/icon-io {:color (st/gray-cl 2) :size 24 :name "ios-lock"}])]))
 
 (defn lock-icon []
   [rn/view {:style [st/align-center st/justify-center]}
@@ -36,10 +40,10 @@
   ([higlited]
    [rn/view {:style [st/align-center st/justify-center (st/padding 1)]}
     (if-not higlited
-      [nm/icon-io {:color (st/gray-cl 2) :size 18 :name "ios-star-outline"}]
-      [nm/icon-io {:color "gold" :size 18 :name "ios-star"}])]))
+      [nm/icon-io {:color (st/gray-cl 2) :size 16 :name "ios-star-outline"}]
+      [nm/icon-io {:color "gold" :size 16 :name "ios-star"}])]))
 
-(defn lessons-list-element [{:keys [id date title text color statistic navigation]}]
+(defn lessons-list-element [{:keys [id date title text color enabled statistic navigation]}]
   [view {:style []}
    [rn/touchable-opacity {:style    [st/row st/align-center (st/padding 16)]
                           :on-press #(navigate! :recording {:lesson id :text text})}
@@ -47,21 +51,18 @@
                    (st/height 30)
                    (st/rounded 16)
                    (st/border 3 color)
-                   #_(st/background-color color #_(st/gray-cl 1))
                    st/align-center st/justify-center]}
      [rn/text {:style [st/bold]} (str (inc id))]]
     [rn/spacer 16]
     [rn/text {:number-of-lines 1 :elipsis-mode "tail"
-              :style [(st/font-size 16) (st/flex 3) ]} (str title)]
-    [view {:style [(st/flex) st/row]}
-     [flexer]
-     [view {:style [st/row]}
+              :style [(st/font-size 16) ]} (str title)]
+    [view {:style [(st/flex) st/row (st/justify-content "flex-end")]}
+     [view {:style [st/row (st/margin-top 2)]}
       [star-icon (-> statistic :accuracy (> 0))]
       [star-icon (-> statistic :accuracy (> 30))]
       [star-icon (-> statistic :accuracy (> 70))]]
      [spacer 16]
-     [go-icon]
-     [spacer 16]]]])
+     [go-icon (not enabled)]]]])
 
 (defn one-list-line [x]
   (let [id      (-> x .-item .-id)
