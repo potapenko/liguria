@@ -35,6 +35,8 @@
                      (map (fn [[k v]] {(-> k name (string/replace "get-" "") keyword) (v)}))
                      (apply merge)))
 
+(def app-intro (rn/adapt-react-class (.-AppIntro modules) "AppIntro"))
+
 (comment
   (println (-> device-info))
   (js/Object.keys modules))

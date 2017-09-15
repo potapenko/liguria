@@ -31,3 +31,5 @@ export const Animatable = AnimatableLink;
 export const AnimatableView = AnimatableLink.View;
 export const AnimatableText = AnimatableLink.Text;
 
+import AppIntroLink from 'react-native-app-intro';
+export const AppIntro = AppIntroLink;
