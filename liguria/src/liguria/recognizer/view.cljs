@@ -1,4 +1,4 @@
-(ns liguria.recognizer.recognizer
+(ns liguria.recognizer.view
   (:require [liguria.shared.native-modules :as nm]
             [micro-rn.react-native :as rn :refer [alert text text-input view spacer flexer touchable-opacity]]
             [micro-rn.styles :as st]

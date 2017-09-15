@@ -6,7 +6,7 @@
             [liguria.shared.screens-shared-ui :as sh]
             [liguria.screens.recording.controls :as controls]
             [liguria.screens.recording.model :as model]
-            [liguria.recognizer.recognizer :as recognizer]
+            [liguria.recognizer.view :as recognizer]
             [liguria.shared.liguria-text :refer [liguria-text]]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [re-frame.core :refer [subscribe dispatch dispatch-sync]]
