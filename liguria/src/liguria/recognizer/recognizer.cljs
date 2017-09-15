@@ -66,15 +66,7 @@
           [id text background-gray text-style
            selected searched deleted recorded] :as data}]
 
-      (go
-        (let [diffs (->> @diff-state
-                         (filter (fn [[k v]] (and (k data) (not= (k data) (k v)))))
-                         (map (fn [[k v] k])))]
-          (when-not (empty? diffs)
-            (<! (timeout 100))
-            (some-> @animation-ref (.word 800)))
-          (reset! diff-state (... selected recorded))))
-      (let [;;recorded      selected selected false
+      (let [recorded      selected selected false
             text-style    (-> text-style (conj
                                           (when selected [:invert
                                                           (when recorded (st/color "gold"))])
@@ -83,6 +75,16 @@
                              recorded (st/background-color "gold")
                              selected (st/gray 9)
                              :else    (st/background-color "transparent"))]]
+        (go
+          (let [diff-data (... recorded)
+                diffs (->> @diff-state
+                           (filter (fn [[k v]] (and (k diff-data) (not= (k diff-data) (k v)))))
+                           (map (fn [[k v] k])))]
+            (when-not (empty? diffs)
+              (<! (timeout 100))
+              (some-> @animation-ref (.word 800)))
+            (reset! diff-state diff-data)))
+
         [nm/animatable-view {:ref #(reset! animation-ref %)}
          [view (merge {:ref #(dispatch [::model/word-state id :ref %])} responder-props)
           [view {:style (conj text-bg-style (st/padding 4 2))}
