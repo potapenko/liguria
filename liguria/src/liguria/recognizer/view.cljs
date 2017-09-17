@@ -188,27 +188,35 @@
                          :ItemSeparatorComponent    #(r/as-element [view {:style [(st/height 1) (st/gray 10)]}])
                          :key-extractor             #(str "paragraph-list-" (-> % .-id))}]])])))
 
-(defn text-editor [{:keys [text lesson] :as props}]
-  (let [lesson (if-not (nil? lesson) lesson 0)
-        text   (if-not (nil? text) text (-> liguria-text nlp/create-paragraphs first))]
-    (recording-controls/stop-recording)
-    (dispatch-sync [::model/transcript []])
-    (go
-      (<! (utils/await-cb rn/run-after-interactions))
-      (loop [parts   (nlp/create-text-parts text)
-             current '()]
-        (let [v     (first parts)
-              parts (time (rest parts))]
-          (when v
-            (let [new-list (concat current [v])]
-              (<! (timeout 100))
-              (dispatch-sync [::model/transcript new-list])
-              (recur parts new-list)))))
-      (<! (timeout 500))
-      (<! (utils/await-cb rn/run-after-interactions))
-      (recording-controls/start-recording))
-    (fn []
-      [text-list props])))
+(defn text-editor []
+  (r/create-class
+   {:component-will-unmount (fn []
+                              (recording-controls/stop-recording)
+                              (dispatch-sync [::model/transcript []]))
+    :component-will-mount   (fn []
+                              (recording-controls/stop-recording)
+                              (dispatch-sync [::model/transcript []]))
+    :component-did-mount    (fn [{:keys [text lesson] :as props}]
+                              (let [lesson (if-not (nil? lesson) lesson 0)
+                                    text   (if-not (nil? text) text (-> liguria-text nlp/create-paragraphs first))]
+                                (dispatch-sync [::model/transcript []])
+                                (go
+                                  (<! (utils/await-cb rn/run-after-interactions))
+                                  (loop [parts   (nlp/create-text-parts text)
+                                         current '()]
+                                    (let [v     (first parts)
+                                          parts (time (rest parts))]
+                                      (when v
+                                        (let [new-list (concat current [v])]
+                                          (<! (timeout 100))
+                                          (dispatch-sync [::model/transcript new-list])
+                                          (recur parts new-list)))))
+                                  (<! (timeout 500))
+                                  (<! (utils/await-cb rn/run-after-interactions))
+                                  (recording-controls/start-recording))))
+    :reagent-render         (fn [props]
+                              (println :reagent-render)
+                              [text-list props])}))
 
 (comment
   (subscribe [::model/word-data 1 :selected])
