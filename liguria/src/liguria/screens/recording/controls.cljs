@@ -9,7 +9,8 @@
             [liguria.shared.screens-shared-ui :as sh]
             [re-frame.core :refer [subscribe dispatch]]
             [liguria.screens.recording.model :as model]
-            [micro-rn.utils :as utils])
+            [micro-rn.utils :as utils]
+            [micro-rn.rn-utils :as rn-utils])
   (:require-macros
    [cljs.core.async.macros :refer [go go-loop]]))
 
@@ -17,19 +18,36 @@
 
 (defn start-recording []
   (dispatch [::model/recording true])
-  (-> nm/audio-recorder .startRecording)
-  ;; -160dB 0dB
-  (-> nm/audio-recorder
-      (aset "onProgress"
-            #(let [from 38 to -5
-                   monitoring (-> % .-currentMetering
-                                  (+ from) (/ from) (* 100) (max 0))
-                   set-width (some-> @monitor-lines-ref .-setWidth)]
-               (when set-width
-                 (set-width monitoring))))))
+  #_(do
+    (-> nm/speech-to-text (.startRecognition "en-US"))
+    (-> rn/NativeModules
+        (.addListener "SpeechToText"
+                      (fn [result]
+                        (let [result (utils/prepare-to-clj result)]
+                          (println "speech to text: >>> " result)
+
+
+                          )
+                        )))
+
+
+
+    )
+  (do
+    (-> nm/audio-recorder .startRecording)
+    ;; -160dB 0dB
+    (-> nm/audio-recorder
+        (aset "onProgress"
+              #(let [from       38 to -5
+                     monitoring (-> % .-currentMetering
+                                    (+ from) (/ from) (* 100) (max 0))
+                     set-width  (some-> @monitor-lines-ref .-setWidth)]
+                 (when set-width
+                   (set-width monitoring)))))))
 
 (defn stop-recording []
   (dispatch [::model/recording false])
+  #_(-> nm/speech-to-text .stopRecognition)
   (-> nm/audio-recorder .stopRecording))
 
 (defn toggle-play []

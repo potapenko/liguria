@@ -37,6 +37,11 @@
 
 (def app-intro (rn/adapt-react-class (.-AppIntro modules) "AppIntro"))
 
+(def speech-to-text (js/require "react-native-speech-to-text-ios"))
+
+
+
+
 (comment
   (println (-> device-info))
   (js/Object.keys modules))
