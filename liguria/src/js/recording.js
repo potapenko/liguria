@@ -7,7 +7,7 @@ const audioPath = AudioUtils.DocumentDirectoryPath + '/recordign.aac';
 
 AudioRecorder.prepareRecordingAtPath(audioPath, {
     SampleRate: 22050,
-    Channels: 2,
+    Channels: 1,
     AudioQuality: "High",
     AudioEncoding: "aac",
     MeteringEnabled: true

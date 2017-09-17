@@ -188,7 +188,7 @@
                          :ItemSeparatorComponent    #(r/as-element [view {:style [(st/height 1) (st/gray 10)]}])
                          :key-extractor             #(str "paragraph-list-" (-> % .-id))}]])])))
 
-(defn text-editor []
+(defn text-editor [{:keys [text lesson] :as props}]
   (r/create-class
    {:component-will-unmount (fn []
                               (recording-controls/stop-recording)
@@ -196,7 +196,7 @@
     :component-will-mount   (fn []
                               (recording-controls/stop-recording)
                               (dispatch-sync [::model/transcript []]))
-    :component-did-mount    (fn [{:keys [text lesson] :as props}]
+    :component-did-mount    (fn []
                               (let [lesson (if-not (nil? lesson) lesson 0)
                                     text   (if-not (nil? text) text (-> liguria-text nlp/create-paragraphs first))]
                                 (dispatch-sync [::model/transcript []])
@@ -215,7 +215,6 @@
                                   (<! (utils/await-cb rn/run-after-interactions))
                                   (recording-controls/start-recording))))
     :reagent-render         (fn [props]
-                              (println :reagent-render)
                               [text-list props])}))
 
 (comment
