@@ -53,6 +53,7 @@
 		9DF6B7DC1F5939CC0003B771 /* SFCompactText-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 9DF6B7DA1F5939CC0003B771 /* SFCompactText-Regular.otf */; };
 		A4188D16473F42DF9B98C488 /* libOGReactNativeWaveform.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BCC6EB46B97C4418A994FAAF /* libOGReactNativeWaveform.a */; };
 		C5E56C1F98704079A8E74CDA /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4243A173DF4E4BA9801C2521 /* Ionicons.ttf */; };
+		E04C536E33CD136E8D851B37 /* libPods-liguria.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F740FD8151EC0A7106F19A7E /* libPods-liguria.a */; };
 		E561E0124AF1445B830A98A2 /* libRNVectorIcons.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 212F4BE76D2B4FDA9A8054AA /* libRNVectorIcons.a */; };
 		FA4E9027C3DC47EA977D0751 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 082F90B8C1E7446BB6F4DC70 /* MaterialCommunityIcons.ttf */; };
 		FAA09229A55F4E6B8F41670B /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 1725D3AF23194AB29256DF83 /* Zocial.ttf */; };
@@ -330,6 +331,7 @@
 		00E356EE1AD99517003FC87E /* liguriaTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = liguriaTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* liguriaTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = liguriaTests.m; sourceTree = "<group>"; };
+		05A8AE2B3157BAD8E97F5C0F /* Pods-liguria.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-liguria.debug.xcconfig"; path = "Pods/Target Support Files/Pods-liguria/Pods-liguria.debug.xcconfig"; sourceTree = "<group>"; };
 		082F90B8C1E7446BB6F4DC70 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialCommunityIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialCommunityIcons.ttf"; sourceTree = "<group>"; };
 		139105B61AF99BAD00B5F7CC /* RCTSettings.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTSettings.xcodeproj; path = "../node_modules/react-native/Libraries/Settings/RCTSettings.xcodeproj"; sourceTree = "<group>"; };
 		139FDEE61B06529A00C62182 /* RCTWebSocket.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWebSocket.xcodeproj; path = "../node_modules/react-native/Libraries/WebSocket/RCTWebSocket.xcodeproj"; sourceTree = "<group>"; };
@@ -370,6 +372,8 @@
 		A6C538C470B84E6489E0FE45 /* RNSVG.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RNSVG.xcodeproj; path = "../node_modules/react-native-svg/ios/RNSVG.xcodeproj"; sourceTree = "<group>"; };
 		BCC6EB46B97C4418A994FAAF /* libOGReactNativeWaveform.a */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = archive.ar; path = libOGReactNativeWaveform.a; sourceTree = "<group>"; };
 		F1862115116041B1BC34B5A0 /* MaterialIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = MaterialIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/MaterialIcons.ttf"; sourceTree = "<group>"; };
+		F740FD8151EC0A7106F19A7E /* libPods-liguria.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-liguria.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F9E18EFE92148A57E4CCF0EC /* Pods-liguria.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-liguria.release.xcconfig"; path = "Pods/Target Support Files/Pods-liguria/Pods-liguria.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -401,6 +405,7 @@
 				E561E0124AF1445B830A98A2 /* libRNVectorIcons.a in Frameworks */,
 				A4188D16473F42DF9B98C488 /* libOGReactNativeWaveform.a in Frameworks */,
 				8A215ECBB67C423D8109E2F4 /* libRNSVG.a in Frameworks */,
+				E04C536E33CD136E8D851B37 /* libPods-liguria.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -582,6 +587,7 @@
 		7D68B8F05D314B568DAB28A3 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				F740FD8151EC0A7106F19A7E /* libPods-liguria.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -628,6 +634,7 @@
 				7D68B8F05D314B568DAB28A3 /* Frameworks */,
 				0316BF9550E447039FF728E1 /* Resources */,
 				9D72AF1B1F697A2E00BA1F06 /* Recovered References */,
+				F8C5166DE6D69E138E631E72 /* Pods */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -697,6 +704,15 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		F8C5166DE6D69E138E631E72 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				05A8AE2B3157BAD8E97F5C0F /* Pods-liguria.debug.xcconfig */,
+				F9E18EFE92148A57E4CCF0EC /* Pods-liguria.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -722,10 +738,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "liguria" */;
 			buildPhases = (
+				9E51E6DD25EDE27A7957C5BF /* [CP] Check Pods Manifest.lock */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
+				61AD6DC0F6B6B742822228A2 /* [CP] Embed Pods Frameworks */,
+				78B10D4E79BCE80F4DAE60F7 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -1207,6 +1226,51 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
+		61AD6DC0F6B6B742822228A2 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-liguria/Pods-liguria-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		78B10D4E79BCE80F4DAE60F7 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-liguria/Pods-liguria-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9E51E6DD25EDE27A7957C5BF /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -1331,6 +1395,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 05A8AE2B3157BAD8E97F5C0F /* Pods-liguria.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
@@ -1357,6 +1422,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F9E18EFE92148A57E4CCF0EC /* Pods-liguria.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CURRENT_PROJECT_VERSION = 1;
