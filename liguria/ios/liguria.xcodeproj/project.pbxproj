@@ -48,6 +48,10 @@
 		8A215ECBB67C423D8109E2F4 /* libRNSVG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 141954CBCE34461C9B3082BF /* libRNSVG.a */; };
 		9D5067851F6C009600BF2840 /* RNSpeechToTextIos.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D5067841F6C009600BF2840 /* RNSpeechToTextIos.m */; };
 		9D5067861F6C009600BF2840 /* RNSpeechToTextIos.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D5067841F6C009600BF2840 /* RNSpeechToTextIos.m */; };
+		9D6E27F31F72961E00E79E1E /* SpeechRecognitionService.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D6E27CC1F72961E00E79E1E /* SpeechRecognitionService.m */; };
+		9D6E27F41F72961E00E79E1E /* SpeechRecognitionService.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D6E27CC1F72961E00E79E1E /* SpeechRecognitionService.m */; };
+		9D6E27F51F72961E00E79E1E /* AudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D6E27F01F72961E00E79E1E /* AudioController.m */; };
+		9D6E27F61F72961E00E79E1E /* AudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D6E27F01F72961E00E79E1E /* AudioController.m */; };
 		9DF6B7D81F5939120003B771 /* SFCompactText-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 9DF6B7D71F5939120003B771 /* SFCompactText-Bold.otf */; };
 		9DF6B7DB1F5939CC0003B771 /* SFCompactText-Semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 9DF6B7D91F5939CC0003B771 /* SFCompactText-Semibold.otf */; };
 		9DF6B7DC1F5939CC0003B771 /* SFCompactText-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 9DF6B7DA1F5939CC0003B771 /* SFCompactText-Regular.otf */; };
@@ -365,6 +369,10 @@
 		9BCB865FB46645ACAF49057C /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		9D5067831F6C009600BF2840 /* RNSpeechToTextIos.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNSpeechToTextIos.h; path = liguria/RNSpeechToTextIos.h; sourceTree = "<group>"; };
 		9D5067841F6C009600BF2840 /* RNSpeechToTextIos.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNSpeechToTextIos.m; path = liguria/RNSpeechToTextIos.m; sourceTree = "<group>"; };
+		9D6E27CC1F72961E00E79E1E /* SpeechRecognitionService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SpeechRecognitionService.m; path = liguria/SpeechRecognitionService.m; sourceTree = "<group>"; };
+		9D6E27F01F72961E00E79E1E /* AudioController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AudioController.m; path = liguria/AudioController.m; sourceTree = "<group>"; };
+		9D6E27F11F72961E00E79E1E /* SpeechRecognitionService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SpeechRecognitionService.h; path = liguria/SpeechRecognitionService.h; sourceTree = "<group>"; };
+		9D6E27F21F72961E00E79E1E /* AudioController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = AudioController.h; path = liguria/AudioController.h; sourceTree = "<group>"; };
 		9DF6B7D71F5939120003B771 /* SFCompactText-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFCompactText-Bold.otf"; sourceTree = "<group>"; };
 		9DF6B7D91F5939CC0003B771 /* SFCompactText-Semibold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFCompactText-Semibold.otf"; sourceTree = "<group>"; };
 		9DF6B7DA1F5939CC0003B771 /* SFCompactText-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SFCompactText-Regular.otf"; sourceTree = "<group>"; };
@@ -534,6 +542,10 @@
 		13B07FAE1A68108700A75B9A /* liguria */ = {
 			isa = PBXGroup;
 			children = (
+				9D6E27F21F72961E00E79E1E /* AudioController.h */,
+				9D6E27F01F72961E00E79E1E /* AudioController.m */,
+				9D6E27F11F72961E00E79E1E /* SpeechRecognitionService.h */,
+				9D6E27CC1F72961E00E79E1E /* SpeechRecognitionService.m */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -1286,9 +1298,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D6E27F61F72961E00E79E1E /* AudioController.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				9D5067851F6C009600BF2840 /* RNSpeechToTextIos.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				9D6E27F41F72961E00E79E1E /* SpeechRecognitionService.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1296,9 +1310,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				9D6E27F51F72961E00E79E1E /* AudioController.m in Sources */,
 				2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */,
 				9D5067861F6C009600BF2840 /* RNSpeechToTextIos.m in Sources */,
 				2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */,
+				9D6E27F31F72961E00E79E1E /* SpeechRecognitionService.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
