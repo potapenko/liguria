@@ -82,5 +82,6 @@
                       :key-extractor          #(str "lessons-list-" (-> % .-id))}]])))
 
 (comment
+  (navigate! :results {})
   @(subscribe [::model/lessons-list])
   @(subscribe [::model/navigator]))

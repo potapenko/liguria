@@ -15,24 +15,24 @@
    [cljs.core.async.macros :refer [go go-loop]]))
 
 (def monitor-lines-ref (atom {}))
+(def subscription (atom nil))
+
+(def test-state (atom nil))
 
 (defn start-recording []
   (dispatch [::model/recording true])
-  #_(do
-    (-> nm/speech-to-text (.startRecognition "en-US"))
-    (-> rn/NativeModules
-        (.addListener "SpeechToText"
-                      (fn [result]
-                        (let [result (utils/prepare-to-clj result)]
-                          (println "speech to text: >>> " result)
-
-
-                          )
-                        )))
-
-
-
-    )
+  (do
+    (-> nm/speech-to-text (.startRecognition "ru-RU" "а сашка только шапкой шишки сшиб затем по шоссе саша пошел саше на шоссе саша нашел"))
+    (reset! subscription
+            (-> rn/NativeAppEventEmitter
+                (.addListener "SpeechToText"
+                              (fn [result]
+                                (let [result (utils/prepare-to-clj result)]
+                                  (println "speech to text: >>> " (-> result :best-transcription :formatted-string))
+                                  (reset! test-state result)
+                                  (-> @test-state :transcriptions),
+                                  )
+                                )))))
   (do
     (-> nm/audio-recorder .startRecording)
     ;; -160dB 0dB
@@ -47,7 +47,8 @@
 
 (defn stop-recording []
   (dispatch [::model/recording false])
-  #_(-> nm/speech-to-text .stopRecognition)
+  (-> nm/speech-to-text .finishRecognition)
+  (some-> @subscription .remove)
   (-> nm/audio-recorder .stopRecording))
 
 (defn toggle-play []

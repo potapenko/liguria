@@ -21,7 +21,8 @@
 {
 }
 
-- (void) setupAndStartRecognizing:(NSString*)localeStr {
+- (void) setupAndStartRecognizing :(NSString*)localeStr
+                                  :(NSArray<NSString*> *) contextualStrings{
     [self teardown];
 
     NSLocale* locale = nil;
@@ -36,7 +37,6 @@
     }
 
     self.speechRecognizer.delegate = self;
-
 
     NSError* audioSessionError = nil;
     self.audioSession = [AVAudioSession sharedInstance];
@@ -56,13 +56,14 @@
         return;
     }
 
-
     self.recognitionRequest = [[SFSpeechAudioBufferRecognitionRequest alloc] init];
 
     if (self.recognitionRequest == nil){
         [self sendResult:RCTMakeError(@"Unable to created a SFSpeechAudioBufferRecognitionRequest object", nil, nil) :nil :nil :nil];
         return;
     }
+  
+    self.recognitionRequest.contextualStrings = contextualStrings;
 
     if (self.audioEngine == nil) {
         self.audioEngine = [[AVAudioEngine alloc] init];
@@ -195,13 +196,13 @@ RCT_EXPORT_METHOD(stopRecognition)
     [self teardown];
 }
 
-RCT_EXPORT_METHOD(startRecognition:(NSString*)localeStr)
+RCT_EXPORT_METHOD(startRecognition :(NSString*)localeStr
+                                   :(NSString*) contextualString)
 {
     if (self.recognitionTask != nil) {
         [self sendResult:RCTMakeError(@"Speech recognition already started!", nil, nil) :nil :nil :nil];
         return;
     }
-
 
     [SFSpeechRecognizer requestAuthorization:^(SFSpeechRecognizerAuthorizationStatus status) {
         switch (status) {
@@ -215,7 +216,7 @@ RCT_EXPORT_METHOD(startRecognition:(NSString*)localeStr)
                 [self sendResult:RCTMakeError(@"Speech recognition restricted on this device", nil, nil) :nil :nil :nil];
                 break;
             case SFSpeechRecognizerAuthorizationStatusAuthorized:
-                [self setupAndStartRecognizing:localeStr];
+            [self setupAndStartRecognizing:localeStr :@[contextualString]];
                 break;
         }
     }];

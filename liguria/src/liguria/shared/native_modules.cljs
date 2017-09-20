@@ -39,9 +39,6 @@
 
 (def speech-to-text (js/require "react-native-speech-to-text-ios"))
 
-
-
-
 (comment
   (println (-> device-info))
   (js/Object.keys modules))
