@@ -33,8 +33,11 @@
 
 
 (comment
+  (start-recognizing nil)
+
   (start-recognizing ["привет как дела"])
 
+  (deref in-progress?)
 
   (go-loop []
     (println (<! recognizing-results-chan)))

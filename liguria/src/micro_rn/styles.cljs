@@ -42,7 +42,7 @@
   (println)
   (println)
   (println)
-  (let [style-map (apply merge (map original style))
+  (let [style-map    (apply merge (map original style))
         sorted-style (doall
                       (sort #(compare (name (:k %1)) (name (:k %2)))
                             (for [[k v] style-map]
@@ -105,7 +105,7 @@
   (new-style (keyword (str "align-items-" v)) {:align-items v}))
 
 (defn flex-align [v]
-  (new-style (keyword (str "flex-align-" v)) {:align-items v
+  (new-style (keyword (str "flex-align-" v)) {:align-items     v
                                               :justify-content v}))
 
 (defn justify-content [v]
@@ -210,7 +210,7 @@
    (new-style (keyword (str "text-shadow-" a "-" w "-" h "-" r))
               {:text-shadow-offset {:width w :height h}
                :text-shadow-radius r
-               :text-shadow-color (str "rgba(0,0,0,0." a ")")})))
+               :text-shadow-color  (str "rgba(0,0,0,0." a ")")})))
 
 ;; dimentions
 

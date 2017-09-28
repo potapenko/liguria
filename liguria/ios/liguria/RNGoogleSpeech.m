@@ -10,6 +10,7 @@
 @interface RNGoogleSpeech () <AudioControllerDelegate>
 @property (nonatomic, strong) NSMutableData *audioData;
 @property (nonatomic, strong) RCTResponseSenderBlock callback;
+@property (nonatomic, assign) BOOL inProgress;
 @end
 
 @implementation RNGoogleSpeech
@@ -19,7 +20,16 @@ RCT_EXPORT_MODULE();
 RCT_EXPORT_METHOD(startRecognizing
                   :(NSArray<NSString *> *) phrasesArray
                   :(RCTResponseSenderBlock)callback) {
-
+  
+  if(_inProgress){
+    NSLog(@">! RECOGNIZING ALREADY STARTED!");
+    return;
+  }
+  
+  NSLog(@">! START RECOGNIZING");
+  
+  _inProgress = TRUE;
+  
   [AudioController sharedInstance].delegate = self;
 
   AVAudioSession *audioSession = [AVAudioSession sharedInstance];
@@ -27,6 +37,7 @@ RCT_EXPORT_METHOD(startRecognizing
 
   self.callback = callback;
   self.audioData = [[NSMutableData alloc] init];
+  
   [[AudioController sharedInstance] prepareWithSampleRate:SAMPLE_RATE];
   [[SpeechRecognitionService sharedInstance] setSampleRate:SAMPLE_RATE];
   [[SpeechRecognitionService sharedInstance] setPhrasesArray:phrasesArray];
@@ -36,6 +47,7 @@ RCT_EXPORT_METHOD(startRecognizing
 RCT_EXPORT_METHOD(stopRecognizing) {
   [[AudioController sharedInstance] stop];
   [[SpeechRecognitionService sharedInstance] stopStreaming];
+  _inProgress = FALSE;
 }
 
 - (void) processSampleData:(NSData *)data
@@ -53,7 +65,7 @@ RCT_EXPORT_METHOD(stopRecognizing) {
   int chunk_size = 0.1 /* seconds/chunk */ * SAMPLE_RATE * 2 /* bytes/sample */ ; /* bytes/chunk */
 
   if ([self.audioData length] > chunk_size) {
-    NSLog(@"SENDING");
+    NSLog(@">! SENDING");
     [[SpeechRecognitionService sharedInstance] streamAudioData:self.audioData
                                                 withCompletion:^(StreamingRecognizeResponse *response, NSError *error) {
                                                   NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
@@ -62,12 +74,11 @@ RCT_EXPORT_METHOD(stopRecognizing) {
                                                     [self stopRecognizing];
                                                     result[@"error"] = [error localizedDescription];
                                                   } else if (response) {
-
-                                                    NSLog(@"RESPONSE: %@", response);
+                                                    NSLog(@">! RESPONSE: %@", response);
                                                     for (StreamingRecognitionResult *result in response.resultsArray) {
-                                                      
                                                     }
-                                                   // _textView.text = [response description];
+                                                    result[@"description"] = [response description];
+                                                    _callback(@[result]);
                                                   }
                                                 }
      ];

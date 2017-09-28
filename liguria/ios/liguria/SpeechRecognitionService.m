@@ -60,7 +60,7 @@
 
     if(_phrasesArray){
      SpeechContext *context = [SpeechContext message];
-     context.phrasesArray = [NSMutableArray arrayWithArray:_phrasesArray];
+      context.phrasesArray = [[NSMutableArray alloc] initWithArray:_phrasesArray];
      recognitionConfig.speechContextsArray = @[context];
     }
 
