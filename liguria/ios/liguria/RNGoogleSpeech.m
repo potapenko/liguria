@@ -29,6 +29,7 @@ RCT_EXPORT_METHOD(startRecognizing
   self.audioData = [[NSMutableData alloc] init];
   [[AudioController sharedInstance] prepareWithSampleRate:SAMPLE_RATE];
   [[SpeechRecognitionService sharedInstance] setSampleRate:SAMPLE_RATE];
+  [[SpeechRecognitionService sharedInstance] setPhrasesArray:phrasesArray];
   [[AudioController sharedInstance] start];
 }
 
@@ -62,19 +63,11 @@ RCT_EXPORT_METHOD(stopRecognizing) {
                                                     result[@"error"] = [error localizedDescription];
                                                   } else if (response) {
 
-
-
-                                                    BOOL finished = NO;
                                                     NSLog(@"RESPONSE: %@", response);
                                                     for (StreamingRecognitionResult *result in response.resultsArray) {
-                                                      if (result.isFinal) {
-                                                        finished = YES;
-                                                      }
+                                                      
                                                     }
                                                    // _textView.text = [response description];
-                                                    if (finished) {
-                                                      [self stopRecognizing];
-                                                    }
                                                   }
                                                 }
      ];
