@@ -48,6 +48,8 @@
 		8A215ECBB67C423D8109E2F4 /* libRNSVG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 141954CBCE34461C9B3082BF /* libRNSVG.a */; };
 		9D5067851F6C009600BF2840 /* RNSpeechToTextIos.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D5067841F6C009600BF2840 /* RNSpeechToTextIos.m */; };
 		9D5067861F6C009600BF2840 /* RNSpeechToTextIos.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D5067841F6C009600BF2840 /* RNSpeechToTextIos.m */; };
+		9D57C16F1F7A82C500730EC7 /* RNGoogleSpeech.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D57C16E1F7A82C500730EC7 /* RNGoogleSpeech.m */; };
+		9D57C1701F7A82C500730EC7 /* RNGoogleSpeech.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D57C16E1F7A82C500730EC7 /* RNGoogleSpeech.m */; };
 		9D6E27F31F72961E00E79E1E /* SpeechRecognitionService.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D6E27CC1F72961E00E79E1E /* SpeechRecognitionService.m */; };
 		9D6E27F41F72961E00E79E1E /* SpeechRecognitionService.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D6E27CC1F72961E00E79E1E /* SpeechRecognitionService.m */; };
 		9D6E27F51F72961E00E79E1E /* AudioController.m in Sources */ = {isa = PBXBuildFile; fileRef = 9D6E27F01F72961E00E79E1E /* AudioController.m */; };
@@ -369,6 +371,8 @@
 		9BCB865FB46645ACAF49057C /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = SimpleLineIcons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/SimpleLineIcons.ttf"; sourceTree = "<group>"; };
 		9D5067831F6C009600BF2840 /* RNSpeechToTextIos.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNSpeechToTextIos.h; path = liguria/RNSpeechToTextIos.h; sourceTree = "<group>"; };
 		9D5067841F6C009600BF2840 /* RNSpeechToTextIos.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNSpeechToTextIos.m; path = liguria/RNSpeechToTextIos.m; sourceTree = "<group>"; };
+		9D57C14A1F7A82C500730EC7 /* RNGoogleSpeech.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RNGoogleSpeech.h; path = liguria/RNGoogleSpeech.h; sourceTree = "<group>"; };
+		9D57C16E1F7A82C500730EC7 /* RNGoogleSpeech.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = RNGoogleSpeech.m; path = liguria/RNGoogleSpeech.m; sourceTree = "<group>"; };
 		9D6E27CC1F72961E00E79E1E /* SpeechRecognitionService.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = SpeechRecognitionService.m; path = liguria/SpeechRecognitionService.m; sourceTree = "<group>"; };
 		9D6E27F01F72961E00E79E1E /* AudioController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = AudioController.m; path = liguria/AudioController.m; sourceTree = "<group>"; };
 		9D6E27F11F72961E00E79E1E /* SpeechRecognitionService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = SpeechRecognitionService.h; path = liguria/SpeechRecognitionService.h; sourceTree = "<group>"; };
@@ -555,6 +559,8 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				9D5067831F6C009600BF2840 /* RNSpeechToTextIos.h */,
 				9D5067841F6C009600BF2840 /* RNSpeechToTextIos.m */,
+				9D57C14A1F7A82C500730EC7 /* RNGoogleSpeech.h */,
+				9D57C16E1F7A82C500730EC7 /* RNGoogleSpeech.m */,
 			);
 			name = liguria;
 			sourceTree = "<group>";
@@ -1300,6 +1306,7 @@
 			files = (
 				9D6E27F61F72961E00E79E1E /* AudioController.m in Sources */,
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				9D57C16F1F7A82C500730EC7 /* RNGoogleSpeech.m in Sources */,
 				9D5067851F6C009600BF2840 /* RNSpeechToTextIos.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 				9D6E27F41F72961E00E79E1E /* SpeechRecognitionService.m in Sources */,
@@ -1312,6 +1319,7 @@
 			files = (
 				9D6E27F51F72961E00E79E1E /* AudioController.m in Sources */,
 				2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */,
+				9D57C1701F7A82C500730EC7 /* RNGoogleSpeech.m in Sources */,
 				9D5067861F6C009600BF2840 /* RNSpeechToTextIos.m in Sources */,
 				2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */,
 				9D6E27F31F72961E00E79E1E /* SpeechRecognitionService.m in Sources */,

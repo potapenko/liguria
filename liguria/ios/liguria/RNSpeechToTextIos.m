@@ -62,7 +62,6 @@
         [self sendResult:RCTMakeError(@"Unable to created a SFSpeechAudioBufferRecognitionRequest object", nil, nil) :nil :nil :nil];
         return;
     }
-  
     self.recognitionRequest.contextualStrings = contextualStrings;
 
     if (self.audioEngine == nil) {
