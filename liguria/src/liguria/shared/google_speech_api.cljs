@@ -15,17 +15,21 @@
   ;; TODO
   phrase)
 
-(defn start-recognizing [phrases-array]
+(defn start-recognizing [phrases]
   (reset! in-progress? true)
+  (-> rn/NativeAppEventEmitter
+      (.addListener "GoogleRecognizeResult"
+                    (fn [result]
+                      (let [result (utils/prepare-to-clj result)]
+                        (when (:error result)
+                          (reset! in-progress? false))
+                        (println "result:" result)
+                        (put! recognizing-results-chan result)))))
+
   (-> google-speech  (.startRecognizing
-                      (->> phrases-array
+                      (->> phrases
                            (map remove-punctuations-from-phrase)
-                           utils/prepare-to-js)
-                      (fn [result]
-                        (let [result (utils/prepare-to-clj result)]
-                          (when (:error result)
-                            (reset! in-progress? false))
-                          (put! recognizing-results-chan result))))))
+                           utils/prepare-to-js))))
 
 (defn stop-recognizing []
   (reset! in-progress? false)
@@ -33,13 +37,21 @@
 
 
 (comment
-  (start-recognizing nil)
 
   (start-recognizing ["привет как дела"])
 
+
+  (stop-recognizing)
+
+
   (deref in-progress?)
 
+  (-> google-speech .-startRecognizing)
+  (-> google-speech .-stopRecognizing)
+
+
   (go-loop []
-    (println (<! recognizing-results-chan)))
+    (println (<! recognizing-results-chan))
+    (recur))
 
   )

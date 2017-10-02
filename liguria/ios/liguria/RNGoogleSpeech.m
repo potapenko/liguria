@@ -4,22 +4,26 @@
 #import "AudioController.h"
 #import "SpeechRecognitionService.h"
 #import "google/cloud/speech/v1/CloudSpeech.pbrpc.h"
+#import <React/RCTBridge.h>
+#import <React/RCTEventDispatcher.h>
 
 #define SAMPLE_RATE 16000.0f
 
 @interface RNGoogleSpeech () <AudioControllerDelegate>
+
 @property (nonatomic, strong) NSMutableData *audioData;
-@property (nonatomic, strong) RCTResponseSenderBlock callback;
 @property (nonatomic, assign) BOOL inProgress;
+
+@property (nonatomic, weak, readwrite) RCTBridge *bridge;
+
 @end
 
 @implementation RNGoogleSpeech
 
+
 RCT_EXPORT_MODULE();
 
-RCT_EXPORT_METHOD(startRecognizing
-                  :(NSArray<NSString *> *) phrasesArray
-                  :(RCTResponseSenderBlock)callback) {
+RCT_EXPORT_METHOD(startRecognizing :(NSArray<NSString *> *) phrasesArray) {
   
   if(_inProgress){
     NSLog(@">! RECOGNIZING ALREADY STARTED!");
@@ -35,7 +39,6 @@ RCT_EXPORT_METHOD(startRecognizing
   AVAudioSession *audioSession = [AVAudioSession sharedInstance];
   [audioSession setCategory:AVAudioSessionCategoryRecord error:nil];
 
-  self.callback = callback;
   self.audioData = [[NSMutableData alloc] init];
   
   [[AudioController sharedInstance] prepareWithSampleRate:SAMPLE_RATE];
@@ -66,22 +69,24 @@ RCT_EXPORT_METHOD(stopRecognizing) {
 
   if ([self.audioData length] > chunk_size) {
     NSLog(@">! SENDING");
-    [[SpeechRecognitionService sharedInstance] streamAudioData:self.audioData
-                                                withCompletion:^(StreamingRecognizeResponse *response, NSError *error) {
-                                                  NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
+    [[SpeechRecognitionService sharedInstance]
+     streamAudioData:self.audioData
+      withCompletion:^(StreamingRecognizeResponse *response, NSError *error) {
+        NSMutableDictionary* result = [[NSMutableDictionary alloc] init];
 
-                                                  if (error) {
-                                                    [self stopRecognizing];
-                                                    result[@"error"] = [error localizedDescription];
-                                                  } else if (response) {
-                                                    NSLog(@">! RESPONSE: %@", response);
-                                                    for (StreamingRecognitionResult *result in response.resultsArray) {
-                                                    }
-                                                    result[@"description"] = [response description];
-                                                    _callback(@[result]);
-                                                  }
-                                                }
-     ];
+        if (error) {
+          [self stopRecognizing];
+          result[@"error"] = [error localizedDescription];
+        } else if (response) {
+          NSLog(@">! RESPONSE: %@", response);
+          /*
+          for (StreamingRecognitionResult *oneResult in response.resultsArray) {
+          }*/
+          
+          [self.bridge.eventDispatcher sendAppEventWithName:@"GoogleRecognizeResult" body:@{@"result":  response.resultsArray.firstObject.alternativesArray.firstObject.transcript}];
+        }
+      }
+   ];
     self.audioData = [[NSMutableData alloc] init];
   }
 }

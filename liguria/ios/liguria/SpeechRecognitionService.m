@@ -13,6 +13,7 @@
 @property (nonatomic, strong) Speech *client;
 @property (nonatomic, strong) GRXBufferedPipe *writer;
 @property (nonatomic, strong) GRPCProtoCall *call;
+
 // @property (nonatomic, assign) NSArray<NSString *> *phrasesArray;
 
 @end
@@ -60,10 +61,11 @@
 
     if(_phrasesArray){
      SpeechContext *context = [SpeechContext message];
-      context.phrasesArray = [[NSMutableArray alloc] initWithArray:_phrasesArray];
+      NSMutableArray *mutablePhrasesArray = [[NSMutableArray alloc] initWithArray:self.phrasesArray];
+      context.phrasesArray = mutablePhrasesArray;
      recognitionConfig.speechContextsArray = @[context];
     }
-
+    
     StreamingRecognitionConfig *streamingRecognitionConfig = [StreamingRecognitionConfig message];
     streamingRecognitionConfig.config = recognitionConfig;
     streamingRecognitionConfig.singleUtterance = NO;
