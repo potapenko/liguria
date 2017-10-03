@@ -56,10 +56,10 @@
     recognitionConfig.encoding = RecognitionConfig_AudioEncoding_Linear16;
     recognitionConfig.sampleRateHertz = self.sampleRate;
     recognitionConfig.languageCode = @"ru-RU";
-    recognitionConfig.maxAlternatives = 1;
-    recognitionConfig.enableWordTimeOffsets = YES;
+    // recognitionConfig.maxAlternatives = 1;
+    recognitionConfig.enableWordTimeOffsets = FALSE;
 
-    if(_phrasesArray){
+    if(self.phrasesArray){
      SpeechContext *context = [SpeechContext message];
       NSMutableArray *mutablePhrasesArray = [[NSMutableArray alloc] initWithArray:self.phrasesArray];
       context.phrasesArray = mutablePhrasesArray;

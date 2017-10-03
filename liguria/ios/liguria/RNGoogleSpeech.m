@@ -83,7 +83,15 @@ RCT_EXPORT_METHOD(stopRecognizing) {
           for (StreamingRecognitionResult *oneResult in response.resultsArray) {
           }*/
           
-          [self.bridge.eventDispatcher sendAppEventWithName:@"GoogleRecognizeResult" body:@{@"result":  response.resultsArray.firstObject.alternativesArray.firstObject.transcript}];
+          StreamingRecognitionResult * _Nullable firstResult = response.resultsArray.firstObject;
+          SpeechRecognitionAlternative * _Nullable firstAlternative = firstResult.alternativesArray.firstObject;
+          NSDictionary *body = @{@"transcript":  firstAlternative.transcript,
+                                 @"isFinal": @(firstResult.isFinal)};
+          if(firstResult.isFinal){
+            
+          }
+          [self.bridge.eventDispatcher sendAppEventWithName:@"GoogleRecognizeResult"
+                                                       body:body];
         }
       }
    ];
