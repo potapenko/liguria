@@ -1,7 +1,8 @@
 (ns liguria.shared.google-speech-api
   (:require [micro-rn.react-native :as rn]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
-            [micro-rn.utils :as utils])
+            [micro-rn.utils :as utils]
+            [clojure.string :as string])
   (:require-macros
    [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))
@@ -12,9 +13,17 @@
 (def in-progress? (atom false))
 (def subscribtion (atom nil))
 
-(defn remove-punctuations-from-phrase [phrase]
-  ;; TODO
-  phrase)
+(defn remove-punctuation-from-phrases [phrases]
+  (if (or (nil? phrases) (empty? phrases))
+    nil
+    (->> phrases
+         (map (fn [e]
+                (-> e
+                    string/lower-case
+                    (string/replace #"[,!.?-]" "")
+                    string/trim))
+              )
+         vec)))
 
 (defn stop-recognizing []
   (println "stop google speech recognizing")
@@ -34,18 +43,18 @@
                                   #_(when (:is-final result) (stop-recognizing))
                                   (put! recognizing-results-chan result))))))))
 
-(defn start-recognizing [phrases]
+(defn start-recognizing [& phrases]
   (println "start google speech recognizing")
   (reset! in-progress? true)
   (add-listener)
   (-> google-speech  (.startRecognizing
                       (->> phrases
-                           (map remove-punctuations-from-phrase)
+                           remove-punctuation-from-phrases
                            utils/prepare-to-js))))
 
 (comment
 
-  (start-recognizing ["привет как дела"])
+  (start-recognizing "привет как дела")
 
   (stop-recognizing)
 
