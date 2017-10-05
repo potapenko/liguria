@@ -68,7 +68,7 @@
     
     StreamingRecognitionConfig *streamingRecognitionConfig = [StreamingRecognitionConfig message];
     streamingRecognitionConfig.config = recognitionConfig;
-    streamingRecognitionConfig.singleUtterance = NO;
+    streamingRecognitionConfig.singleUtterance = self.phrasesArray != NULL;
     streamingRecognitionConfig.interimResults = YES;
 
     StreamingRecognizeRequest *streamingRecognizeRequest = [StreamingRecognizeRequest message];

@@ -22,7 +22,7 @@
 (defn start-recording []
   (dispatch [::model/recording true])
   (do
-    (-> nm/speech-to-text (.startRecognition "ru-RU" "а сашка только шапкой шишки сшиб затем по шоссе саша пошел саше на шоссе саша нашел"))
+    (-> nm/speech-to-text (.startRecognition "ru-RU"))
     (reset! subscription
             (-> rn/NativeAppEventEmitter
                 (.addListener "SpeechToText"

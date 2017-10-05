@@ -2,7 +2,8 @@
   (:require [micro-rn.react-native :as rn]
             [cljs.core.async :as async :refer [<! >! put! chan timeout]]
             [micro-rn.utils :as utils]
-            [clojure.string :as string])
+            [clojure.string :as string]
+            [liguria.shared.nlp :as nlp])
   (:require-macros
    [micro-rn.macros :refer [...]]
    [cljs.core.async.macros :refer [go go-loop]]))
@@ -20,7 +21,8 @@
          (map (fn [e]
                 (-> e
                     string/lower-case
-                    (string/replace #"[,!.?-]" "")
+                    (string/replace #"[.,\/#!$%\^&\*;:{}=\-_`~()—]" "")
+                    (string/replace #"\s+" " ")
                     string/trim))
               )
          vec)))
@@ -37,30 +39,36 @@
                 (.addListener "GoogleRecognizeResult"
                               (fn [result]
                                 (let [result (utils/prepare-to-clj result)]
-                                  (when (:error result)
-                                    (reset! in-progress? false))
-                                  (println "result:" result)
-                                  #_(when (:is-final result) (stop-recognizing))
-                                  (put! recognizing-results-chan result))))))))
+                                  (when @in-progress?
+                                    (println "result:" result)
+                                    (when (:error result)
+                                      (reset! in-progress? false))
+                                    (when (:is-final result)
+                                      (stop-recognizing))
+                                    (put! recognizing-results-chan result)))))))))
 
 (defn start-recognizing [& phrases]
-  (println "start google speech recognizing")
-  (reset! in-progress? true)
-  (add-listener)
-  (-> google-speech  (.startRecognizing
-                      (->> phrases
-                           remove-punctuation-from-phrases
-                           utils/prepare-to-js))))
+  (let [phrases (->> phrases
+                    remove-punctuation-from-phrases
+                    utils/prepare-to-js)]
+    (println "start google speech recognizing:" phrases)
+    (reset! in-progress? true)
+    (add-listener)
+    (-> google-speech  (.startRecognizing phrases))))
 
 (comment
 
-  (start-recognizing "привет как дела")
+  (start-recognizing
+   "В четверг четвертого числа в четыре с четвертью часа лигурийский регулировщик регулировал в Лигурии")
 
-  (stop-recognizing)
+  (start-recognizing "один" "два" "три")
+
+  (start-recognizing)
 
   (deref in-progress?)
 
   (-> google-speech .-startRecognizing)
-  (-> google-speech .-stopRecognizing) (go-loop []
-                                         (println (<! recognizing-results-chan))
-                                         (recur)))
+  (-> google-speech .-stopRecognizing)
+  (go-loop []
+    (println (<! recognizing-results-chan))
+    (recur)))

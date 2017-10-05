@@ -25,14 +25,14 @@ RCT_EXPORT_MODULE();
 
 RCT_EXPORT_METHOD(startRecognizing :(NSArray<NSString *> *) phrasesArray) {
   
-  if(_inProgress){
+  if(self.inProgress){
     NSLog(@">! RECOGNIZING ALREADY STARTED!");
     return;
   }
   
   NSLog(@">! START RECOGNIZING");
   
-  _inProgress = TRUE;
+  self.inProgress = TRUE;
   
   [AudioController sharedInstance].delegate = self;
 
@@ -50,7 +50,7 @@ RCT_EXPORT_METHOD(startRecognizing :(NSArray<NSString *> *) phrasesArray) {
 RCT_EXPORT_METHOD(stopRecognizing) {
   [[AudioController sharedInstance] stop];
   [[SpeechRecognitionService sharedInstance] stopStreaming];
-  _inProgress = FALSE;
+  self.inProgress = FALSE;
 }
 
 - (void) processSampleData:(NSData *)data
@@ -68,7 +68,7 @@ RCT_EXPORT_METHOD(stopRecognizing) {
   int chunk_size = 0.1 /* seconds/chunk */ * SAMPLE_RATE * 2 /* bytes/sample */ ; /* bytes/chunk */
 
   if ([self.audioData length] > chunk_size) {
-    NSLog(@">! SENDING");
+    NSLog(@">! SENDING AUDIO DATA");
     [[SpeechRecognitionService sharedInstance]
      streamAudioData:self.audioData
       withCompletion:^(StreamingRecognizeResponse *response, NSError *error) {
@@ -84,14 +84,20 @@ RCT_EXPORT_METHOD(stopRecognizing) {
           }*/
           
           StreamingRecognitionResult * _Nullable firstResult = response.resultsArray.firstObject;
-          SpeechRecognitionAlternative * _Nullable firstAlternative = firstResult.alternativesArray.firstObject;
-          NSDictionary *body = @{@"transcript":  firstAlternative.transcript,
-                                 @"isFinal": @(firstResult.isFinal)};
-          if(firstResult.isFinal){
-            
+          if(firstResult){
+            SpeechRecognitionAlternative * _Nullable firstAlternative = firstResult.alternativesArray.firstObject;
+            if(firstAlternative){
+              NSDictionary *body = @{@"transcript":  firstAlternative.transcript,
+                                     @"isFinal": @(firstResult.isFinal)
+                                     
+                                     };
+              if(firstResult.isFinal){
+                
+              }
+              [self.bridge.eventDispatcher sendAppEventWithName:@"GoogleRecognizeResult"
+                                                           body:body];
+            }
           }
-          [self.bridge.eventDispatcher sendAppEventWithName:@"GoogleRecognizeResult"
-                                                       body:body];
         }
       }
    ];

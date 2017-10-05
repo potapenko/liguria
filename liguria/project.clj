@@ -24,8 +24,7 @@
   :profiles {:dev  {:dependencies [[figwheel-sidecar "0.5.10"]
                                    [com.cemerick/piggieback "0.2.1"]]
                     :source-paths ["src" "env/dev"]
-                    :cljsbuild    {:builds [
-                                            {:id           "ios"
+                    :cljsbuild    {:builds [{:id           "ios"
                                              :source-paths ["src" "env/dev"]
                                              :figwheel     true
                                              :compiler     {:output-to       "target/ios/not-used.js"
