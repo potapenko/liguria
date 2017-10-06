@@ -7,13 +7,28 @@
 (def one-dot-mark "#one#")
 (def one-question-mark "#question#")
 (def one-exclamation-mark "#exclamation#")
-(def sentence-separator "#sentence#")
+(def sentence-separator "#S#")
+(def synthetic-sentence-separator "#L#")
 (def escape_dot "#escape_dot#")
+(def escape_dash "#escape_dash#")
+(def escape_multidot "#escape_multidot#")
+(def escape_longdash "#escape_longdash#")
 (def escape_qustion "#escape_question#")
 (def escape_exclamation "#escape_exclamation#")
 
 (defn create-words [s]
-  (string/split s #"\s+"))
+  (-> s
+      (->
+       (string/replace #"\s+\.\.\.\s*" (str escape_dash " ") )
+       (string/replace #"\s+\-\s+" (str escape_dash " ") )
+       (string/replace #"\s*—\s*" (str escape_longdash " ")))
+      (string/split #"\s+")
+      (->>
+       (map #(string/replace % escape_multidot " ... "))
+       (map #(string/replace % escape_dash " - "))
+       (map #(string/replace % escape_longdash " — "))
+       (map string/trim)
+       (filter (complement empty?)))))
 
 (defn- person-dots [s]
   (let [person-words ["Dr" "Prof" "Ms" "Mrs" "Mr" "St"]]
@@ -22,6 +37,13 @@
       (if v
         (recur t (string/replace s (str v ".") (str v one-dot-mark)))
         s))))
+
+(defn remove-punctuation [s]
+  (-> s
+      string/lower-case
+      (string/replace #"[.,\/#!$%\^&\*;:{}=\-_`~()—]" "")
+      (string/replace #"\s+" " ")
+      string/trim))
 
 (def create-sentences
   (memoize
@@ -45,11 +67,12 @@
           (string/replace one-dot-mark ".")
           (string/replace one-question-mark "?")
           (string/replace one-exclamation-mark "!")
-          (string/split sentence-separator))
+          (string/split (re-pattern (str sentence-separator "|" synthetic-sentence-separator))))
          (->>
           (map #(string/replace % escape_dot "."))
           (map #(string/replace % escape_qustion "?"))
-          (map #(string/replace % escape_exclamation "!")))))))
+          (map #(string/replace % escape_exclamation "!"))
+          (map string/trim))))))
 
 (create-sentences "")
 

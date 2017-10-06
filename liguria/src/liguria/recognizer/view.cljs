@@ -123,13 +123,14 @@
     (let [rx (re-pattern (build-search-rx search-text))]
       (->> sentences (filter #(->> % :text string/lower-case (re-find rx) nil? not))))))
 
-(defn sentence [{:keys [id p-id]}]
+(defn sentence [{:keys [id p-id text show-info]}]
   (let []
     (fn [{:keys [words]}]
       [nm/update-scope {:ref       #(dispatch [::model/sentence-data id :ref %])
                         :on-layout #(dispatch [::model/sentence-data id :layout (rn-util/event->layout %)])
                         :equals    =
                         :value     words}
+       (when show-info [rn/text {:style [(st/color "#ccc") (st/padding-top 8)]} (str (count (nlp/remove-punctuation text)))])
        [rn/touchable-opacity {:active-opacity 1
                               :on-press       #(dispatch [::model/sentence-click id])}
         [view {:style [(st/width "100%") (st/margin 6 0) st/row st/wrap]}

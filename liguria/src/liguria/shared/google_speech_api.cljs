@@ -18,13 +18,7 @@
   (if (or (nil? phrases) (empty? phrases))
     nil
     (->> phrases
-         (map (fn [e]
-                (-> e
-                    string/lower-case
-                    (string/replace #"[.,\/#!$%\^&\*;:{}=\-_`~()—]" "")
-                    (string/replace #"\s+" " ")
-                    string/trim))
-              )
+         (map nlp/remove-punctuation)
          vec)))
 
 (defn stop-recognizing []
@@ -48,9 +42,7 @@
                                     (put! recognizing-results-chan result)))))))))
 
 (defn start-recognizing [& phrases]
-  (let [phrases (->> phrases
-                    remove-punctuation-from-phrases
-                    utils/prepare-to-js)]
+  (let [phrases (->> phrases remove-punctuation-from-phrases utils/prepare-to-js)]
     (println "start google speech recognizing:" phrases)
     (reset! in-progress? true)
     (add-listener)
