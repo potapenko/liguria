@@ -1,14 +1,16 @@
-# liguria
+# Liguria Mobile Application (ios/android)
 
-A Clojure library designed to ... well, that part is up to you.
+Лигурия - это упражнение для улучшения дикции - огромная скороговорка. Приложение будет помогать заучить эту скороговорку, а так же контролировать качество произнесения, скорость и другие параметры. А так же предлагать повторять те скороговорки, которые хуже получались. 
 
-## Usage
+### Технологии:
 
-FIXME
+Google Speech API (Speech Recognition),
+React Native,
+ClojureScript,
+Reagent,
+re-frame,
+re-natal. 
 
-## License
 
-Copyright © 2017 FIXME
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+ 
